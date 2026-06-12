@@ -1,0 +1,26 @@
+
+-- Drop the recursive super admin policies and replace with a security definer function
+DROP POLICY IF EXISTS "Super admins can read all profiles" ON user_profiles;
+DROP POLICY IF EXISTS "Super admins can update all profiles" ON user_profiles;
+DROP POLICY IF EXISTS "Super admins can insert profiles" ON user_profiles;
+
+-- Create a security definer function to check super admin role (avoids recursive RLS)
+CREATE OR REPLACE FUNCTION public.is_super_admin()
+RETURNS boolean
+LANGUAGE plpgsql
+SECURITY DEFINER SET search_path = public
+AS $$
+DECLARE
+  user_role text;
+BEGIN
+  SELECT role INTO user_role FROM public.user_profiles WHERE id = auth.uid();
+  RETURN user_role = 'super_admin';
+EXCEPTION WHEN others THEN
+  RETURN false;
+END;
+$$;
+
+-- Re-create the policies using the function
+CREATE POLICY "Super admins can read all profiles" ON user_profiles FOR SELECT USING (public.is_super_admin());
+CREATE POLICY "Super admins can update all profiles" ON user_profiles FOR UPDATE USING (public.is_super_admin());
+CREATE POLICY "Super admins can insert profiles" ON user_profiles FOR INSERT WITH CHECK (public.is_super_admin());

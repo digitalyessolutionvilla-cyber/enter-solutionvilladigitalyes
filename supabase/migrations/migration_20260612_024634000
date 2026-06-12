@@ -1,0 +1,155 @@
+
+-- Contact Submissions
+CREATE TABLE IF NOT EXISTS contact_submissions (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  name text NOT NULL,
+  email text NOT NULL,
+  phone text,
+  subject text,
+  message text NOT NULL,
+  status text DEFAULT 'new' CHECK (status IN ('new', 'read', 'replied')),
+  created_at timestamptz DEFAULT now()
+);
+ALTER TABLE contact_submissions ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Anyone can submit contact form" ON contact_submissions FOR INSERT WITH CHECK (true);
+CREATE POLICY "Admins can view submissions" ON contact_submissions FOR SELECT USING (auth.role() = 'authenticated');
+CREATE POLICY "Admins can update submissions" ON contact_submissions FOR UPDATE USING (auth.role() = 'authenticated');
+
+-- Blog Posts
+CREATE TABLE IF NOT EXISTS blog_posts (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  title text NOT NULL,
+  slug text UNIQUE NOT NULL,
+  excerpt text,
+  body text,
+  category text DEFAULT 'General',
+  tags text[] DEFAULT '{}',
+  author_id uuid REFERENCES auth.users(id),
+  featured_image text,
+  status text DEFAULT 'draft' CHECK (status IN ('draft', 'published', 'archived')),
+  published_at timestamptz,
+  created_at timestamptz DEFAULT now(),
+  updated_at timestamptz DEFAULT now(),
+  views int DEFAULT 0
+);
+ALTER TABLE blog_posts ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Public can read published posts" ON blog_posts FOR SELECT USING (status = 'published');
+CREATE POLICY "Admins can do all on posts" ON blog_posts FOR ALL USING (auth.role() = 'authenticated');
+
+-- Portfolio Items
+CREATE TABLE IF NOT EXISTS portfolio_items (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  title text NOT NULL,
+  category text NOT NULL,
+  description text,
+  image_url text,
+  client text,
+  year int,
+  tags text[] DEFAULT '{}',
+  sort_order int DEFAULT 0,
+  status text DEFAULT 'published' CHECK (status IN ('published', 'draft', 'archived')),
+  created_at timestamptz DEFAULT now()
+);
+ALTER TABLE portfolio_items ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Public can read published portfolio" ON portfolio_items FOR SELECT USING (status = 'published');
+CREATE POLICY "Admins can do all on portfolio" ON portfolio_items FOR ALL USING (auth.role() = 'authenticated');
+
+-- Case Studies
+CREATE TABLE IF NOT EXISTS case_studies (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  title text NOT NULL,
+  slug text UNIQUE NOT NULL,
+  client text NOT NULL,
+  industry text,
+  cover_image text,
+  problem text,
+  solution text,
+  results text,
+  gallery text[] DEFAULT '{}',
+  video_url text,
+  testimonial text,
+  testimonial_author text,
+  status text DEFAULT 'published' CHECK (status IN ('published', 'draft', 'archived')),
+  created_at timestamptz DEFAULT now()
+);
+ALTER TABLE case_studies ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Public can read published case studies" ON case_studies FOR SELECT USING (status = 'published');
+CREATE POLICY "Admins can do all on case studies" ON case_studies FOR ALL USING (auth.role() = 'authenticated');
+
+-- Team Members
+CREATE TABLE IF NOT EXISTS team_members (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  name text NOT NULL,
+  position text NOT NULL,
+  department text DEFAULT 'General',
+  bio text,
+  photo_url text,
+  linkedin text,
+  twitter text,
+  sort_order int DEFAULT 0,
+  status text DEFAULT 'active' CHECK (status IN ('active', 'inactive')),
+  created_at timestamptz DEFAULT now()
+);
+ALTER TABLE team_members ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Public can read active team members" ON team_members FOR SELECT USING (status = 'active');
+CREATE POLICY "Admins can do all on team" ON team_members FOR ALL USING (auth.role() = 'authenticated');
+
+-- Testimonials
+CREATE TABLE IF NOT EXISTS testimonials (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  quote text NOT NULL,
+  author_name text NOT NULL,
+  author_title text,
+  company text,
+  avatar_url text,
+  status text DEFAULT 'published' CHECK (status IN ('published', 'draft', 'archived')),
+  sort_order int DEFAULT 0,
+  created_at timestamptz DEFAULT now()
+);
+ALTER TABLE testimonials ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Public can read published testimonials" ON testimonials FOR SELECT USING (status = 'published');
+CREATE POLICY "Admins can do all on testimonials" ON testimonials FOR ALL USING (auth.role() = 'authenticated');
+
+-- User Profiles (extends auth.users)
+CREATE TABLE IF NOT EXISTS user_profiles (
+  id uuid PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  full_name text,
+  role text DEFAULT 'admin' CHECK (role IN ('super_admin', 'admin')),
+  avatar_url text,
+  created_at timestamptz DEFAULT now()
+);
+ALTER TABLE user_profiles ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Users can read own profile" ON user_profiles FOR SELECT USING (auth.uid() = id);
+CREATE POLICY "Super admins can read all profiles" ON user_profiles FOR SELECT USING (
+  EXISTS (SELECT 1 FROM user_profiles WHERE id = auth.uid() AND role = 'super_admin')
+);
+CREATE POLICY "Users can update own profile" ON user_profiles FOR UPDATE USING (auth.uid() = id);
+CREATE POLICY "Super admins can update all profiles" ON user_profiles FOR UPDATE USING (
+  EXISTS (SELECT 1 FROM user_profiles WHERE id = auth.uid() AND role = 'super_admin')
+);
+CREATE POLICY "Super admins can insert profiles" ON user_profiles FOR INSERT WITH CHECK (
+  EXISTS (SELECT 1 FROM user_profiles WHERE id = auth.uid() AND role = 'super_admin')
+);
+
+-- Function to auto-create user profile on signup
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER SET search_path = public
+AS $$
+BEGIN
+  INSERT INTO public.user_profiles (id, full_name, role)
+  VALUES (
+    NEW.id,
+    COALESCE(NEW.raw_user_meta_data->>'full_name', NEW.email),
+    COALESCE(NEW.raw_user_meta_data->>'role', 'admin')
+  )
+  ON CONFLICT (id) DO NOTHING;
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+CREATE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();

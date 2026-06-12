@@ -1,18 +1,92 @@
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
+import About from "./pages/About";
+import Team from "./pages/Team";
+import Portfolio from "./pages/Portfolio";
+import CaseStudies from "./pages/CaseStudies";
+import CaseStudyDetail from "./pages/CaseStudyDetail";
+import Blog from "./pages/Blog";
+import BlogPost from "./pages/BlogPost";
+import Contact from "./pages/Contact";
+import AdminLogin from "./pages/admin/Login";
+import Dashboard from "./pages/admin/Dashboard";
+import BlogAdmin from "./pages/admin/BlogAdmin";
+import PortfolioAdmin from "./pages/admin/PortfolioAdmin";
+import CaseStudiesAdmin from "./pages/admin/CaseStudiesAdmin";
+import TeamAdmin from "./pages/admin/TeamAdmin";
+import TestimonialsAdmin from "./pages/admin/TestimonialsAdmin";
+import Inquiries from "./pages/admin/Inquiries";
+import Users from "./pages/admin/Users";
+import Settings from "./pages/admin/Settings";
+import ProtectedRoute from "./components/admin/ProtectedRoute";
 
 export const routers = [
+  // Public pages
+  { path: "/", name: "home", element: <Index /> },
+  { path: "/about", name: "about", element: <About /> },
+  { path: "/team", name: "team", element: <Team /> },
+  { path: "/portfolio", name: "portfolio", element: <Portfolio /> },
+  { path: "/case-studies", name: "caseStudies", element: <CaseStudies /> },
+  { path: "/case-studies/:slug", name: "caseStudyDetail", element: <CaseStudyDetail /> },
+  { path: "/blog", name: "blog", element: <Blog /> },
+  { path: "/blog/:slug", name: "blogPost", element: <BlogPost /> },
+  { path: "/contact", name: "contact", element: <Contact /> },
+
+  // Admin pages (protected)
+  { path: "/admin/login", name: "adminLogin", element: <AdminLogin /> },
   {
-    path: "/",
-    name: "home",
-    element: <Index />,
+    path: "/admin",
+    name: "admin",
+    element: <ProtectedRoute><Dashboard /></ProtectedRoute>,
   },
+  {
+    path: "/admin/dashboard",
+    name: "dashboard",
+    element: <ProtectedRoute><Dashboard /></ProtectedRoute>,
+  },
+  {
+    path: "/admin/blog",
+    name: "adminBlog",
+    element: <ProtectedRoute><BlogAdmin /></ProtectedRoute>,
+  },
+  {
+    path: "/admin/portfolio",
+    name: "adminPortfolio",
+    element: <ProtectedRoute><PortfolioAdmin /></ProtectedRoute>,
+  },
+  {
+    path: "/admin/case-studies",
+    name: "adminCaseStudies",
+    element: <ProtectedRoute><CaseStudiesAdmin /></ProtectedRoute>,
+  },
+  {
+    path: "/admin/team",
+    name: "adminTeam",
+    element: <ProtectedRoute><TeamAdmin /></ProtectedRoute>,
+  },
+  {
+    path: "/admin/testimonials",
+    name: "adminTestimonials",
+    element: <ProtectedRoute><TestimonialsAdmin /></ProtectedRoute>,
+  },
+  {
+    path: "/admin/inquiries",
+    name: "adminInquiries",
+    element: <ProtectedRoute><Inquiries /></ProtectedRoute>,
+  },
+  {
+    path: "/admin/users",
+    name: "adminUsers",
+    element: <ProtectedRoute><Users /></ProtectedRoute>,
+  },
+  {
+    path: "/admin/settings",
+    name: "adminSettings",
+    element: <ProtectedRoute><Settings /></ProtectedRoute>,
+  },
+
   /* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */
-  {
-    path: "*",
-    name: "404",
-    element: <NotFound />,
-  },
+  { path: "*", name: "404", element: <NotFound /> },
 ];
 
 declare global {

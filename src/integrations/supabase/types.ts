@@ -3109,13 +3109,297 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      blog_posts: {
+        Row: {
+          author_id: string | null
+          body: string | null
+          category: string | null
+          created_at: string | null
+          excerpt: string | null
+          featured_image: string | null
+          id: string
+          published_at: string | null
+          slug: string
+          status: string | null
+          tags: string[] | null
+          title: string
+          updated_at: string | null
+          views: number | null
+        }
+        Insert: {
+          author_id?: string | null
+          body?: string | null
+          category?: string | null
+          created_at?: string | null
+          excerpt?: string | null
+          featured_image?: string | null
+          id?: string
+          published_at?: string | null
+          slug: string
+          status?: string | null
+          tags?: string[] | null
+          title: string
+          updated_at?: string | null
+          views?: number | null
+        }
+        Update: {
+          author_id?: string | null
+          body?: string | null
+          category?: string | null
+          created_at?: string | null
+          excerpt?: string | null
+          featured_image?: string | null
+          id?: string
+          published_at?: string | null
+          slug?: string
+          status?: string | null
+          tags?: string[] | null
+          title?: string
+          updated_at?: string | null
+          views?: number | null
+        }
+        Relationships: []
+      }
+      case_studies: {
+        Row: {
+          client: string
+          cover_image: string | null
+          created_at: string | null
+          gallery: string[] | null
+          id: string
+          industry: string | null
+          problem: string | null
+          results: string | null
+          slug: string
+          solution: string | null
+          status: string | null
+          testimonial: string | null
+          testimonial_author: string | null
+          title: string
+          video_url: string | null
+        }
+        Insert: {
+          client: string
+          cover_image?: string | null
+          created_at?: string | null
+          gallery?: string[] | null
+          id?: string
+          industry?: string | null
+          problem?: string | null
+          results?: string | null
+          slug: string
+          solution?: string | null
+          status?: string | null
+          testimonial?: string | null
+          testimonial_author?: string | null
+          title: string
+          video_url?: string | null
+        }
+        Update: {
+          client?: string
+          cover_image?: string | null
+          created_at?: string | null
+          gallery?: string[] | null
+          id?: string
+          industry?: string | null
+          problem?: string | null
+          results?: string | null
+          slug?: string
+          solution?: string | null
+          status?: string | null
+          testimonial?: string | null
+          testimonial_author?: string | null
+          title?: string
+          video_url?: string | null
+        }
+        Relationships: []
+      }
+      contact_submissions: {
+        Row: {
+          created_at: string | null
+          email: string
+          id: string
+          message: string
+          name: string
+          phone: string | null
+          status: string | null
+          subject: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          id?: string
+          message: string
+          name: string
+          phone?: string | null
+          status?: string | null
+          subject?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          id?: string
+          message?: string
+          name?: string
+          phone?: string | null
+          status?: string | null
+          subject?: string | null
+        }
+        Relationships: []
+      }
+      portfolio_items: {
+        Row: {
+          category: string
+          client: string | null
+          created_at: string | null
+          description: string | null
+          id: string
+          image_url: string | null
+          sort_order: number | null
+          status: string | null
+          tags: string[] | null
+          title: string
+          year: number | null
+        }
+        Insert: {
+          category: string
+          client?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          sort_order?: number | null
+          status?: string | null
+          tags?: string[] | null
+          title: string
+          year?: number | null
+        }
+        Update: {
+          category?: string
+          client?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          sort_order?: number | null
+          status?: string | null
+          tags?: string[] | null
+          title?: string
+          year?: number | null
+        }
+        Relationships: []
+      }
+      team_members: {
+        Row: {
+          bio: string | null
+          created_at: string | null
+          department: string | null
+          id: string
+          linkedin: string | null
+          name: string
+          photo_url: string | null
+          position: string
+          sort_order: number | null
+          status: string | null
+          twitter: string | null
+        }
+        Insert: {
+          bio?: string | null
+          created_at?: string | null
+          department?: string | null
+          id?: string
+          linkedin?: string | null
+          name: string
+          photo_url?: string | null
+          position: string
+          sort_order?: number | null
+          status?: string | null
+          twitter?: string | null
+        }
+        Update: {
+          bio?: string | null
+          created_at?: string | null
+          department?: string | null
+          id?: string
+          linkedin?: string | null
+          name?: string
+          photo_url?: string | null
+          position?: string
+          sort_order?: number | null
+          status?: string | null
+          twitter?: string | null
+        }
+        Relationships: []
+      }
+      testimonials: {
+        Row: {
+          author_name: string
+          author_title: string | null
+          avatar_url: string | null
+          company: string | null
+          created_at: string | null
+          id: string
+          quote: string
+          sort_order: number | null
+          status: string | null
+        }
+        Insert: {
+          author_name: string
+          author_title?: string | null
+          avatar_url?: string | null
+          company?: string | null
+          created_at?: string | null
+          id?: string
+          quote: string
+          sort_order?: number | null
+          status?: string | null
+        }
+        Update: {
+          author_name?: string
+          author_title?: string | null
+          avatar_url?: string | null
+          company?: string | null
+          created_at?: string | null
+          id?: string
+          quote?: string
+          sort_order?: number | null
+          status?: string | null
+        }
+        Relationships: []
+      }
+      user_profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string | null
+          full_name: string | null
+          id: string
+          role: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string | null
+          full_name?: string | null
+          id: string
+          role?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string | null
+          full_name?: string | null
+          id?: string
+          role?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      is_super_admin: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never
