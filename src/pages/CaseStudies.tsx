@@ -4,12 +4,13 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowRight, Search } from "lucide-react";
 import PageLayout from "@/components/layout/PageLayout";
-import { caseStudies } from "@/lib/data";
+import { useCaseStudies } from "@/hooks/useCaseStudies";
 
 const industries = ["All", "Technology", "Fintech", "Events", "Healthcare", "Retail"];
 
 export default function CaseStudies() {
   useSeo("/case-studies");
+  const caseStudies = useCaseStudies();
   const [active, setActive] = useState("All");
   const [query, setQuery] = useState("");
 
@@ -43,25 +44,13 @@ export default function CaseStudies() {
           <div className="flex flex-col md:flex-row gap-4 mb-10">
             <div className="relative flex-1 max-w-md">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
-              <input
-                type="text"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search case studies..."
-                className="w-full bg-white/5 border border-white/15 rounded-full pl-10 pr-4 py-2.5 text-white placeholder-white/35 text-sm outline-none focus:border-[#F5D76E] focus:ring-2 focus:ring-[rgba(245,215,110,0.15)] transition-all"
-              />
+              <input type="text" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search case studies..."
+                className="w-full bg-white/5 border border-white/15 rounded-full pl-10 pr-4 py-2.5 text-white placeholder-white/35 text-sm outline-none focus:border-[#F5D76E] focus:ring-2 focus:ring-[rgba(245,215,110,0.15)] transition-all" />
             </div>
             <div className="flex flex-wrap gap-2">
               {industries.map((ind) => (
-                <button
-                  key={ind}
-                  onClick={() => setActive(ind)}
-                  className={`text-sm font-medium px-4 py-2 rounded-full transition-all duration-200 ${
-                    active === ind
-                      ? "gradient-brand text-white shadow-glow"
-                      : "border border-white/15 text-white/55 hover:text-white hover:border-white/35"
-                  }`}
-                >
+                <button key={ind} onClick={() => setActive(ind)}
+                  className={`text-sm font-medium px-4 py-2 rounded-full transition-all duration-200 ${active === ind ? "gradient-brand text-white shadow-glow" : "border border-white/15 text-white/55 hover:text-white hover:border-white/35"}`}>
                   {ind}
                 </button>
               ))}
@@ -71,16 +60,10 @@ export default function CaseStudies() {
           {/* Case Studies grid */}
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filtered.map((study, i) => (
-              <motion.div
-                key={study.id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="group glass-card rounded-2xl overflow-hidden hover:-translate-y-1.5 transition-all duration-300"
-              >
+              <motion.div key={study.id} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }} className="group glass-card rounded-2xl overflow-hidden hover:-translate-y-1.5 transition-all duration-300">
                 <div className="relative overflow-hidden aspect-video">
-                  <img src={study.cover} alt={study.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                  <img src={study.cover_image ?? ""} alt={study.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
                   <span className="absolute top-3 left-3 gradient-brand text-white text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-full">
                     {study.industry}
                   </span>
@@ -88,22 +71,17 @@ export default function CaseStudies() {
                 <div className="p-6">
                   <p className="text-[#F5D76E] text-xs font-semibold mb-2">{study.client}</p>
                   <h3 className="text-white font-bold text-lg mb-3 line-clamp-2">{study.title}</h3>
-                  <p className="text-white/55 text-sm mb-4 line-clamp-2">{study.problem}</p>
+                  {study.problem && <p className="text-white/55 text-sm mb-4 line-clamp-2">{study.problem}</p>}
 
-                  {/* Metrics */}
-                  <div className="grid grid-cols-3 gap-2 mb-5 p-3 rounded-xl bg-[rgba(212,175,55,0.08)] border border-[rgba(212,175,55,0.15)]">
-                    {[study.metric1, study.metric2, study.metric3].map((m) => (
-                      <div key={m.label} className="text-center">
-                        <p className="gradient-text font-black text-base">{m.value}</p>
-                        <p className="text-white/45 text-[10px]">{m.label}</p>
-                      </div>
-                    ))}
-                  </div>
+                  {/* Results highlight */}
+                  {study.results && (
+                    <div className="mb-5 p-3 rounded-xl bg-[rgba(212,175,55,0.08)] border border-[rgba(212,175,55,0.15)]">
+                      <p className="text-white/70 text-xs leading-relaxed line-clamp-2">{study.results}</p>
+                    </div>
+                  )}
 
-                  <Link
-                    to={`/case-studies/${study.slug}`}
-                    className="flex items-center gap-1.5 text-[#D4AF37] text-sm font-semibold hover:gap-2.5 transition-all duration-200"
-                  >
+                  <Link to={`/case-studies/${study.slug}`}
+                    className="flex items-center gap-1.5 text-[#D4AF37] text-sm font-semibold hover:gap-2.5 transition-all duration-200">
                     Read Full Case Study
                     <ArrowRight className="w-4 h-4" />
                   </Link>

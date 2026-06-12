@@ -3147,11 +3147,13 @@ export type Database = {
       }
       blog_posts: {
         Row: {
+          author: string | null
           author_id: string | null
           body: string | null
           category: string | null
           created_at: string | null
           excerpt: string | null
+          featured: boolean | null
           featured_image: string | null
           id: string
           published_at: string | null
@@ -3163,11 +3165,13 @@ export type Database = {
           views: number | null
         }
         Insert: {
+          author?: string | null
           author_id?: string | null
           body?: string | null
           category?: string | null
           created_at?: string | null
           excerpt?: string | null
+          featured?: boolean | null
           featured_image?: string | null
           id?: string
           published_at?: string | null
@@ -3179,11 +3183,13 @@ export type Database = {
           views?: number | null
         }
         Update: {
+          author?: string | null
           author_id?: string | null
           body?: string | null
           category?: string | null
           created_at?: string | null
           excerpt?: string | null
+          featured?: boolean | null
           featured_image?: string | null
           id?: string
           published_at?: string | null
@@ -3291,6 +3297,7 @@ export type Database = {
           id: string
           image_url: string
           is_active: boolean | null
+          page_path: string
           sort_order: number | null
           subtitle: string | null
           title: string | null
@@ -3302,6 +3309,7 @@ export type Database = {
           id?: string
           image_url: string
           is_active?: boolean | null
+          page_path?: string
           sort_order?: number | null
           subtitle?: string | null
           title?: string | null
@@ -3313,6 +3321,7 @@ export type Database = {
           id?: string
           image_url?: string
           is_active?: boolean | null
+          page_path?: string
           sort_order?: number | null
           subtitle?: string | null
           title?: string | null

@@ -3,12 +3,13 @@ import { useSeo } from "@/hooks/useSeo";
 import { motion } from "framer-motion";
 import { Linkedin, Twitter } from "lucide-react";
 import PageLayout from "@/components/layout/PageLayout";
-import { teamMembers } from "@/lib/data";
+import { useTeamMembers } from "@/hooks/useTeamMembers";
 
 const departments = ["All", "Leadership", "Technology", "Design", "Marketing", "Events"];
 
 export default function Team() {
   useSeo("/team");
+  const teamMembers = useTeamMembers();
   const [active, setActive] = useState("All");
 
   const filtered = active === "All"
@@ -19,10 +20,7 @@ export default function Team() {
     <PageLayout>
       {/* Hero */}
       <section className="relative pt-32 pb-16 overflow-hidden gradient-hero">
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{ background: "radial-gradient(ellipse at 70% 50%, rgba(245,215,110,0.1) 0%, transparent 60%)" }}
-        />
+        <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse at 70% 50%, rgba(245,215,110,0.1) 0%, transparent 60%)" }} />
         <div className="container-custom relative z-10 text-center max-w-3xl mx-auto">
           <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-[#F5D76E] text-xs font-bold tracking-widest uppercase block mb-4">
             Our Team
@@ -42,15 +40,8 @@ export default function Team() {
           {/* Filter tabs */}
           <div className="flex flex-wrap justify-center gap-2 mb-12">
             {departments.map((dept) => (
-              <button
-                key={dept}
-                onClick={() => setActive(dept)}
-                className={`text-sm font-medium px-4 py-2 rounded-full transition-all duration-200 ${
-                  active === dept
-                    ? "gradient-brand text-white shadow-glow"
-                    : "border border-white/15 text-white/55 hover:text-white hover:border-white/35"
-                }`}
-              >
+              <button key={dept} onClick={() => setActive(dept)}
+                className={`text-sm font-medium px-4 py-2 rounded-full transition-all duration-200 ${active === dept ? "gradient-brand text-white shadow-glow" : "border border-white/15 text-white/55 hover:text-white hover:border-white/35"}`}>
                 {dept}
               </button>
             ))}
@@ -58,31 +49,29 @@ export default function Team() {
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
             {filtered.map((member, i) => (
-              <motion.div
-                key={member.id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.07 }}
-                className="group glass-card rounded-2xl overflow-hidden hover:-translate-y-1.5 transition-all duration-300"
-              >
+              <motion.div key={member.id} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: i * 0.07 }} className="group glass-card rounded-2xl overflow-hidden hover:-translate-y-1.5 transition-all duration-300">
                 {/* Photo */}
                 <div className="relative overflow-hidden aspect-square">
                   <img
-                    src={member.photo}
+                    src={member.photo_url ?? `https://ui-avatars.com/api/?name=${encodeURIComponent(member.name)}&background=D4AF37&color=0A0A0A`}
                     alt={member.name}
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
                   {/* Hover overlay */}
                   <div className="absolute inset-0 bg-gradient-to-t from-[rgba(10,10,10,0.9)] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
-                    <p className="text-white/80 text-xs leading-relaxed line-clamp-3">{member.bio}</p>
+                    {member.bio && <p className="text-white/80 text-xs leading-relaxed line-clamp-3">{member.bio}</p>}
                     <div className="flex gap-2 mt-3">
-                      <a href={member.linkedin} className="w-8 h-8 rounded-full bg-white/15 flex items-center justify-center hover:bg-[#D4AF37] transition-colors">
-                        <Linkedin className="w-4 h-4 text-white" />
-                      </a>
-                      <a href={member.twitter} className="w-8 h-8 rounded-full bg-white/15 flex items-center justify-center hover:bg-[#D4AF37] transition-colors">
-                        <Twitter className="w-4 h-4 text-white" />
-                      </a>
+                      {member.linkedin && member.linkedin !== "#" && (
+                        <a href={member.linkedin} target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/15 flex items-center justify-center hover:bg-[#D4AF37] transition-colors">
+                          <Linkedin className="w-4 h-4 text-white" />
+                        </a>
+                      )}
+                      {member.twitter && member.twitter !== "#" && (
+                        <a href={member.twitter} target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/15 flex items-center justify-center hover:bg-[#D4AF37] transition-colors">
+                          <Twitter className="w-4 h-4 text-white" />
+                        </a>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -96,6 +85,10 @@ export default function Team() {
               </motion.div>
             ))}
           </div>
+
+          {filtered.length === 0 && (
+            <div className="text-center text-white/40 py-20 text-lg">No team members in this department.</div>
+          )}
         </div>
       </section>
     </PageLayout>

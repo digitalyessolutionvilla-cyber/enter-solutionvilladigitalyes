@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { Plus, Pencil, Trash2, X } from "lucide-react";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
@@ -28,6 +28,7 @@ export default function TeamAdmin() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(defaultForm);
   const [saving, setSaving] = useState(false);
+  const [loadingEdit, setLoadingEdit] = useState(false);
 
   const load = async () => {
     setLoading(true);
@@ -50,61 +51,97 @@ export default function TeamAdmin() {
     setShowForm(false); setEditingId(null); setForm(defaultForm); load();
   };
 
+  // ✅ Fixed: fetch FULL record before opening editor
+  const handleEdit = async (memberId: string) => {
+    setLoadingEdit(true);
+    const { data } = await supabase.from("team_members").select("*").eq("id", memberId).maybeSingle();
+    setLoadingEdit(false);
+    if (!data) return;
+    setEditingId(data.id);
+    setForm({
+      name: data.name ?? "",
+      position: data.position ?? "",
+      department: data.department ?? "General",
+      bio: data.bio ?? "",
+      photo_url: data.photo_url ?? "",
+      linkedin: data.linkedin ?? "",
+      twitter: data.twitter ?? "",
+      status: data.status ?? "active",
+    });
+    setShowForm(true);
+  };
+
   const handleDelete = async (id: string) => {
     if (!confirm("Remove this team member?")) return;
     await supabase.from("team_members").delete().eq("id", id);
+    await logActivity("deleted", "team_member", id, "Team Member");
     toast({ title: "Member removed" }); load();
   };
+
+  const f = (k: string, v: string) => setForm((p) => ({ ...p, [k]: v }));
 
   return (
     <AdminLayout>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-white font-black text-2xl">Team Members</h1>
-          <button onClick={() => { setShowForm(true); setEditingId(null); setForm(defaultForm); }} className="flex items-center gap-2 gradient-brand text-white font-semibold px-4 py-2.5 rounded-full btn-glow hover:scale-105 transition-all text-sm">
+          <button onClick={() => { setShowForm(true); setEditingId(null); setForm(defaultForm); }} className="flex items-center gap-2 gradient-brand text-[#0A0A0A] font-bold px-5 py-2.5 rounded-full btn-glow hover:scale-105 transition-all text-sm">
             <Plus className="w-4 h-4" /> Add Member
           </button>
         </div>
 
         {showForm && (
           <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-            <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-[#1A1A1A] border border-white/15 rounded-2xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
-              <h2 className="text-white font-bold text-xl mb-6">{editingId ? "Edit Member" : "Add Team Member"}</h2>
+            <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-[#1A1A1A] border border-[rgba(212,175,55,0.2)] rounded-2xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-white font-bold text-xl">{editingId ? "Edit Member" : "Add Team Member"}</h2>
+                <button onClick={() => { setShowForm(false); setEditingId(null); }} className="text-white/30 hover:text-white transition-colors"><X className="w-5 h-5" /></button>
+              </div>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="col-span-2">
-                    <label className="text-white/60 text-xs font-semibold uppercase mb-1 block">Full Name *</label>
-                    <input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-[#F5D76E] transition-all" />
+                    <label className="text-white/50 text-xs font-semibold uppercase mb-1 block">Full Name *</label>
+                    <input required value={form.name} onChange={(e) => f("name", e.target.value)} className="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-[#D4AF37]/50 transition-all" />
                   </div>
                   <div>
-                    <label className="text-white/60 text-xs font-semibold uppercase mb-1 block">Position *</label>
-                    <input required value={form.position} onChange={(e) => setForm({ ...form, position: e.target.value })} className="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-[#F5D76E] transition-all" />
+                    <label className="text-white/50 text-xs font-semibold uppercase mb-1 block">Position *</label>
+                    <input required value={form.position} onChange={(e) => f("position", e.target.value)} className="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-[#D4AF37]/50 transition-all" />
                   </div>
                   <div>
-                    <label className="text-white/60 text-xs font-semibold uppercase mb-1 block">Department</label>
-                    <select value={form.department} onChange={(e) => setForm({ ...form, department: e.target.value })} className="w-full bg-[#0A0A0A] border border-white/15 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-[#F5D76E] transition-all">
+                    <label className="text-white/50 text-xs font-semibold uppercase mb-1 block">Department</label>
+                    <select value={form.department} onChange={(e) => f("department", e.target.value)} className="w-full bg-[#0A0A0A] border border-white/15 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-[#D4AF37]/50 transition-all">
                       {departments.map((d) => <option key={d}>{d}</option>)}
                     </select>
                   </div>
                   <div className="col-span-2">
-                    <label className="text-white/60 text-xs font-semibold uppercase mb-1 block">Photo URL</label>
-                    <input value={form.photo_url} onChange={(e) => setForm({ ...form, photo_url: e.target.value })} className="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-[#F5D76E] transition-all" placeholder="https://..." />
+                    <label className="text-white/50 text-xs font-semibold uppercase mb-1 block">Photo URL</label>
+                    <input value={form.photo_url} onChange={(e) => f("photo_url", e.target.value)} className="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-[#D4AF37]/50 transition-all" placeholder="https://..." />
+                    {form.photo_url && (
+                      <img src={form.photo_url} alt="preview" className="mt-2 w-16 h-16 object-cover rounded-full border-2 border-[rgba(212,175,55,0.3)]" onError={(e) => (e.currentTarget.style.display = "none")} />
+                    )}
                   </div>
                   <div>
-                    <label className="text-white/60 text-xs font-semibold uppercase mb-1 block">LinkedIn URL</label>
-                    <input value={form.linkedin} onChange={(e) => setForm({ ...form, linkedin: e.target.value })} className="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-[#F5D76E] transition-all" />
+                    <label className="text-white/50 text-xs font-semibold uppercase mb-1 block">LinkedIn URL</label>
+                    <input value={form.linkedin} onChange={(e) => f("linkedin", e.target.value)} className="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-[#D4AF37]/50 transition-all" placeholder="https://linkedin.com/in/..." />
                   </div>
                   <div>
-                    <label className="text-white/60 text-xs font-semibold uppercase mb-1 block">Twitter URL</label>
-                    <input value={form.twitter} onChange={(e) => setForm({ ...form, twitter: e.target.value })} className="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-[#F5D76E] transition-all" />
+                    <label className="text-white/50 text-xs font-semibold uppercase mb-1 block">Twitter URL</label>
+                    <input value={form.twitter} onChange={(e) => f("twitter", e.target.value)} className="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-[#D4AF37]/50 transition-all" placeholder="https://twitter.com/..." />
                   </div>
                   <div className="col-span-2">
-                    <label className="text-white/60 text-xs font-semibold uppercase mb-1 block">Bio</label>
-                    <textarea value={form.bio} onChange={(e) => setForm({ ...form, bio: e.target.value })} rows={3} className="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-[#F5D76E] transition-all resize-none" />
+                    <label className="text-white/50 text-xs font-semibold uppercase mb-1 block">Bio</label>
+                    <textarea value={form.bio} onChange={(e) => f("bio", e.target.value)} rows={3} className="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-[#D4AF37]/50 transition-all resize-none" placeholder="Brief team member biography..." />
+                  </div>
+                  <div>
+                    <label className="text-white/50 text-xs font-semibold uppercase mb-1 block">Status</label>
+                    <select value={form.status} onChange={(e) => f("status", e.target.value)} className="w-full bg-[#0A0A0A] border border-white/15 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-[#D4AF37]/50 transition-all">
+                      <option value="active">Active</option>
+                      <option value="inactive">Inactive</option>
+                    </select>
                   </div>
                 </div>
                 <div className="flex gap-3 pt-2">
-                  <button type="submit" disabled={saving} className="flex-1 gradient-brand text-white font-semibold py-2.5 rounded-full btn-glow disabled:opacity-60">{saving ? "Saving..." : editingId ? "Update" : "Add Member"}</button>
+                  <button type="submit" disabled={saving} className="flex-1 gradient-brand text-[#0A0A0A] font-bold py-2.5 rounded-full btn-glow disabled:opacity-60">{saving ? "Saving..." : editingId ? "Update" : "Add Member"}</button>
                   <button type="button" onClick={() => { setShowForm(false); setEditingId(null); setForm(defaultForm); }} className="px-6 border border-white/20 text-white/70 font-medium py-2.5 rounded-full hover:border-white/40 transition-all">Cancel</button>
                 </div>
               </form>
@@ -117,12 +154,12 @@ export default function TeamAdmin() {
            members.length === 0 ? <p className="col-span-full text-center text-white/40 py-12">No team members yet.</p> :
            members.map((m) => (
             <motion.div key={m.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="glass-card rounded-2xl p-5 text-center relative group">
-              <img src={m.photo_url ?? `https://ui-avatars.com/api/?name=${m.name}&background=0066FF&color=fff`} alt={m.name} className="w-16 h-16 rounded-full object-cover mx-auto mb-3 border-2 border-[rgba(212,175,55,0.4)]" />
+              <img src={m.photo_url ?? `https://ui-avatars.com/api/?name=${encodeURIComponent(m.name)}&background=D4AF37&color=0A0A0A`} alt={m.name} className="w-16 h-16 rounded-full object-cover mx-auto mb-3 border-2 border-[rgba(212,175,55,0.4)]" />
               <p className="text-white font-bold text-sm">{m.name}</p>
               <p className="text-[#F5D76E] text-xs mt-0.5">{m.position}</p>
               <p className="text-white/40 text-xs mt-0.5">{m.department}</p>
               <div className="flex gap-1.5 justify-center mt-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                <button onClick={() => { setEditingId(m.id); setForm({ name: m.name, position: m.position, department: m.department, bio: "", photo_url: m.photo_url ?? "", linkedin: "", twitter: "", status: m.status }); setShowForm(true); }} className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center text-[#D4AF37] hover:bg-[rgba(212,175,55,0.2)] transition-colors">
+                <button onClick={() => handleEdit(m.id)} disabled={loadingEdit} className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center text-[#D4AF37] hover:bg-[rgba(212,175,55,0.2)] transition-colors disabled:opacity-40">
                   <Pencil className="w-3 h-3" />
                 </button>
                 {isSuperAdmin && <button onClick={() => handleDelete(m.id)} className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center text-red-400 hover:bg-[rgba(255,77,106,0.2)] transition-colors"><Trash2 className="w-3 h-3" /></button>}

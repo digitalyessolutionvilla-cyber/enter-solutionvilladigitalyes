@@ -13,9 +13,20 @@ interface NavItem {
   sort_order: number;
   is_active: boolean;
   opens_new_tab: boolean;
+  nav_area: string | null;
+  footer_column: string | null;
 }
 
-const emptyForm = { label: "", href: "", parent_id: null as string | null, sort_order: 0, is_active: true, opens_new_tab: false };
+const emptyForm = {
+  label: "",
+  href: "",
+  parent_id: null as string | null,
+  sort_order: 0,
+  is_active: true,
+  opens_new_tab: false,
+  nav_area: "header" as string,
+  footer_column: "" as string,
+};
 
 export default function NavigationAdmin() {
   const { toast } = useToast();
@@ -59,7 +70,7 @@ export default function NavigationAdmin() {
 
   const handleEdit = (item: NavItem) => {
     setEditId(item.id);
-    setForm({ label: item.label, href: item.href, parent_id: item.parent_id, sort_order: item.sort_order, is_active: item.is_active, opens_new_tab: item.opens_new_tab });
+    setForm({ label: item.label, href: item.href, parent_id: item.parent_id, sort_order: item.sort_order, is_active: item.is_active, opens_new_tab: item.opens_new_tab, nav_area: item.nav_area ?? "header", footer_column: item.footer_column ?? "" });
     setShowForm(true);
   };
 
@@ -137,6 +148,26 @@ export default function NavigationAdmin() {
                 <input type="number" value={form.sort_order} onChange={(e) => set("sort_order", e.target.value)}
                   className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-[#D4AF37]/50" />
               </div>
+              <div>
+                <label className="text-white/50 text-xs font-semibold uppercase block mb-1.5">Area</label>
+                <select value={form.nav_area} onChange={(e) => set("nav_area", e.target.value)}
+                  className="w-full bg-[#1A1A1A] border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-[#D4AF37]/50">
+                  <option value="header">Header Navigation</option>
+                  <option value="footer">Footer Navigation</option>
+                </select>
+              </div>
+              {form.nav_area === "footer" && (
+                <div>
+                  <label className="text-white/50 text-xs font-semibold uppercase block mb-1.5">Footer Column</label>
+                  <select value={form.footer_column} onChange={(e) => set("footer_column", e.target.value)}
+                    className="w-full bg-[#1A1A1A] border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-[#D4AF37]/50">
+                    <option value="">No column</option>
+                    <option value="services">Services</option>
+                    <option value="company">Company</option>
+                    <option value="legal">Legal</option>
+                  </select>
+                </div>
+              )}
               <div className="flex gap-5 md:col-span-2">
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input type="checkbox" checked={form.is_active} onChange={(e) => set("is_active", e.target.checked)} className="w-4 h-4 accent-[#D4AF37]" />
@@ -183,6 +214,9 @@ export default function NavigationAdmin() {
                         <span className="text-white font-medium">{item.label}</span>
                         {item.opens_new_tab && <ExternalLink className="w-3.5 h-3.5 text-white/30" />}
                         {!item.is_active && <span className="text-white/30 text-xs border border-white/10 rounded-full px-2">hidden</span>}
+                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${item.nav_area === "footer" ? "text-blue-400 border-blue-400/20 bg-blue-400/10" : "text-[#D4AF37]/80 border-[#D4AF37]/20 bg-[#D4AF37]/10"}`}>
+                          {item.nav_area === "footer" ? "Footer" : "Header"}
+                        </span>
                       </div>
                       <span className="text-white/30 text-xs">{item.href}</span>
                     </div>

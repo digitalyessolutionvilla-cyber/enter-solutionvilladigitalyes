@@ -17,9 +17,19 @@ interface HeroSlide {
   cta_href: string | null;
   sort_order: number;
   is_active: boolean;
+  page_path: string;
 }
 
-const emptyForm = { title: "", subtitle: "", image_url: "", cta_text: "Learn More", cta_href: "/contact", is_active: true };
+const emptyForm = { title: "", subtitle: "", image_url: "", cta_text: "Learn More", cta_href: "/contact", is_active: true, page_path: "/" };
+
+const pageOptions = [
+  { value: "/", label: "Home Page" },
+  { value: "/about", label: "About Page" },
+  { value: "/portfolio", label: "Portfolio Page" },
+  { value: "/case-studies", label: "Case Studies" },
+  { value: "/blog", label: "Blog Page" },
+  { value: "/contact", label: "Contact Page" },
+];
 
 function SortableSlideRow({ slide, onEdit, onToggle, onDelete }: {
   slide: HeroSlide;
@@ -50,7 +60,7 @@ function SortableSlideRow({ slide, onEdit, onToggle, onDelete }: {
           <span className="text-white font-medium text-sm truncate">{slide.title || "Untitled Slide"}</span>
           {!slide.is_active && <span className="text-white/25 text-[10px] border border-white/10 rounded-full px-2 flex-shrink-0">hidden</span>}
         </div>
-        <p className="text-white/30 text-xs mt-0.5 truncate">{slide.subtitle || slide.cta_text}</p>
+        <p className="text-white/30 text-xs mt-0.5 truncate">{slide.subtitle || slide.cta_text} <span className="text-[#D4AF37]/40 ml-1">→ {slide.page_path || "/"}</span></p>
       </div>
       <div className="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
         <button onClick={() => onToggle(slide)} className={`w-8 h-8 flex items-center justify-center rounded-lg transition-all ${slide.is_active ? "text-green-400 hover:bg-red-500/10 hover:text-red-400" : "text-white/25 hover:text-green-400"}`}>
@@ -107,7 +117,7 @@ export default function HeroSlidesAdmin() {
 
   const handleEdit = (s: HeroSlide) => {
     setEditId(s.id);
-    setForm({ title: s.title || "", subtitle: s.subtitle || "", image_url: s.image_url, cta_text: s.cta_text || "Learn More", cta_href: s.cta_href || "/contact", is_active: s.is_active });
+    setForm({ title: s.title || "", subtitle: s.subtitle || "", image_url: s.image_url, cta_text: s.cta_text || "Learn More", cta_href: s.cta_href || "/contact", is_active: s.is_active, page_path: s.page_path || "/" });
     setShowForm(true);
   };
 
@@ -192,6 +202,13 @@ export default function HeroSlidesAdmin() {
                 <label className="text-white/50 text-xs font-semibold uppercase block mb-1.5">CTA Link</label>
                 <input value={form.cta_href} onChange={(e) => set("cta_href", e.target.value)} placeholder="/contact"
                   className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-[#D4AF37]/50" />
+              </div>
+              <div className="md:col-span-2">
+                <label className="text-white/50 text-xs font-semibold uppercase block mb-1.5">Assign to Page</label>
+                <select value={form.page_path} onChange={(e) => set("page_path", e.target.value)}
+                  className="w-full bg-[#1A1A1A] border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-[#D4AF37]/50">
+                  {pageOptions.map((p) => <option key={p.value} value={p.value}>{p.label}</option>)}
+                </select>
               </div>
               <div className="md:col-span-2 flex items-center gap-3">
                 <input type="checkbox" id="slide_active" checked={form.is_active} onChange={(e) => set("is_active", e.target.checked)} className="w-4 h-4 accent-[#D4AF37]" />
