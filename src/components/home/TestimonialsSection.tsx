@@ -78,27 +78,27 @@ export default function TestimonialsSection() {
                   {Array.from({ length: 5 }).map((_, i) => (
                     <Star
                       key={i}
-                      className={`w-5 h-5 ${i < (t.rating || 5) ? "text-[#D4AF37]" : "text-white/15"}`}
-                      fill={i < (t.rating || 5) ? "currentColor" : "none"}
+                      className={`w-5 h-5 ${i < 5 ? "text-[#D4AF37]" : "text-white/15"}`}
+                      fill={i < 5 ? "currentColor" : "none"}
                     />
                   ))}
                 </div>
 
                 {/* Quote */}
                 <blockquote className="text-xl md:text-2xl text-white/85 font-light leading-relaxed mb-8 font-display italic">
-                  "{t.content}"
+                  "{t.quote}"
                 </blockquote>
 
                 {/* Author */}
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-full gradient-brand flex items-center justify-center flex-shrink-0 shadow-glow">
                     <span className="text-[#0A0A0A] font-black text-sm">
-                      {t.name.charAt(0)}
+                      {(t.author_name || "?").charAt(0)}
                     </span>
                   </div>
                   <div>
-                    <div className="text-white font-bold">{t.name}</div>
-                    <div className="text-[#D4AF37]/70 text-sm">{t.role} · {t.company}</div>
+                    <div className="text-white font-bold">{t.author_name}</div>
+                    <div className="text-[#D4AF37]/70 text-sm">{t.author_title} · {t.company}</div>
                   </div>
                 </div>
               </motion.div>

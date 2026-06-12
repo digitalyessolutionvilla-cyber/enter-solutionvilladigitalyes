@@ -64,7 +64,7 @@ export default function BlogPreview() {
                     {post.excerpt}
                   </p>
                   <div className="flex items-center justify-between pt-3 border-t border-[rgba(212,175,55,0.08)]">
-                    <span className="text-white/30 text-xs">{post.readTime} min read · {post.author}</span>
+                    <span className="text-white/30 text-xs">{post.readTime} · {post.author}</span>
                     <ExternalLink className="w-4 h-4 text-[#D4AF37]/40 group-hover:text-[#D4AF37] transition-colors" />
                   </div>
                 </div>
