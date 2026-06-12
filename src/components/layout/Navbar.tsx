@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X, ChevronRight } from "lucide-react";
 import { useScrollPosition } from "@/hooks/useScrollPosition";
-import { navLinks } from "@/lib/data";
+import { useNavigation } from "@/hooks/useNavigation";
 import { cn } from "@/lib/utils";
 
 export default function Navbar() {
@@ -11,6 +11,7 @@ export default function Navbar() {
   const location = useLocation();
   const scrolled = scrollY > 80;
   const isAdmin = location.pathname.startsWith("/admin");
+  const navLinks = useNavigation("header");
 
   useEffect(() => setMobileOpen(false), [location]);
 
@@ -47,8 +48,10 @@ export default function Navbar() {
             <div className="hidden md:flex items-center gap-7">
               {navLinks.map((link) => (
                 <Link
-                  key={link.href}
+                  key={link.id}
                   to={link.href}
+                  target={link.opens_new_tab ? "_blank" : undefined}
+                  rel={link.opens_new_tab ? "noreferrer" : undefined}
                   className={cn(
                     "text-sm font-medium transition-all duration-200 relative group tracking-wide",
                     location.pathname === link.href
@@ -110,7 +113,7 @@ export default function Navbar() {
             <div className="flex flex-col gap-1">
               {navLinks.map((link) => (
                 <Link
-                  key={link.href}
+                  key={link.id}
                   to={link.href}
                   className={cn(
                     "text-base font-medium py-3 px-4 rounded-xl transition-all duration-200",

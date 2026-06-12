@@ -3283,6 +3283,42 @@ export type Database = {
         }
         Relationships: []
       }
+      hero_slides: {
+        Row: {
+          created_at: string | null
+          cta_href: string | null
+          cta_text: string | null
+          id: string
+          image_url: string
+          is_active: boolean | null
+          sort_order: number | null
+          subtitle: string | null
+          title: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          cta_href?: string | null
+          cta_text?: string | null
+          id?: string
+          image_url: string
+          is_active?: boolean | null
+          sort_order?: number | null
+          subtitle?: string | null
+          title?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          cta_href?: string | null
+          cta_text?: string | null
+          id?: string
+          image_url?: string
+          is_active?: boolean | null
+          sort_order?: number | null
+          subtitle?: string | null
+          title?: string | null
+        }
+        Relationships: []
+      }
       media_files: {
         Row: {
           alt_text: string | null
@@ -3325,33 +3361,39 @@ export type Database = {
       navigation_items: {
         Row: {
           created_at: string | null
+          footer_column: string | null
           href: string
           icon: string | null
           id: string
           is_active: boolean | null
           label: string
+          nav_area: string
           opens_new_tab: boolean | null
           parent_id: string | null
           sort_order: number | null
         }
         Insert: {
           created_at?: string | null
+          footer_column?: string | null
           href: string
           icon?: string | null
           id?: string
           is_active?: boolean | null
           label: string
+          nav_area?: string
           opens_new_tab?: boolean | null
           parent_id?: string | null
           sort_order?: number | null
         }
         Update: {
           created_at?: string | null
+          footer_column?: string | null
           href?: string
           icon?: string | null
           id?: string
           is_active?: boolean | null
           label?: string
+          nav_area?: string
           opens_new_tab?: boolean | null
           parent_id?: string | null
           sort_order?: number | null
@@ -3476,6 +3518,42 @@ export type Database = {
           page_name?: string
           page_path?: string
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      services: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          icon: string
+          id: string
+          is_active: boolean | null
+          link_href: string | null
+          sort_order: number | null
+          tag: string | null
+          title: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          icon?: string
+          id?: string
+          is_active?: boolean | null
+          link_href?: string | null
+          sort_order?: number | null
+          tag?: string | null
+          title: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          icon?: string
+          id?: string
+          is_active?: boolean | null
+          link_href?: string | null
+          sort_order?: number | null
+          tag?: string | null
+          title?: string
         }
         Relationships: []
       }

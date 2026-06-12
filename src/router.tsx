@@ -23,6 +23,9 @@ import ActivityLogs from "./pages/admin/ActivityLogs";
 import SeoSettings from "./pages/admin/SeoSettings";
 import NavigationAdmin from "./pages/admin/NavigationAdmin";
 import PageEditor from "./pages/admin/PageEditor";
+import ServicesAdmin from "./pages/admin/ServicesAdmin";
+import ContentEditor from "./pages/admin/ContentEditor";
+import HeroSlidesAdmin from "./pages/admin/HeroSlidesAdmin";
 import ProtectedRoute from "./components/admin/ProtectedRoute";
 
 export const routers = [
@@ -53,6 +56,9 @@ export const routers = [
   { path: "/admin/inquiries", name: "adminInquiries", element: <ProtectedRoute><Inquiries /></ProtectedRoute> },
 
   // Site management
+  { path: "/admin/content", name: "adminContent", element: <ProtectedRoute><ContentEditor /></ProtectedRoute> },
+  { path: "/admin/services", name: "adminServices", element: <ProtectedRoute><ServicesAdmin /></ProtectedRoute> },
+  { path: "/admin/hero-slides", name: "adminHeroSlides", element: <ProtectedRoute><HeroSlidesAdmin /></ProtectedRoute> },
   { path: "/admin/pages", name: "adminPages", element: <ProtectedRoute><PageEditor /></ProtectedRoute> },
   { path: "/admin/media", name: "adminMedia", element: <ProtectedRoute><MediaLibrary /></ProtectedRoute> },
   { path: "/admin/navigation", name: "adminNavigation", element: <ProtectedRoute><NavigationAdmin /></ProtectedRoute> },

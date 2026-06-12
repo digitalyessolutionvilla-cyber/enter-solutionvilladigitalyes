@@ -1,21 +1,44 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, Crown } from "lucide-react";
 import { motion } from "framer-motion";
+import { usePageSection } from "@/hooks/usePageSection";
+
+interface CTAContent {
+  title: string;
+  highlighted_word: string;
+  subtitle: string;
+  primary_cta_text: string;
+  primary_cta_href: string;
+  secondary_cta_text: string;
+  secondary_cta_href: string;
+  badges: string[];
+}
+
+const DEFAULT: CTAContent = {
+  title: "Ready for",
+  highlighted_word: "Premium?",
+  subtitle: "Join the exclusive circle of brands that chose world-class digital excellence. Your transformation starts with a single conversation.",
+  primary_cta_text: "Start Your Journey",
+  primary_cta_href: "/contact",
+  secondary_cta_text: "View Case Studies",
+  secondary_cta_href: "/case-studies",
+  badges: ["500+ Projects Delivered", "98% Client Satisfaction", "Award-Winning Agency", "10+ Years of Excellence"],
+};
 
 export default function CTASection() {
+  const cta = usePageSection<CTAContent>("/", "cta", DEFAULT);
+  const badges = Array.isArray(cta.badges) ? cta.badges : DEFAULT.badges;
+
   return (
     <section className="relative py-28 overflow-hidden">
       {/* Background */}
       <div className="absolute inset-0 bg-[#111111]" />
-      {/* Gold center glow */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{ background: "radial-gradient(ellipse 60% 80% at center, rgba(212,175,55,0.1) 0%, transparent 70%)" }}
       />
-      {/* Top / Bottom lines */}
       <div className="h-px absolute top-0 left-0 right-0 bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent opacity-35" />
       <div className="h-px absolute bottom-0 left-0 right-0 bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent opacity-35" />
-      {/* Grid pattern */}
       <div
         className="absolute inset-0 opacity-[0.025]"
         style={{
@@ -31,7 +54,6 @@ export default function CTASection() {
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
         >
-          {/* Crown icon */}
           <div className="flex justify-center mb-6">
             <div className="w-16 h-16 rounded-full bg-[rgba(212,175,55,0.1)] border border-[rgba(212,175,55,0.3)] flex items-center justify-center animate-gold-pulse">
               <Crown className="w-8 h-8 text-[#D4AF37]" />
@@ -39,16 +61,15 @@ export default function CTASection() {
           </div>
 
           <h2 className="text-4xl md:text-6xl font-display font-black text-white mb-4 leading-tight">
-            Ready for <span className="gradient-text">Premium</span>?
+            {cta.title} <span className="gradient-text">{cta.highlighted_word}</span>
           </h2>
           <div className="luxury-divider my-6" />
           <p className="text-white/50 text-xl max-w-2xl mx-auto mb-10 font-light leading-relaxed">
-            Join the exclusive circle of brands that chose world-class digital excellence. Your transformation starts with a single conversation.
+            {cta.subtitle}
           </p>
 
-          {/* Trust badges */}
           <div className="flex flex-wrap items-center justify-center gap-5 mb-10">
-            {["500+ Projects Delivered", "98% Client Satisfaction", "Award-Winning Agency", "10+ Years of Excellence"].map((badge) => (
+            {badges.map((badge) => (
               <span
                 key={badge}
                 className="inline-flex items-center gap-2 border border-[rgba(212,175,55,0.2)] bg-[rgba(212,175,55,0.05)] text-white/60 text-sm px-4 py-2 rounded-full backdrop-blur-sm"
@@ -59,20 +80,19 @@ export default function CTASection() {
             ))}
           </div>
 
-          {/* CTA */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
-              to="/contact"
+              to={cta.primary_cta_href}
               className="flex items-center gap-2 gradient-brand text-[#0A0A0A] font-bold text-lg px-10 py-4 rounded-full btn-glow hover:scale-105 transition-all duration-300 shadow-luxury"
             >
-              Start Your Journey
+              {cta.primary_cta_text}
               <ArrowRight className="w-5 h-5" />
             </Link>
             <Link
-              to="/case-studies"
+              to={cta.secondary_cta_href}
               className="flex items-center gap-2 border border-[rgba(212,175,55,0.3)] text-white/70 font-medium text-lg px-10 py-4 rounded-full hover:border-[#D4AF37] hover:text-[#F5D76E] transition-all duration-300"
             >
-              View Case Studies
+              {cta.secondary_cta_text}
             </Link>
           </div>
         </motion.div>

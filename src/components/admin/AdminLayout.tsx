@@ -10,7 +10,6 @@ import { cn } from "@/lib/utils";
 
 const navItems = [
   { icon: LayoutDashboard, label: "Dashboard", href: "/admin/dashboard" },
-  { icon: BarChart2, label: "Analytics", href: "/admin/dashboard", divider: false },
   { divider: true, label: "Content" },
   { icon: FileText, label: "Blog Posts", href: "/admin/blog" },
   { icon: FolderOpen, label: "Portfolio", href: "/admin/portfolio" },
@@ -19,7 +18,9 @@ const navItems = [
   { icon: Users, label: "Team", href: "/admin/team" },
   { icon: MessageSquare, label: "Inquiries", href: "/admin/inquiries" },
   { divider: true, label: "Site Management" },
-  { icon: Layout, label: "Page Editor", href: "/admin/pages" },
+  { icon: Layout, label: "Content Editor", href: "/admin/content" },
+  { icon: BarChart2, label: "Services", href: "/admin/services" },
+  { icon: Image, label: "Hero Slides", href: "/admin/hero-slides" },
   { icon: Image, label: "Media Library", href: "/admin/media" },
   { icon: Menu, label: "Navigation", href: "/admin/navigation" },
   { icon: Search, label: "SEO Settings", href: "/admin/seo" },

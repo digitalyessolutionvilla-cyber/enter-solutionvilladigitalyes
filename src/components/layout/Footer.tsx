@@ -1,11 +1,23 @@
 import { Link } from "react-router-dom";
 import { Twitter, Linkedin, Facebook, Instagram, Youtube, Send } from "lucide-react";
-import { footerLinks } from "@/lib/data";
 import { useState } from "react";
+import { useFooterNavigation } from "@/hooks/useNavigation";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
+import { footerLinks as fallbackFooter } from "@/lib/data";
+
+const COLUMN_LABELS: Record<string, string> = {
+  services: "Services",
+  company: "Company",
+  resources: "Legal",
+};
 
 export default function Footer() {
   const [email, setEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
+  const footerNav = useFooterNavigation();
+  const settings = useSiteSettings();
+
+  const hasFooterNav = Object.keys(footerNav).length > 0;
 
   const handleSubscribe = (e: React.FormEvent) => {
     e.preventDefault();
@@ -13,16 +25,20 @@ export default function Footer() {
   };
 
   const socials = [
-    { icon: Twitter, label: "Twitter", href: "#" },
-    { icon: Linkedin, label: "LinkedIn", href: "#" },
-    { icon: Facebook, label: "Facebook", href: "#" },
-    { icon: Instagram, label: "Instagram", href: "#" },
-    { icon: Youtube, label: "YouTube", href: "#" },
+    { icon: Twitter, label: "Twitter", href: settings.twitter_url || "#" },
+    { icon: Linkedin, label: "LinkedIn", href: settings.linkedin_url || "#" },
+    { icon: Facebook, label: "Facebook", href: settings.facebook_url || "#" },
+    { icon: Instagram, label: "Instagram", href: settings.instagram_url || "#" },
+    { icon: Youtube, label: "YouTube", href: settings.youtube_url || "#" },
   ];
+
+  // Use DB footer nav if available, otherwise fall back to data.ts
+  const services = hasFooterNav ? footerNav.services : fallbackFooter.services;
+  const company = hasFooterNav ? footerNav.company : fallbackFooter.company;
+  const resources = hasFooterNav ? footerNav.resources : fallbackFooter.resources;
 
   return (
     <footer className="bg-[#0A0A0A] border-t border-[rgba(212,175,55,0.1)]">
-      {/* Top gold accent line */}
       <div className="h-px bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent opacity-40" />
 
       <div className="container-custom py-16 md:py-20">
@@ -34,14 +50,14 @@ export default function Footer() {
                 <span className="text-[#0A0A0A] font-black text-sm">SV</span>
               </div>
               <div className="flex flex-col leading-tight">
-                <span className="text-white font-display font-bold text-base">Solution Villa</span>
+                <span className="text-white font-display font-bold text-base">{settings.site_name || "Solution Villa"}</span>
                 <span className="gradient-text-static text-[9px] font-semibold tracking-[0.25em] uppercase">
-                  The Digital YES
+                  {settings.site_tagline || "The Digital YES"}
                 </span>
               </div>
             </Link>
             <p className="text-white/40 text-sm leading-relaxed mb-6 max-w-xs">
-              Africa's most premium technology and digital solutions agency. We deliver world-class results that transform businesses into industry leaders.
+              {settings.site_description || "Africa's most premium technology and digital solutions agency. We deliver world-class results that transform businesses into industry leaders."}
             </p>
             <div className="flex items-center gap-2">
               {socials.map(({ icon: Icon, label, href }) => (
@@ -49,6 +65,8 @@ export default function Footer() {
                   key={label}
                   href={href}
                   aria-label={label}
+                  target="_blank"
+                  rel="noreferrer"
                   className="w-9 h-9 flex items-center justify-center rounded-full bg-[rgba(212,175,55,0.06)] border border-[rgba(212,175,55,0.15)] text-white/40 hover:text-[#D4AF37] hover:border-[#D4AF37] hover:bg-[rgba(212,175,55,0.12)] hover:scale-110 transition-all duration-200"
                 >
                   <Icon className="w-4 h-4" />
@@ -57,11 +75,11 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Services */}
+          {/* Services Links */}
           <div>
             <h4 className="text-[#D4AF37] text-[10px] font-bold uppercase tracking-[0.2em] mb-4">Services</h4>
             <ul className="space-y-2.5">
-              {footerLinks.services.map((l) => (
+              {(services || []).map((l) => (
                 <li key={l.label}>
                   <Link
                     to={l.href}
@@ -74,11 +92,11 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Company */}
+          {/* Company Links */}
           <div>
             <h4 className="text-[#D4AF37] text-[10px] font-bold uppercase tracking-[0.2em] mb-4">Company</h4>
             <ul className="space-y-2.5">
-              {footerLinks.company.map((l) => (
+              {(company || []).map((l) => (
                 <li key={l.label}>
                   <Link
                     to={l.href}
@@ -91,7 +109,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Newsletter */}
+          {/* Newsletter + Legal */}
           <div>
             <h4 className="text-[#D4AF37] text-[10px] font-bold uppercase tracking-[0.2em] mb-4">Newsletter</h4>
             <p className="text-white/40 text-sm mb-4 leading-relaxed">
@@ -109,11 +127,7 @@ export default function Footer() {
                   className="flex-1 bg-transparent px-4 py-2.5 text-sm text-white placeholder-white/25 outline-none min-w-0"
                   required
                 />
-                <button
-                  type="submit"
-                  className="gradient-brand px-4 py-2.5 text-[#0A0A0A] hover:opacity-90 transition-opacity"
-                  aria-label="Subscribe"
-                >
+                <button type="submit" className="gradient-brand px-4 py-2.5 text-[#0A0A0A] hover:opacity-90 transition-opacity" aria-label="Subscribe">
                   <Send className="w-4 h-4" />
                 </button>
               </form>
@@ -121,7 +135,7 @@ export default function Footer() {
             <div className="mt-8">
               <h4 className="text-[#D4AF37] text-[10px] font-bold uppercase tracking-[0.2em] mb-3">Legal</h4>
               <ul className="space-y-2">
-                {footerLinks.resources.map((l) => (
+                {(resources || []).map((l) => (
                   <li key={l.label}>
                     <a href={l.href} className="text-white/30 text-sm hover:text-white/60 transition-colors">
                       {l.label}
@@ -136,7 +150,7 @@ export default function Footer() {
         {/* Bottom bar */}
         <div className="mt-12 pt-6 border-t border-[rgba(212,175,55,0.08)] flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-white/25 text-sm">
-            © {new Date().getFullYear()} Solution Villa. All rights reserved.
+            © {new Date().getFullYear()} {settings.site_name || "Solution Villa"}. All rights reserved.
           </p>
           <p className="gradient-text-static text-sm font-semibold tracking-wide">
             Premium Solutions. Premium Results.

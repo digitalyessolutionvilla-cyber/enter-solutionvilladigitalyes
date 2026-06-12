@@ -1,13 +1,28 @@
 import { useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import { ArrowRight, Palette, TrendingUp, Video, Film, Globe, Printer, Briefcase, Smartphone, Code2, Cloud } from "lucide-react";
-import { services } from "@/lib/data";
+import { useServices } from "@/hooks/useServices";
+import { usePageSection } from "@/hooks/usePageSection";
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Palette, TrendingUp, Video, Film, Globe, Printer, Briefcase, Smartphone, Code2, Cloud,
 };
 
-function ServiceCard({ service, index }: { service: typeof services[0]; index: number }) {
+interface ServicesHeader {
+  eyebrow: string;
+  title: string;
+  title_highlighted: string;
+  subtitle: string;
+}
+
+const DEFAULT_HEADER: ServicesHeader = {
+  eyebrow: "What We Do",
+  title: "Our",
+  title_highlighted: "Premium Services",
+  subtitle: "Comprehensive luxury digital solutions designed to elevate your brand, accelerate growth, and deliver world-class results.",
+};
+
+function ServiceCard({ service, index }: { service: { icon: string; title: string; description?: string; tag?: string; link_href?: string }; index: number }) {
   const Icon = iconMap[service.icon] || Globe;
 
   return (
@@ -53,6 +68,8 @@ function ServiceCard({ service, index }: { service: typeof services[0]; index: n
 export default function ServicesSection() {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: "-100px" });
+  const services = useServices();
+  const header = usePageSection<ServicesHeader>("/", "services_header", DEFAULT_HEADER);
 
   return (
     <section id="services" className="section-padding relative overflow-hidden bg-[#0A0A0A]">
@@ -71,14 +88,14 @@ export default function ServicesSection() {
           transition={{ duration: 0.7 }}
         >
           <span className="text-[#D4AF37] text-[10px] font-bold tracking-[0.3em] uppercase mb-4 block">
-            What We Do
+            {header.eyebrow}
           </span>
           <h2 className="text-3xl md:text-5xl font-display font-black text-white mb-4">
-            Our <span className="gradient-text">Premium Services</span>
+            {header.title} <span className="gradient-text">{header.title_highlighted}</span>
           </h2>
           <div className="luxury-divider my-5" />
           <p className="text-white/45 text-lg max-w-2xl mx-auto font-light leading-relaxed">
-            Comprehensive luxury digital solutions designed to elevate your brand, accelerate growth, and deliver world-class results.
+            {header.subtitle}
           </p>
         </motion.div>
 

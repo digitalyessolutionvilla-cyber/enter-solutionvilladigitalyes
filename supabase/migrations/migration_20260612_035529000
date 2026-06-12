@@ -1,0 +1,231 @@
+
+-- ═══════════════════════════════════════
+-- SERVICES TABLE
+-- ═══════════════════════════════════════
+CREATE TABLE IF NOT EXISTS services (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  icon text NOT NULL DEFAULT 'Globe',
+  title text NOT NULL,
+  description text,
+  tag text,
+  sort_order int DEFAULT 0,
+  is_active boolean DEFAULT true,
+  link_href text DEFAULT '/#services',
+  created_at timestamptz DEFAULT now()
+);
+ALTER TABLE services ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Public can read active services" ON services FOR SELECT USING (true);
+CREATE POLICY "Admins can manage services" ON services FOR ALL USING (auth.role() = 'authenticated');
+
+INSERT INTO services (icon, title, description, tag, sort_order, is_active) VALUES
+  ('Palette', 'Branding & Design', 'We craft compelling brand identities that resonate with your audience — from logo design to complete visual systems that make you unforgettable.', 'Creative', 1, true),
+  ('TrendingUp', 'Digital Marketing', 'Data-driven campaigns across SEO, social media, PPC, and email marketing that deliver measurable ROI and sustainable growth.', 'Growth', 2, true),
+  ('Video', 'Event Production', 'End-to-end event management and production — from intimate corporate gatherings to large-scale conferences and hybrid events.', 'Events', 3, true),
+  ('Film', 'Media & Content Creation', 'Professional video production, photography, podcasts, and content strategies that captivate audiences and drive engagement.', 'Media', 4, true),
+  ('Globe', 'Website Development', 'Modern, fast, and conversion-optimized websites built with cutting-edge technologies — from landing pages to complex web applications.', 'Web', 5, true),
+  ('Printer', 'Printing & Branding', 'High-quality print solutions including banners, flyers, business cards, branded merchandise, and large-format printing.', 'Print', 6, true),
+  ('Briefcase', 'Business Consulting', 'Strategic business advisory services that help organizations optimize operations, enter new markets, and achieve sustainable growth.', 'Strategy', 7, true),
+  ('Smartphone', 'Mobile App Development', 'Native and cross-platform mobile applications for iOS and Android that deliver exceptional user experiences and drive business value.', 'Mobile', 8, true),
+  ('Code2', 'Software Solutions', 'Custom enterprise software, ERP systems, CRM platforms, and automation tools tailored to your unique business requirements.', 'Software', 9, true),
+  ('Cloud', 'Cloud Solutions', 'Cloud infrastructure, migration services, DevOps implementation, and managed cloud services for scalable, secure operations.', 'Cloud', 10, true)
+ON CONFLICT DO NOTHING;
+
+-- ═══════════════════════════════════════
+-- HERO SLIDES TABLE
+-- ═══════════════════════════════════════
+CREATE TABLE IF NOT EXISTS hero_slides (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  title text,
+  subtitle text,
+  image_url text NOT NULL,
+  cta_text text DEFAULT 'Learn More',
+  cta_href text DEFAULT '/contact',
+  sort_order int DEFAULT 0,
+  is_active boolean DEFAULT true,
+  created_at timestamptz DEFAULT now()
+);
+ALTER TABLE hero_slides ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Public can read hero slides" ON hero_slides FOR SELECT USING (true);
+CREATE POLICY "Admins can manage hero slides" ON hero_slides FOR ALL USING (auth.role() = 'authenticated');
+
+INSERT INTO hero_slides (title, subtitle, image_url, cta_text, cta_href, sort_order, is_active) VALUES
+  ('Premium Digital Solutions', 'We transform businesses across Africa with world-class digital strategies', 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1920&h=1080&fit=crop', 'Start Your Journey', '/contact', 1, true),
+  ('Award-Winning Branding', 'From logo to full brand identity — we make you unforgettable', 'https://images.unsplash.com/photo-1542744094-3a31f272c490?w=1920&h=1080&fit=crop', 'See Our Work', '/portfolio', 2, true),
+  ('World-Class Web & Mobile', 'High-performance apps and websites built for conversion and scale', 'https://images.unsplash.com/photo-1556155092-490a1ba16284?w=1920&h=1080&fit=crop', 'View Case Studies', '/case-studies', 3, true)
+ON CONFLICT DO NOTHING;
+
+-- ═══════════════════════════════════════
+-- ADD nav_area COLUMN TO navigation_items
+-- ═══════════════════════════════════════
+ALTER TABLE navigation_items ADD COLUMN IF NOT EXISTS nav_area text NOT NULL DEFAULT 'header';
+ALTER TABLE navigation_items ADD COLUMN IF NOT EXISTS footer_column text;
+
+-- Seed footer navigation
+INSERT INTO navigation_items (label, href, sort_order, nav_area, footer_column) VALUES
+  ('Branding & Design', '/#services', 1, 'footer', 'services'),
+  ('Digital Marketing', '/#services', 2, 'footer', 'services'),
+  ('Website Development', '/#services', 3, 'footer', 'services'),
+  ('Mobile Apps', '/#services', 4, 'footer', 'services'),
+  ('Event Production', '/#services', 5, 'footer', 'services'),
+  ('Cloud Solutions', '/#services', 6, 'footer', 'services'),
+  ('About Us', '/about', 1, 'footer', 'company'),
+  ('Our Team', '/team', 2, 'footer', 'company'),
+  ('Portfolio', '/portfolio', 3, 'footer', 'company'),
+  ('Case Studies', '/case-studies', 4, 'footer', 'company'),
+  ('Blog', '/blog', 5, 'footer', 'company'),
+  ('Contact', '/contact', 6, 'footer', 'company'),
+  ('Privacy Policy', '#', 1, 'footer', 'resources'),
+  ('Terms of Service', '#', 2, 'footer', 'resources'),
+  ('Cookie Policy', '#', 3, 'footer', 'resources'),
+  ('Sitemap', '#', 4, 'footer', 'resources')
+ON CONFLICT DO NOTHING;
+
+-- ═══════════════════════════════════════
+-- EXPAND PAGE SECTIONS SEEDS
+-- ═══════════════════════════════════════
+-- Update existing hero section with more fields
+UPDATE page_sections SET content = '{
+  "headline1": "Premium Solutions.",
+  "headline2": "Premium Experience.",
+  "subheadline": "Africa''s most premium technology and digital solutions agency. We deliver world-class branding, software, marketing, and media that transforms businesses into industry leaders.",
+  "cta_primary_text": "Start Your Premium Journey",
+  "cta_primary_href": "/contact",
+  "cta_secondary_text": "Explore Our Work",
+  "cta_secondary_href": "/portfolio",
+  "keywords": ["Premium Results", "Digital Excellence", "Brand Luxury", "Tech Innovation", "Market Leadership"],
+  "badge_text": "The Digital YES",
+  "is_visible": true
+}' WHERE page_path = '/' AND section_key = 'hero';
+
+-- Update stats
+UPDATE page_sections SET content = '[
+  {"label": "Projects Completed", "value": 500, "suffix": "+"},
+  {"label": "Happy Clients", "value": 200, "suffix": "+"},
+  {"label": "Countries Served", "value": 15, "suffix": "+"},
+  {"label": "Awards Won", "value": 30, "suffix": "+"}
+]' WHERE page_path = '/' AND section_key = 'stats';
+
+-- CTA section
+INSERT INTO page_sections (page_path, section_key, section_label, content) VALUES
+  ('/', 'cta', 'Homepage CTA', '{
+    "title": "Ready for",
+    "highlighted_word": "Premium?",
+    "subtitle": "Join the exclusive circle of brands that chose world-class digital excellence. Your transformation starts with a single conversation.",
+    "primary_cta_text": "Start Your Journey",
+    "primary_cta_href": "/contact",
+    "secondary_cta_text": "View Case Studies",
+    "secondary_cta_href": "/case-studies",
+    "badges": ["500+ Projects Delivered", "98% Client Satisfaction", "Award-Winning Agency", "10+ Years of Excellence"],
+    "is_visible": true
+  }'),
+  ('/', 'services_header', 'Homepage Services Header', '{
+    "eyebrow": "What We Do",
+    "title": "Premium Services for",
+    "title_highlighted": "Premium Brands",
+    "subtitle": "From strategy to execution, we deliver end-to-end digital solutions that elevate your brand and accelerate growth across every channel.",
+    "is_visible": true
+  }'),
+  ('/', 'testimonials_header', 'Homepage Testimonials Header', '{
+    "eyebrow": "Client Stories",
+    "title": "What Our",
+    "title_highlighted": "Clients Say",
+    "subtitle": "Real results from real clients. Here is what Africa''s leading businesses say about working with Solution Villa.",
+    "is_visible": true
+  }'),
+  ('/', 'portfolio_header', 'Homepage Portfolio Header', '{
+    "eyebrow": "Selected Work",
+    "title": "Premium",
+    "title_highlighted": "Portfolio",
+    "subtitle": "A curated selection of our finest work across branding, digital, and technology.",
+    "cta_text": "View All Work",
+    "cta_href": "/portfolio",
+    "is_visible": true
+  }'),
+  ('/', 'blog_header', 'Homepage Blog Header', '{
+    "eyebrow": "Premium Insights",
+    "title": "From the",
+    "title_highlighted": "Blog",
+    "subtitle": "Expert insights on digital marketing, branding, and technology from Africa''s leading agency.",
+    "cta_text": "Read All Articles",
+    "cta_href": "/blog",
+    "is_visible": true
+  }'),
+  ('/about', 'hero', 'About – Page Hero', '{
+    "eyebrow": "About Us",
+    "title": "We Are",
+    "title_highlighted": "The Digital YES",
+    "subtitle": "Solution Villa is Africa''s premier digital agency — a team of innovators, strategists, designers, and engineers committed to transforming businesses through world-class digital solutions.",
+    "is_visible": true
+  }'),
+  ('/about', 'values', 'About – Core Values', '[
+    {"icon": "Lightbulb", "title": "Innovation", "desc": "We constantly push boundaries and embrace emerging technologies."},
+    {"icon": "Shield", "title": "Reliability", "desc": "We deliver on our promises with integrity and accountability."},
+    {"icon": "Heart", "title": "Partnership", "desc": "We build long-term relationships, not just transactional engagements."},
+    {"icon": "Zap", "title": "Excellence", "desc": "We pursue world-class quality in everything we create."},
+    {"icon": "Users", "title": "Collaboration", "desc": "We work as a seamless extension of your team."},
+    {"icon": "Target", "title": "Results-Driven", "desc": "Every strategy is designed to deliver measurable outcomes."}
+  ]'),
+  ('/about', 'timeline', 'About – Company Timeline', '[
+    {"year": "2016", "title": "Founded in Lagos", "desc": "Solution Villa was established with a mission to bridge Africa''s digital gap."},
+    {"year": "2018", "title": "First 50 Clients", "desc": "Expanded to serve businesses across Nigeria and Ghana with branding and web services."},
+    {"year": "2020", "title": "Tech Division Launch", "desc": "Launched software and mobile app development practice, serving enterprise clients."},
+    {"year": "2022", "title": "Pan-African Expansion", "desc": "Extended operations to Kenya, South Africa, and Côte d''Ivoire."},
+    {"year": "2023", "title": "Cloud & AI Services", "desc": "Added cloud infrastructure and AI-powered digital marketing capabilities."},
+    {"year": "2024", "title": "500+ Projects Milestone", "desc": "Celebrated 500 successful projects across 15 African countries."}
+  ]'),
+  ('/about', 'page_cta', 'About – Bottom CTA', '{
+    "title": "Ready to Work",
+    "title_highlighted": "Together?",
+    "subtitle": "Let''s start a conversation about your project.",
+    "cta_text": "Get in Touch",
+    "cta_href": "/contact",
+    "is_visible": true
+  }'),
+  ('/contact', 'hero', 'Contact – Page Hero', '{
+    "eyebrow": "Contact Us",
+    "title": "Let''s",
+    "title_highlighted": "Build Together",
+    "subtitle": "Ready to transform your business? Send us a message and we''ll respond within 24 hours.",
+    "is_visible": true
+  }'),
+  ('/portfolio', 'hero', 'Portfolio – Page Hero', '{
+    "eyebrow": "Our Work",
+    "title": "Premium",
+    "title_highlighted": "Portfolio",
+    "subtitle": "A curated selection of our finest work across branding, digital marketing, web development, and technology.",
+    "is_visible": true
+  }'),
+  ('/case-studies', 'hero', 'Case Studies – Page Hero', '{
+    "eyebrow": "Case Studies",
+    "title": "Real Results,",
+    "title_highlighted": "Real Impact",
+    "subtitle": "Deep dives into how we''ve helped brands achieve extraordinary outcomes through strategic digital solutions.",
+    "is_visible": true
+  }'),
+  ('/blog', 'hero', 'Blog – Page Hero', '{
+    "eyebrow": "Premium Insights",
+    "title": "Digital Intelligence",
+    "title_highlighted": "& Insights",
+    "subtitle": "Expert perspectives on marketing, branding, and technology from Africa''s leading digital agency.",
+    "is_visible": true
+  }'),
+  ('/team', 'hero', 'Team – Page Hero', '{
+    "eyebrow": "Our Team",
+    "title": "The Minds Behind",
+    "title_highlighted": "The Digital YES",
+    "subtitle": "World-class professionals united by a passion for innovation, excellence, and measurable impact.",
+    "is_visible": true
+  }')
+ON CONFLICT (page_path, section_key) DO UPDATE SET content = EXCLUDED.content;
+
+-- Update about mission section with full content
+UPDATE page_sections SET content = '{
+  "mission_eyebrow": "Our Purpose",
+  "mission_title": "Our Mission",
+  "mission_text": "To empower African businesses with world-class digital solutions that drive measurable growth, enhance brand value, and accelerate their journey to becoming global competitors.",
+  "vision_title": "Our Vision",
+  "vision_text": "To be Africa''s most trusted and impactful technology partner — a company that consistently delivers YES to innovation, excellence, and transformative digital outcomes.",
+  "founded_year": "2016",
+  "headquarters": "Lagos, Nigeria",
+  "is_visible": true
+}' WHERE page_path = '/about' AND section_key = 'mission';

@@ -1,5 +1,14 @@
 import { useEffect, useRef, useState } from "react";
-import { stats } from "@/lib/data";
+import { usePageSection } from "@/hooks/usePageSection";
+
+interface StatItem { label: string; value: number; suffix: string; }
+
+const DEFAULT_STATS: StatItem[] = [
+  { label: "Projects Completed", value: 500, suffix: "+" },
+  { label: "Happy Clients", value: 200, suffix: "+" },
+  { label: "Countries Served", value: 15, suffix: "+" },
+  { label: "Awards Won", value: 30, suffix: "+" },
+];
 
 function Counter({ target, suffix }: { target: number; suffix: string }) {
   const [count, setCount] = useState(0);
@@ -37,9 +46,11 @@ function Counter({ target, suffix }: { target: number; suffix: string }) {
 }
 
 export default function StatsSection() {
+  const stats = usePageSection<StatItem[]>("/", "stats", DEFAULT_STATS);
+  const safeStats = Array.isArray(stats) ? stats : DEFAULT_STATS;
+
   return (
     <section className="relative py-20 overflow-hidden">
-      {/* Background */}
       <div className="absolute inset-0 bg-[#111111]" />
       <div className="absolute inset-0 bg-gradient-gold-v opacity-[0.04]" />
       <div className="h-px absolute top-0 left-0 right-0 bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent opacity-30" />
@@ -47,12 +58,12 @@ export default function StatsSection() {
 
       <div className="container-custom relative z-10">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-4">
-          {stats.map((stat, i) => (
+          {safeStats.map((stat, i) => (
             <div
               key={stat.label}
-              className={`flex flex-col items-center text-center gap-3 ${i < stats.length - 1 ? "md:border-r md:border-[rgba(212,175,55,0.1)]" : ""}`}
+              className={`flex flex-col items-center text-center gap-3 ${i < safeStats.length - 1 ? "md:border-r md:border-[rgba(212,175,55,0.1)]" : ""}`}
             >
-              <Counter target={stat.value} suffix={stat.suffix} />
+              <Counter target={Number(stat.value)} suffix={stat.suffix} />
               <div className="luxury-divider w-12" style={{ margin: 0 }} />
               <span className="text-white/45 text-sm font-medium tracking-wide">{stat.label}</span>
             </div>

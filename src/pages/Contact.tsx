@@ -5,19 +5,21 @@ import { MapPin, Phone, Mail, Clock, Send, CheckCircle, Twitter, Linkedin, Faceb
 import PageLayout from "@/components/layout/PageLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-
-const officeInfo = [
-  { icon: MapPin, label: "Address", value: "14 Marina Street, Victoria Island, Lagos, Nigeria" },
-  { icon: Phone, label: "Phone", value: "+234 800 000 0000" },
-  { icon: Mail, label: "Email", value: "hello@solutionvilla.com" },
-  { icon: Clock, label: "Hours", value: "Mon–Fri: 8AM – 6PM WAT" },
-];
+import { useSiteSettings } from "@/hooks/useSiteSettings";
 
 const subjects = ["General Inquiry", "Branding & Design", "Website Development", "Mobile App", "Digital Marketing", "Event Production", "Business Consulting", "Other"];
 
 export default function Contact() {
   useSeo("/contact");
   const { toast } = useToast();
+  const settings = useSiteSettings();
+
+  const officeInfo = [
+    { icon: MapPin, label: "Address", value: settings.contact_address || "14 Marina Street, Victoria Island, Lagos, Nigeria" },
+    { icon: Phone, label: "Phone", value: settings.contact_phone || "+234 800 000 0000" },
+    { icon: Mail, label: "Email", value: settings.contact_email || "hello@solutionvilla.com" },
+    { icon: Clock, label: "Hours", value: settings.business_hours || "Mon–Fri: 8AM – 6PM WAT" },
+  ];
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", phone: "", subject: "", message: "" });
