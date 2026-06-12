@@ -26,19 +26,26 @@ import PageEditor from "./pages/admin/PageEditor";
 import ServicesAdmin from "./pages/admin/ServicesAdmin";
 import ContentEditor from "./pages/admin/ContentEditor";
 import HeroSlidesAdmin from "./pages/admin/HeroSlidesAdmin";
+import LiveChat from "./pages/admin/LiveChat";
 import ProtectedRoute from "./components/admin/ProtectedRoute";
+import PublicLayout from "./components/layout/PublicLayout";
 
 export const routers = [
-  // ── Public pages ──────────────────────────────────────────
-  { path: "/", name: "home", element: <Index /> },
-  { path: "/about", name: "about", element: <About /> },
-  { path: "/team", name: "team", element: <Team /> },
-  { path: "/portfolio", name: "portfolio", element: <Portfolio /> },
-  { path: "/case-studies", name: "caseStudies", element: <CaseStudies /> },
-  { path: "/case-studies/:slug", name: "caseStudyDetail", element: <CaseStudyDetail /> },
-  { path: "/blog", name: "blog", element: <Blog /> },
-  { path: "/blog/:slug", name: "blogPost", element: <BlogPost /> },
-  { path: "/contact", name: "contact", element: <Contact /> },
+  // ── Public pages (with SOLUTION AI widget via PublicLayout) ──
+  {
+    element: <PublicLayout />,
+    children: [
+      { path: "/", name: "home", element: <Index /> },
+      { path: "/about", name: "about", element: <About /> },
+      { path: "/team", name: "team", element: <Team /> },
+      { path: "/portfolio", name: "portfolio", element: <Portfolio /> },
+      { path: "/case-studies", name: "caseStudies", element: <CaseStudies /> },
+      { path: "/case-studies/:slug", name: "caseStudyDetail", element: <CaseStudyDetail /> },
+      { path: "/blog", name: "blog", element: <Blog /> },
+      { path: "/blog/:slug", name: "blogPost", element: <BlogPost /> },
+      { path: "/contact", name: "contact", element: <Contact /> },
+    ],
+  },
 
   // ── Admin auth ────────────────────────────────────────────
   { path: "/admin/login", name: "adminLogin", element: <AdminLogin /> },
@@ -54,6 +61,9 @@ export const routers = [
   { path: "/admin/team", name: "adminTeam", element: <ProtectedRoute><TeamAdmin /></ProtectedRoute> },
   { path: "/admin/testimonials", name: "adminTestimonials", element: <ProtectedRoute><TestimonialsAdmin /></ProtectedRoute> },
   { path: "/admin/inquiries", name: "adminInquiries", element: <ProtectedRoute><Inquiries /></ProtectedRoute> },
+
+  // Live Chat
+  { path: "/admin/live-chat", name: "adminLiveChat", element: <ProtectedRoute><LiveChat /></ProtectedRoute> },
 
   // Site management
   { path: "/admin/content", name: "adminContent", element: <ProtectedRoute><ContentEditor /></ProtectedRoute> },

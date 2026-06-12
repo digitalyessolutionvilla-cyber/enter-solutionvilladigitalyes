@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard, FileText, FolderOpen, Users, MessageSquare,
   BookOpen, Settings, ChevronLeft, ChevronRight, LogOut, Crown, Star,
-  Image, Clock, Search, Menu, Layout, BarChart2
+  Image, Clock, Search, Menu, Layout, BarChart2, Headphones
 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
 import { cn } from "@/lib/utils";
 
@@ -17,6 +18,7 @@ const navItems = [
   { icon: Star, label: "Testimonials", href: "/admin/testimonials" },
   { icon: Users, label: "Team", href: "/admin/team" },
   { icon: MessageSquare, label: "Inquiries", href: "/admin/inquiries" },
+  { icon: Headphones, label: "Live Chat", href: "/admin/live-chat", badge: "waiting" },
   { divider: true, label: "Site Management" },
   { icon: Layout, label: "Content Editor", href: "/admin/content" },
   { icon: BarChart2, label: "Services", href: "/admin/services" },
@@ -36,9 +38,24 @@ interface AdminLayoutProps {
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
   const [collapsed, setCollapsed] = useState(false);
+  const [waitingCount, setWaitingCount] = useState(0);
   const location = useLocation();
   const navigate = useNavigate();
   const { signOut, profile } = useAuth();
+
+  // Poll waiting chats every 15s
+  useEffect(() => {
+    const fetch = async () => {
+      const { count } = await supabase
+        .from("chat_conversations")
+        .select("id", { count: "exact", head: true })
+        .eq("status", "waiting");
+      setWaitingCount(count ?? 0);
+    };
+    fetch();
+    const t = setInterval(fetch, 15000);
+    return () => clearInterval(t);
+  }, []);
 
   const handleSignOut = async () => {
     await signOut();
@@ -83,8 +100,10 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             if (!("href" in item)) return null;
             if ("superAdminOnly" in item && item.superAdminOnly && profile?.role !== "super_admin") return null;
 
-            const isActive = location.pathname === item.href && item.href !== "/admin/dashboard" || (item.href === "/admin/dashboard" && (location.pathname === "/admin/dashboard" || location.pathname === "/admin"));
+            const isActive = (location.pathname === item.href && item.href !== "/admin/dashboard") ||
+              (item.href === "/admin/dashboard" && (location.pathname === "/admin/dashboard" || location.pathname === "/admin"));
             const Icon = item.icon as React.ComponentType<{ className?: string }>;
+            const showBadge = "badge" in item && item.badge === "waiting" && waitingCount > 0;
 
             return (
               <Link
@@ -99,8 +118,22 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 )}
                 title={collapsed ? item.label as string : undefined}
               >
-                {Icon && <Icon className={cn("w-3.5 h-3.5 flex-shrink-0", isActive ? "text-[#D4AF37]" : "text-white/30 group-hover:text-white/60")} />}
-                {!collapsed && <span className="truncate">{item.label as string}</span>}
+                <div className="relative flex-shrink-0">
+                  {Icon && <Icon className={cn("w-3.5 h-3.5", isActive ? "text-[#D4AF37]" : "text-white/30 group-hover:text-white/60")} />}
+                  {showBadge && collapsed && (
+                    <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-yellow-400 text-[0px] border border-[#0D0D0D]" />
+                  )}
+                </div>
+                {!collapsed && (
+                  <div className="flex items-center justify-between flex-1 min-w-0">
+                    <span className="truncate">{item.label as string}</span>
+                    {showBadge && (
+                      <span className="ml-1 px-1.5 py-0.5 rounded-full bg-yellow-400/15 text-yellow-400 text-[9px] font-bold border border-yellow-400/25">
+                        {waitingCount}
+                      </span>
+                    )}
+                  </div>
+                )}
               </Link>
             );
           })}
@@ -137,6 +170,13 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             <p className="text-white/25 text-[10px] mt-0.5">Solution Villa · CMS</p>
           </div>
           <div className="flex items-center gap-3">
+            {waitingCount > 0 && (
+              <Link to="/admin/live-chat"
+                className="flex items-center gap-1.5 text-xs text-yellow-400 font-medium border border-yellow-400/25 rounded-full px-3 py-1.5 bg-yellow-400/5 hover:bg-yellow-400/10 transition-all">
+                <Headphones className="w-3.5 h-3.5" />
+                {waitingCount} chat{waitingCount !== 1 ? "s" : ""} waiting
+              </Link>
+            )}
             <Link to="/" target="_blank" className="text-xs text-[#D4AF37]/50 hover:text-[#D4AF37] font-medium transition-colors border border-[rgba(212,175,55,0.12)] rounded-full px-3 py-1.5 hover:bg-[rgba(212,175,55,0.06)]">
               View Site →
             </Link>
