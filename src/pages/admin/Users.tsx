@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { Users as UsersIcon, Plus, ShieldAlert, Shield, UserX, Mail, User, X, Save, Crown } from "lucide-react";
+import { Users as UsersIcon, Plus, ShieldAlert, Shield, Mail, X, Crown, CheckCircle, Copy, Check, Key } from "lucide-react";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
@@ -11,13 +11,100 @@ interface UserRecord {
   role: "super_admin" | "admin";
   avatar_url: string | null;
   created_at: string;
-  email?: string;
+}
+
+interface InviteResult {
+  email: string;
+  emailSent: boolean;
+  tempPassword?: string;
 }
 
 const ROLE_STYLES = {
   super_admin: "text-[#F5D76E] bg-[rgba(212,175,55,0.12)] border-[rgba(212,175,55,0.3)]",
   admin: "text-white/60 bg-white/5 border-white/15",
 };
+
+function CredentialsModal({ result, onClose }: { result: InviteResult; onClose: () => void }) {
+  const [copied, setCopied] = useState(false);
+
+  const copy = (text: string) => {
+    try {
+      navigator.clipboard.writeText(text).catch(() => fallbackCopy(text));
+    } catch { fallbackCopy(text); }
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const fallbackCopy = (text: string) => {
+    const el = document.createElement("textarea");
+    el.value = text;
+    el.style.cssText = "position:fixed;top:-9999px;left:-9999px;opacity:0";
+    document.body.appendChild(el);
+    el.focus(); el.select();
+    try { document.execCommand("copy"); } catch { /* silent */ }
+    document.body.removeChild(el);
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/75 backdrop-blur-md" onClick={onClose} />
+      <div className="relative glass-card rounded-2xl border border-[rgba(212,175,55,0.25)] p-8 w-full max-w-md shadow-luxury">
+        <div className="text-center mb-6">
+          <div className="w-16 h-16 rounded-2xl bg-green-500/10 border border-green-500/25 flex items-center justify-center mx-auto mb-4">
+            <CheckCircle className="w-8 h-8 text-green-400" />
+          </div>
+          <h2 className="text-white font-display font-black text-xl mb-1">Admin Invited!</h2>
+          <p className="text-white/40 text-sm">
+            {result.emailSent
+              ? "An invitation email with login credentials has been sent."
+              : "Account created. Share these credentials with the admin:"}
+          </p>
+        </div>
+
+        <div className="bg-[rgba(212,175,55,0.06)] border border-[rgba(212,175,55,0.2)] rounded-xl p-5 space-y-4 mb-6">
+          <div>
+            <span className="text-white/35 text-[10px] uppercase tracking-wider block mb-1">Email Address</span>
+            <span className="text-white font-medium text-sm">{result.email}</span>
+          </div>
+          {result.tempPassword && (
+            <div>
+              <span className="text-white/35 text-[10px] uppercase tracking-wider block mb-1">Temporary Password</span>
+              <div className="flex items-center gap-3">
+                <span className="text-[#F5D76E] font-mono font-bold text-lg tracking-wider flex-1">{result.tempPassword}</span>
+                <button
+                  onClick={() => copy(result.tempPassword!)}
+                  className="flex items-center gap-1.5 text-xs border border-[rgba(212,175,55,0.3)] text-[#D4AF37] px-3 py-1.5 rounded-lg hover:bg-[rgba(212,175,55,0.1)] transition-all"
+                >
+                  {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                  {copied ? "Copied!" : "Copy"}
+                </button>
+              </div>
+            </div>
+          )}
+          {result.emailSent && (
+            <div className="flex items-center gap-2 pt-1 border-t border-white/5">
+              <Mail className="w-3.5 h-3.5 text-green-400/70" />
+              <span className="text-green-400/70 text-xs">Invitation email sent successfully</span>
+            </div>
+          )}
+        </div>
+
+        {result.tempPassword && (
+          <p className="text-white/25 text-xs text-center mb-5">
+            Share these credentials securely. The admin should change their password after first login.
+          </p>
+        )}
+
+        <button
+          onClick={onClose}
+          className="w-full gradient-brand text-[#0A0A0A] font-bold py-3 rounded-full btn-glow"
+        >
+          Done
+        </button>
+      </div>
+    </div>
+  );
+}
 
 export default function Users() {
   const { isSuperAdmin, user: currentUser } = useAuth();
@@ -27,6 +114,7 @@ export default function Users() {
   const [showInvite, setShowInvite] = useState(false);
   const [inviteForm, setInviteForm] = useState({ email: "", full_name: "", role: "admin" as "admin" | "super_admin" });
   const [inviting, setInviting] = useState(false);
+  const [inviteResult, setInviteResult] = useState<InviteResult | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -64,22 +152,38 @@ export default function Users() {
   const handleInvite = async (e: React.FormEvent) => {
     e.preventDefault();
     setInviting(true);
-    const { data, error } = await supabase.functions.invoke("invite-user", {
-      body: { email: inviteForm.email, full_name: inviteForm.full_name, role: inviteForm.role },
-    });
-    setInviting(false);
-    if (error || data?.error) {
-      toast({ title: "Invite failed", description: data?.error || error?.message, variant: "destructive" });
-      return;
+    try {
+      const { data, error } = await supabase.functions.invoke("invite-user", {
+        body: { email: inviteForm.email, full_name: inviteForm.full_name, role: inviteForm.role },
+      });
+
+      if (error) throw new Error(error.message);
+      if (data?.error) throw new Error(data.error);
+
+      // Show success modal with credentials
+      setInviteResult({
+        email: inviteForm.email,
+        emailSent: data.email_sent === true,
+        tempPassword: data.temp_password,
+      });
+      setShowInvite(false);
+      setInviteForm({ email: "", full_name: "", role: "admin" });
+      load();
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Something went wrong";
+      toast({ title: "Invite failed", description: msg, variant: "destructive" });
+    } finally {
+      setInviting(false);
     }
-    toast({ title: "Admin invited", description: `${inviteForm.email} has been sent an invite.` });
-    setShowInvite(false);
-    setInviteForm({ email: "", full_name: "", role: "admin" });
-    load();
   };
 
   return (
     <AdminLayout>
+      {/* Credentials modal */}
+      {inviteResult && (
+        <CredentialsModal result={inviteResult} onClose={() => setInviteResult(null)} />
+      )}
+
       <div className="space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -97,34 +201,44 @@ export default function Users() {
         {showInvite && (
           <div className="glass-card rounded-2xl p-6 border border-[rgba(212,175,55,0.2)] space-y-5">
             <div className="flex items-center justify-between">
-              <h2 className="text-white font-bold text-lg">Invite New Admin</h2>
+              <div>
+                <h2 className="text-white font-bold text-lg">Invite New Admin</h2>
+                <p className="text-white/30 text-xs mt-0.5">A secure password will be generated and emailed automatically</p>
+              </div>
               <button onClick={() => setShowInvite(false)} className="text-white/30 hover:text-white transition-colors"><X className="w-5 h-5" /></button>
             </div>
             <form onSubmit={handleInvite} className="grid md:grid-cols-3 gap-4">
               <div>
                 <label className="text-white/50 text-xs font-semibold uppercase block mb-1.5">Email *</label>
-                <input required type="email" value={inviteForm.email} onChange={(e) => setInviteForm((f) => ({ ...f, email: e.target.value }))}
+                <input required type="email" value={inviteForm.email}
+                  onChange={(e) => setInviteForm((f) => ({ ...f, email: e.target.value }))}
                   placeholder="admin@company.com"
                   className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-[#D4AF37]/50" />
               </div>
               <div>
                 <label className="text-white/50 text-xs font-semibold uppercase block mb-1.5">Full Name</label>
-                <input type="text" value={inviteForm.full_name} onChange={(e) => setInviteForm((f) => ({ ...f, full_name: e.target.value }))}
+                <input type="text" value={inviteForm.full_name}
+                  onChange={(e) => setInviteForm((f) => ({ ...f, full_name: e.target.value }))}
                   placeholder="John Doe"
                   className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-[#D4AF37]/50" />
               </div>
               <div>
                 <label className="text-white/50 text-xs font-semibold uppercase block mb-1.5">Role</label>
-                <select value={inviteForm.role} onChange={(e) => setInviteForm((f) => ({ ...f, role: e.target.value as "admin" | "super_admin" }))}
+                <select value={inviteForm.role}
+                  onChange={(e) => setInviteForm((f) => ({ ...f, role: e.target.value as "admin" | "super_admin" }))}
                   className="w-full bg-[#1A1A1A] border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-[#D4AF37]/50">
                   <option value="admin">Admin</option>
                   <option value="super_admin">Super Admin</option>
                 </select>
               </div>
-              <div className="md:col-span-3 flex gap-3">
+              <div className="md:col-span-3 flex gap-3 items-center">
                 <button type="submit" disabled={inviting}
-                  className="flex items-center gap-2 gradient-brand text-[#0A0A0A] font-bold px-5 py-2.5 rounded-full btn-glow disabled:opacity-50">
-                  <Mail className="w-4 h-4" /> {inviting ? "Sending…" : "Send Invite"}
+                  className="flex items-center gap-2 gradient-brand text-[#0A0A0A] font-bold px-6 py-2.5 rounded-full btn-glow disabled:opacity-50 transition-all">
+                  {inviting ? (
+                    <><span className="w-4 h-4 border-2 border-[#0A0A0A]/30 border-t-[#0A0A0A] rounded-full animate-spin" /> Creating account…</>
+                  ) : (
+                    <><Key className="w-4 h-4" /> Send Invite</>
+                  )}
                 </button>
                 <button type="button" onClick={() => setShowInvite(false)}
                   className="border border-white/15 text-white/60 px-5 py-2.5 rounded-full hover:border-white/30 hover:text-white transition-all">
@@ -132,7 +246,6 @@ export default function Users() {
                 </button>
               </div>
             </form>
-            <p className="text-white/25 text-xs">The user will receive an email to set their password and access the admin panel.</p>
           </div>
         )}
 
@@ -159,18 +272,18 @@ export default function Users() {
                 {users.map((u) => {
                   const isYou = u.id === currentUser?.id;
                   return (
-                    <tr key={u.id} className="border-b border-white/5 hover:bg-white/3 transition-colors">
+                    <tr key={u.id} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors">
                       <td className="px-5 py-4">
                         <div className="flex items-center gap-3">
                           <div className="w-9 h-9 rounded-full gradient-brand flex items-center justify-center flex-shrink-0">
-                            <span className="text-[#0A0A0A] font-black text-xs">{(u.full_name || "A").charAt(0)}</span>
+                            <span className="text-[#0A0A0A] font-black text-xs">{(u.full_name || "A").charAt(0).toUpperCase()}</span>
                           </div>
                           <div>
                             <div className="text-white font-medium text-sm flex items-center gap-1.5">
-                              {u.full_name || "Unknown"}
+                              {u.full_name || "Admin User"}
                               {isYou && <span className="text-[10px] text-[#D4AF37]/60 border border-[rgba(212,175,55,0.2)] rounded-full px-1.5">You</span>}
                             </div>
-                            <div className="text-white/30 text-xs">{u.id.slice(0, 8)}…</div>
+                            <div className="text-white/25 text-xs font-mono">{u.id.slice(0, 8)}…</div>
                           </div>
                         </div>
                       </td>
@@ -185,17 +298,16 @@ export default function Users() {
                       </td>
                       <td className="px-5 py-4">
                         <div className="flex items-center justify-end gap-2">
-                          {!isYou && (
-                            <>
-                              <select value={u.role}
-                                onChange={(e) => handleRoleChange(u.id, e.target.value as "admin" | "super_admin")}
-                                className="bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-white text-xs outline-none focus:border-[#D4AF37]/50">
-                                <option value="admin" className="bg-[#1A1A1A]">Admin</option>
-                                <option value="super_admin" className="bg-[#1A1A1A]">Super Admin</option>
-                              </select>
-                            </>
+                          {!isYou ? (
+                            <select value={u.role}
+                              onChange={(e) => handleRoleChange(u.id, e.target.value as "admin" | "super_admin")}
+                              className="bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-white text-xs outline-none focus:border-[#D4AF37]/50 cursor-pointer">
+                              <option value="admin" className="bg-[#1A1A1A]">Admin</option>
+                              <option value="super_admin" className="bg-[#1A1A1A]">Super Admin</option>
+                            </select>
+                          ) : (
+                            <span className="text-white/20 text-xs italic">current session</span>
                           )}
-                          {isYou && <span className="text-white/20 text-xs italic">current session</span>}
                         </div>
                       </td>
                     </tr>
@@ -210,7 +322,7 @@ export default function Users() {
         <div className="glass-card rounded-xl p-4 border border-[rgba(212,175,55,0.1)] flex items-start gap-3">
           <ShieldAlert className="w-4 h-4 text-[#D4AF37]/60 flex-shrink-0 mt-0.5" />
           <p className="text-white/30 text-xs leading-relaxed">
-            All admin accounts have access to the CMS. Super Admins can manage users and all settings. Admins can manage content only. Invited users receive an email to set their own password.
+            All admin accounts have full CMS access. Super Admins can manage users and all settings. When you invite a user, a secure temporary password is generated and emailed to them automatically.
           </p>
         </div>
       </div>
