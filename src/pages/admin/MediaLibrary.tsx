@@ -122,9 +122,25 @@ export default function MediaLibrary() {
   };
 
   const copyUrl = (url: string) => {
-    navigator.clipboard.writeText(url);
+    try {
+      // Modern API (may be blocked in iframes)
+      navigator.clipboard.writeText(url).catch(() => fallbackCopy(url));
+    } catch {
+      fallbackCopy(url);
+    }
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const fallbackCopy = (text: string) => {
+    const el = document.createElement("textarea");
+    el.value = text;
+    el.style.cssText = "position:fixed;top:-9999px;left:-9999px;opacity:0";
+    document.body.appendChild(el);
+    el.focus();
+    el.select();
+    try { document.execCommand("copy"); } catch { /* silent */ }
+    document.body.removeChild(el);
   };
 
   const filtered = files.filter((f) => {
