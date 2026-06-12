@@ -1,372 +1,178 @@
-# Solution Villa – "The Digital YES" — Full Website Build Plan
+# Solution Villa — Secure CMS Backend Plan
 
 ## Context
-Build a world-class, enterprise-level website for Solution Villa, an African digital agency.
-Stack: React + Vite + TypeScript + Tailwind CSS + shadcn/ui.
-Backend: Enter Cloud (Supabase) for database, auth, edge functions.
-Design: Dark-first futuristic glassmorphism with Deep Blue (#0A2540), Electric Blue (#0066FF), Neon Cyan (#00E5FF).
+Enhancing the existing admin panel (at `/admin/*`) into a full-featured, secure CMS with role-based access, media management, activity auditing, SEO control, dynamic navigation, user management, site content editing, and an analytics dashboard. All content updates persist in the database and instantly reflect on the public frontend.
 
 ---
 
-## Phase 0 — Enable Enter Cloud + Install Dependencies
-- Enable Enter Cloud (Supabase) via `supabase_enable`
-- Install extra packages: `framer-motion`, `embla-carousel-react`, `react-hook-form`, `zod`, `@hookform/resolvers`, `recharts`, `yet-another-react-lightbox`, `react-intersection-observer`, `react-countup`, `canvas-confetti`
-- Add Google Fonts (Inter) to `index.html`
+## Existing Foundation (Do Not Break)
+- `src/pages/admin/` — 10 existing admin pages (Blog, Portfolio, CaseStudies, Team, Testimonials, Inquiries, Users stub, Settings stub, Dashboard, Login)
+- `src/components/admin/AdminLayout.tsx` — collapsible sidebar + topbar
+- `src/components/admin/ProtectedRoute.tsx` — auth guard
+- `src/context/AuthContext.tsx` — session + profile + RBAC (super_admin / admin)
+- Database: 7 tables already exist (contact_submissions, blog_posts, portfolio_items, case_studies, team_members, testimonials, user_profiles)
 
 ---
 
-## Phase 1 — Design System (index.css + tailwind.config.ts)
-Update both files with all brand tokens:
+## New Database Tables (single migration)
 
-### CSS Custom Properties (`index.css`)
+| Table | Purpose |
+|---|---|
+| `media_files` | Cloud storage file metadata (url, type, size, created_by) |
+| `activity_logs` | Audit trail: who did what, when, on which entity |
+| `seo_settings` | Per-page meta title, description, OG image (keyed by page_path) |
+| `navigation_items` | Dynamic menu links with parent/child (submenu) support |
+| `site_settings` | Key-value store for all site-wide settings (persists to DB) |
+| `page_sections` | JSON content blocks for editable homepage/about sections |
+
+**RLS policies:** Public read where appropriate; authenticated write for all; super_admin-only for sensitive tables.
+
+**Supabase Storage:** Create a public `media` bucket for file uploads.
+
+---
+
+## New Edge Function
+- `invite-user` — Supabase admin API call to create a new user account by email (super_admin only). Returns a temporary password / triggers password reset email.
+
+---
+
+## New Shared Utility
+- `src/lib/activityLog.ts` — `logActivity(supabase, action, entity_type, entity_id, details)` helper used by all admin pages on CRUD operations.
+
+---
+
+## New Admin Pages (8 new pages)
+
+### 1. `/admin/media` — Media Library (`MediaLibrary.tsx`)
+- Upload images/files drag-and-drop or click → Supabase Storage `media` bucket
+- Grid view of all uploaded files with name, size, type, date
+- Copy URL to clipboard, preview, delete
+- Filter by type (images / documents / video)
+
+### 2. `/admin/activity-logs` — Activity Logs (`ActivityLogs.tsx`)
+- Table of all admin actions (created/updated/deleted entity_type by user at time)
+- Filters: by user, by action type, by date range
+- Super Admin sees all; Admin sees only own actions
+- Auto-populated by `logActivity()` helper in all CRUD pages
+
+### 3. `/admin/seo` — SEO Settings (`SeoSettings.tsx`)
+- Table of all pages: Home, About, Blog, Portfolio, Case Studies, Team, Contact
+- Edit meta_title, meta_description, og_image, og_title per page
+- Changes saved to `seo_settings` table
+- Frontend: each public page reads from `seo_settings` and injects into `<head>` via a `useSeo()` hook
+
+### 4. `/admin/navigation` — Navigation Manager (`NavigationAdmin.tsx`)
+- CRUD for navigation items (label, href, sort_order, parent_id for submenus, is_active)
+- Drag-to-reorder (via simple up/down buttons)
+- Frontend Navbar reads from `navigation_items` table (falls back to static data)
+
+### 5. `/admin/pages` — Site Content Editor (`PageEditor.tsx`)
+- Edit key content sections stored in `page_sections`:
+  - Hero: headline, subheadline, CTA text, CTA link
+  - About: mission, vision text
+  - Stats: 4 stat labels and values
+  - Services: list of service titles/descriptions
+  - Contact: address, phone, email, map embed URL
+- Rich text with simple toolbar (bold, italic, lists) via native contenteditable or textarea
+- "Save & Preview" button opens public site in new tab
+
+### 6. `/admin/users` — Full User Management (`Users.tsx` rewrite)
+- Table of all users from `user_profiles` JOIN auth metadata
+- Change role (admin ↔ super_admin)  
+- Deactivate/reactivate accounts
+- "Invite New Admin" modal: enter email → calls `invite-user` edge function → sends invite email
+- Super Admin only; admins see access-denied screen (unchanged)
+
+### 7. `/admin/settings` — DB-Backed Settings (`Settings.tsx` rewrite)
+- Load from `site_settings` table on mount
+- Save to `site_settings` table on submit
+- Sections: General (name, tagline), Contact info, Social media links, WhatsApp number, Business hours
+
+### 8. `/admin/analytics` — Analytics Dashboard (enhanced `Dashboard.tsx`)
+- Existing stat cards remain
+- Add: contact submissions by week (bar chart), blog views by post (horizontal bar), portfolio by category (donut)
+- Use lightweight `recharts` library for charts
+- Export inquiries as CSV button
+
+---
+
+## Modified Existing Files
+
+### `src/components/admin/AdminLayout.tsx`
+Add new nav items:
+- Media Library (Image icon)
+- Navigation (Menu icon)  
+- Pages / Content (Layout icon)
+- SEO Settings (Search icon)
+- Analytics (BarChart icon)
+- Activity Logs (Clock icon)
+- Users (moved with super_admin badge)
+
+### `src/router.tsx`
+Add 6 new protected routes for the new pages.
+
+### Existing CRUD Pages (Blog, Portfolio, CaseStudies, Team, Testimonials, Inquiries)
+- Add `logActivity()` call after every create/update/delete operation
+- Add "Pick from Media Library" button on image URL fields (opens media picker modal)
+
+### Public Pages (Index, About, Blog, BlogPost, Contact)
+- Add `useSeo(pagePath)` hook that fetches from `seo_settings` and updates `<head>` meta tags
+- Content sections read from `page_sections` with static fallback
+
+---
+
+## File List
+
+**New files:**
 ```
-:root {
-  /* Brand Primitives */
-  --color-deep-blue: 216 80% 15%;        /* #0A2540 */
-  --color-electric-blue: 220 100% 50%;   /* #0066FF */
-  --color-neon-cyan: 191 100% 50%;       /* #00E5FF */
-  --color-surface-dark: 220 60% 5%;      /* #060F1E */
-  --color-surface-mid: 216 80% 15%;      /* #0A2540 */
-  --color-surface-raised: 213 70% 18%;   /* #0D2D4E */
-
-  /* Semantic Tokens (override shadcn defaults) */
-  --background: var(--color-surface-dark);
-  --foreground: 0 0% 100%;
-  --primary: var(--color-electric-blue);
-  --primary-foreground: 0 0% 100%;
-  --secondary: var(--color-surface-mid);
-  --secondary-foreground: 0 0% 100%;
-  --accent: var(--color-neon-cyan);
-  --accent-foreground: 220 60% 5%;
-  --muted: 213 40% 20%;
-  --muted-foreground: 215 20% 60%;
-  --card: 216 80% 15%;        /* glass base */
-  --border: 220 40% 20%;
-  --input: 220 40% 18%;
-  --ring: var(--color-neon-cyan);
-  --radius: 0.75rem;
-
-  /* Glass */
-  --glass-bg: rgba(10,37,64,0.55);
-  --glass-border: rgba(0,102,255,0.25);
-  --glass-blur: blur(20px) saturate(180%);
-  --glass-shadow: 0 8px 32px rgba(0,0,0,0.4), 0 0 0 1px rgba(0,229,255,0.06);
-
-  /* Gradients */
-  --gradient-hero: linear-gradient(135deg, #060F1E 0%, #0A2540 45%, #001A4D 100%);
-  --gradient-brand: linear-gradient(90deg, #0066FF 0%, #00E5FF 100%);
-  --gradient-glow: radial-gradient(ellipse at center, rgba(0,102,255,0.35) 0%, transparent 70%);
-  --gradient-card: linear-gradient(135deg, rgba(0,102,255,0.12) 0%, rgba(0,229,255,0.05) 100%);
-  --gradient-text: linear-gradient(90deg, #0066FF, #00E5FF);
-
-  /* Animations */
-  --ease-spring: cubic-bezier(0.34,1.56,0.64,1);
-  --ease-standard: cubic-bezier(0.4,0,0.2,1);
-}
-```
-
-### tailwind.config.ts additions
-- Custom colors: `electric-blue`, `deep-blue`, `neon-cyan`, `surface-dark`, `surface-mid`, `surface-raised`
-- Custom animations: `float`, `pulse-glow`, `gradient-shift`, `bounce-soft`, `fade-up`
-- Custom keyframes for all animations above
-- Extended `boxShadow` with `glow`, `glass`, `card` variants
-- Extended `backdropBlur` with `glass` variant
-
----
-
-## Phase 2 — Layout Components
-### Files to create:
-- `src/components/layout/Navbar.tsx` — sticky transparent→solid, mobile drawer, "Get a Quote" CTA
-- `src/components/layout/Footer.tsx` — 4-column grid, newsletter input, social icons
-- `src/components/layout/PageLayout.tsx` — wraps pages with Navbar + Footer
-
-### Navbar behavior:
-- `useScrollPosition` hook → adds `scrolled` class at 80px
-- Mobile: Sheet drawer (right-side), hamburger icon (Menu/X toggle)
-- Links: Home, About, Services, Portfolio, Case Studies, Blog, Contact
-- CTA button: gradient pill "Get a Quote" → scrolls to contact form
-
----
-
-## Phase 3 — Home Page (`src/pages/Index.tsx`)
-Compose from section components (each in `src/components/home/`):
-
-### `HeroSection.tsx`
-- Full-screen (100vh), `--gradient-hero` background
-- Animated mesh orbs (CSS keyframes, 3 radial-gradient layers)
-- Particle canvas (60 floating tech-icon nodes via `canvas` + `requestAnimationFrame`)
-- Eyebrow tag: "The Digital YES" (neon-cyan pill)
-- Animated headline with word-swap (rotating keywords via `useState` + interval)
-- Sub-headline + dual CTA buttons
-- Stats bar: 4 counters (200+ Projects, 150+ Clients, 50+ Team, 8+ Years) using `react-countup`
-- Animated scroll indicator (ChevronDown bouncing)
-- Entrance: Framer Motion `staggerChildren`, each element `fade-up` with delay
-
-### `ServicesSection.tsx`
-- Section title + subtitle
-- 10 `ServiceCard` components in responsive grid (4→2→1 cols)
-- Each card: glassmorphism, lucide icon, title, description, "Learn More" link
-- Hover: `translateY(-4px)`, border brightens to neon-cyan, corner glow appears
-- Scroll-triggered stagger entrance via `react-intersection-observer`
-- Services list: Branding & Design, Digital Marketing, Event Production, Media & Content, Website Development, Printing Solutions, Business Consulting, Mobile Apps, Software Solutions, Cloud Solutions
-
-### `StatsSection.tsx`
-- Dark gradient band
-- 4 counter items with `react-countup` triggered by viewport entry
-- Gradient text on values, muted label
-
-### `PortfolioPreview.tsx`
-- Section heading
-- 6-item masonry grid (3→2→1 cols) with placeholder images
-- Category filter tabs (All, Branding, Web, Apps, Events, Media)
-- Hover overlay with project title + category badge + lightbox icon
-- "View All Work" CTA button
-
-### `TestimonialsSection.tsx`
-- Embla Carousel with 5 testimonial cards
-- Each: quote icon, text, avatar, name/title/company
-- Dot indicators, prev/next arrows
-- Auto-play every 6s, pause on hover
-
-### `BlogPreview.tsx`
-- 3 blog cards in responsive grid
-- Each: thumbnail, category badge, title, excerpt, author row
-- "Read All Articles" CTA
-
-### `CTASection.tsx`
-- Full-width gradient band: "Ready to Transform Your Business?"
-- Primary CTA: "Let's Build Something Amazing"
-
----
-
-## Phase 4 — Other Public Pages
-
-### `src/pages/About.tsx`
-- Hero banner with page title
-- Mission / Vision / Core Values (3 glassmorphism cards)
-- Company story timeline (alternating left/right on desktop, stacked mobile)
-- Team preview grid (4 cards) + "Meet The Full Team" button
-- CTA banner → Contact
-
-### `src/pages/Team.tsx`
-- Page hero
-- Department filter tabs
-- Team member cards grid (4→2→1 cols)
-- Each card: photo (avatar placeholder), name, position, bio, social icons (LinkedIn, Twitter)
-- Hover: subtle flip or slide-up bio reveal
-
-### `src/pages/Portfolio.tsx`
-- Page hero
-- Filter tabs (All, Branding, Websites, Mobile Apps, Events, Media, Printing, Marketing)
-- Masonry grid (CSS columns, 3→2→1)
-- Lightbox via `yet-another-react-lightbox`
-- Each item: image, overlay with title + category + open icon
-
-### `src/pages/CaseStudies.tsx`
-- Page hero + search bar
-- Category + industry filter
-- Featured case study (wide card) + grid of case study cards
-- Each card: cover image, client name, industry tag, brief description
-
-### `src/pages/CaseStudyDetail.tsx` (`:id` route)
-- Cover image hero
-- Client info bar (name, industry, date)
-- Challenge / Solution / Results sections (3-column on desktop)
-- Results stats (3 animated counters)
-- Gallery grid
-- Video embed (YouTube iframe)
-- Client testimonial quote block
-- Related case studies
-
-### `src/pages/Blog.tsx`
-- Featured post (large hero card) at top
-- Search bar + category filter tabs
-- Blog card grid (3→2→1 cols)
-- Pagination
-
-### `src/pages/BlogPost.tsx` (`:slug` route)
-- Reading progress bar (top of viewport)
-- Post header: title, author, date, category, read time
-- Rich text body (styled prose)
-- Related posts (3 cards)
-
-### `src/pages/Contact.tsx`
-- Page hero
-- 2-column layout: Contact Form (left) + Office Info Panel (right)
-- Form: Name, Email, Phone, Subject (select), Message, Submit
-- Office panel: address, phone, email, hours, social icons, map embed
-- Form submission → Enter Cloud (Supabase) `contact_submissions` table + toast notification
-
----
-
-## Phase 5 — Enter Cloud (Supabase) Setup
-
-### Database Tables
-```sql
--- contact_submissions
-id uuid PK, name text, email text, phone text, subject text, message text, created_at timestamptz, status text DEFAULT 'new'
-
--- blog_posts
-id uuid PK, title text, slug text UNIQUE, excerpt text, body text, category text, tags text[], author_id uuid, featured_image text, status text DEFAULT 'draft', published_at timestamptz, created_at timestamptz, updated_at timestamptz, views int DEFAULT 0
-
--- portfolio_items
-id uuid PK, title text, category text, description text, image_url text, client text, year int, tags text[], sort_order int, status text DEFAULT 'published'
-
--- case_studies
-id uuid PK, title text, slug text UNIQUE, client text, industry text, cover_image text, problem text, solution text, results text, gallery text[], video_url text, testimonial text, testimonial_author text, status text DEFAULT 'published', created_at timestamptz
-
--- team_members
-id uuid PK, name text, position text, department text, bio text, photo_url text, linkedin text, twitter text, sort_order int, status text DEFAULT 'active'
-
--- testimonials
-id uuid PK, quote text, author_name text, author_title text, company text, avatar_url text, status text DEFAULT 'published', sort_order int
-
--- users_profiles (extends Supabase auth.users)
-id uuid PK (references auth.users), full_name text, role text CHECK (role IN ('super_admin','admin')), avatar_url text, created_at timestamptz
+supabase/functions/invite-user/index.ts
+src/lib/activityLog.ts
+src/hooks/useSeo.ts
+src/components/admin/MediaPickerModal.tsx
+src/pages/admin/MediaLibrary.tsx
+src/pages/admin/ActivityLogs.tsx
+src/pages/admin/SeoSettings.tsx
+src/pages/admin/NavigationAdmin.tsx
+src/pages/admin/PageEditor.tsx
 ```
 
-### Row Level Security
-- `contact_submissions`: Insert for anon, Select/Update for authenticated admins
-- `blog_posts`/`portfolio_items`/etc.: Select published for anon, full CRUD for authenticated
-- `users_profiles`: Admins see all; users see own
-
-### Auth
-- Supabase email/password auth
-- `users_profiles.role` checked on login → stored in React context
-
----
-
-## Phase 6 — Admin Panel
-
-### Routes (all under `/admin`)
-- `/admin` → redirect to `/admin/dashboard`
-- `/admin/login` — login page (protected, redirects if already authed)
-- `/admin/dashboard` — stats overview
-- `/admin/blog` — list + CRUD
-- `/admin/blog/new` — new post editor
-- `/admin/blog/:id/edit` — edit post
-- `/admin/portfolio` — list + CRUD
-- `/admin/portfolio/new` / `edit`
-- `/admin/case-studies` — list + CRUD
-- `/admin/team` — list + CRUD
-- `/admin/testimonials` — list + CRUD
-- `/admin/inquiries` — contact submissions list (read + status update)
-- `/admin/users` — Super Admin only: manage users + roles
-- `/admin/settings` — site info, SEO defaults
-
-### Layout
-- `src/components/admin/AdminLayout.tsx` — fixed sidebar (240px) + topbar
-- `src/components/admin/Sidebar.tsx` — nav items with RBAC visibility
-- `src/components/admin/Topbar.tsx` — page title, notifications, user dropdown
-
-### Key Components
-- `src/components/admin/StatsCard.tsx` — dashboard stat tiles
-- `src/components/admin/DataTable.tsx` — reusable table with actions
-- `src/components/admin/ContentEditor.tsx` — rich text editor (textarea for now, upgrade to Tiptap later)
-- `src/components/admin/ImageUpload.tsx` — URL-based image input (no binary upload needed initially)
-- `src/components/admin/StatusBadge.tsx` — published/draft/archived pills
-
-### Auth Guard
-- `src/components/admin/ProtectedRoute.tsx` — checks Supabase session, redirects to login if none
-- `src/context/AuthContext.tsx` — provides user, role, signIn, signOut
-
-### RBAC Rules
-- Super Admin: all nav items + delete buttons + Users page
-- Admin: no Users & Roles nav item, no delete on content (hide button, not just style)
-
----
-
-## Phase 7 — Shared Utility Components
-- `src/components/ui/GlassCard.tsx` — reusable glassmorphism card wrapper
-- `src/components/ui/SectionHeader.tsx` — eyebrow + title + subtitle pattern
-- `src/components/ui/AnimatedCounter.tsx` — countup with IntersectionObserver
-- `src/components/ui/ParticleCanvas.tsx` — hero particle system
-- `src/components/ui/GradientText.tsx` — gradient clip-path text
-- `src/components/ui/ScrollReveal.tsx` — IntersectionObserver fade-up wrapper
-- `src/hooks/useScrollPosition.ts` — scroll Y tracker for Navbar
-- `src/lib/supabase.ts` — Supabase client
-
----
-
-## Files to Modify
-- `src/index.css` — full design token rewrite
-- `tailwind.config.ts` — brand color extensions + custom animations
-- `src/router.tsx` — add all public + admin routes
-- `src/App.tsx` — wrap with AuthContext + global QueryClient
-- `src/pages/Index.tsx` — compose Home page from section components
-- `index.html` — add Google Fonts (Inter)
-
----
-
-## Files to Create (organized)
+**Modified files:**
 ```
-src/
-  context/AuthContext.tsx
-  hooks/useScrollPosition.ts
-  lib/supabase.ts
-  lib/data.ts                     ← static seed data (services, testimonials, etc.)
-  components/
-    layout/
-      Navbar.tsx
-      Footer.tsx
-      PageLayout.tsx
-    home/
-      HeroSection.tsx
-      ServicesSection.tsx
-      StatsSection.tsx
-      PortfolioPreview.tsx
-      TestimonialsSection.tsx
-      BlogPreview.tsx
-      CTASection.tsx
-    admin/
-      AdminLayout.tsx
-      Sidebar.tsx
-      Topbar.tsx
-      ProtectedRoute.tsx
-      StatsCard.tsx
-      DataTable.tsx
-      StatusBadge.tsx
-    ui/
-      GlassCard.tsx
-      SectionHeader.tsx
-      AnimatedCounter.tsx
-      ParticleCanvas.tsx
-      GradientText.tsx
-      ScrollReveal.tsx
-  pages/
-    About.tsx
-    Team.tsx
-    Portfolio.tsx
-    CaseStudies.tsx
-    CaseStudyDetail.tsx
-    Blog.tsx
-    BlogPost.tsx
-    Contact.tsx
-    admin/
-      Login.tsx
-      Dashboard.tsx
-      BlogAdmin.tsx
-      PortfolioAdmin.tsx
-      CaseStudiesAdmin.tsx
-      TeamAdmin.tsx
-      TestimonialsAdmin.tsx
-      Inquiries.tsx
-      Users.tsx
-      Settings.tsx
+src/components/admin/AdminLayout.tsx        (add nav items)
+src/router.tsx                               (add 5 new routes)
+src/pages/admin/Users.tsx                   (full rewrite)
+src/pages/admin/Settings.tsx                (DB-backed rewrite)
+src/pages/admin/Dashboard.tsx               (add charts, CSV export)
+src/pages/admin/BlogAdmin.tsx               (add logActivity + media picker)
+src/pages/admin/PortfolioAdmin.tsx          (add logActivity + media picker)
+src/pages/admin/TeamAdmin.tsx               (add logActivity)
+src/pages/admin/TestimonialsAdmin.tsx       (add logActivity)
+src/pages/admin/CaseStudiesAdmin.tsx        (add logActivity)
 ```
+
+---
+
+## Security Model
+
+| Role | Capabilities |
+|---|---|
+| `super_admin` | All CMS features + user management + invite admins + view all activity logs |
+| `admin` | Content CRUD (blog/portfolio/team/testimonials/case studies/inquiries) + media + own activity logs |
+| Public | Read-only access to published content; no admin routes |
+
+- All admin routes wrapped in `<ProtectedRoute>` (auth guard)
+- Sensitive operations (user invite, role change) guarded by `isSuperAdmin` check in component + RLS on DB
+- `invite-user` edge function validates caller's role server-side before creating new user
 
 ---
 
 ## Verification
-1. Home page hero renders with animated gradient + particle canvas + counters
-2. Service cards show glassmorphism with hover effects
-3. Portfolio filter tabs switch categories with animation
-4. Testimonials carousel auto-plays
-5. Contact form submits to Supabase and shows toast
-6. Admin login page authenticates via Supabase auth
-7. Admin dashboard shows stats from DB
-8. Admin CRUD works for blog/portfolio/team
-9. Super Admin sees Users page; Admin does not
-10. All pages are responsive (mobile, tablet, desktop)
-11. Navbar transitions from transparent to solid on scroll
-12. All animations respect `prefers-reduced-motion`
+1. Navigate to `/admin/login` → login works
+2. Visit each new admin route → loads without error
+3. Upload file in Media Library → appears in grid + URL is copyable
+4. Create blog post → Activity Logs shows the entry
+5. Edit SEO settings for Home → `<title>` tag updates in browser
+6. Save a navigation item → Navbar on public site reflects change
+7. Super Admin can invite user; Admin cannot access Users page
+8. Dashboard charts render with live data
+9. Settings save to DB (persist after page refresh)
