@@ -1,0 +1,73 @@
+
+-- Enable pgcrypto if not already enabled
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+
+-- Create the super admin user in auth.users
+DO $$
+DECLARE
+  user_id uuid := gen_random_uuid();
+  user_email text := 'digitalyes.solutionvilla@gmail.com';
+  user_password text := 'Newsolution@123';
+BEGIN
+  -- Check if user already exists
+  IF NOT EXISTS (SELECT 1 FROM auth.users WHERE email = user_email) THEN
+    INSERT INTO auth.users (
+      id,
+      instance_id,
+      email,
+      encrypted_password,
+      email_confirmed_at,
+      created_at,
+      updated_at,
+      raw_app_meta_data,
+      raw_user_meta_data,
+      is_super_admin,
+      role,
+      aud,
+      confirmation_token,
+      recovery_token,
+      email_change_token_new,
+      email_change
+    ) VALUES (
+      user_id,
+      '00000000-0000-0000-0000-000000000000',
+      user_email,
+      crypt(user_password, gen_salt('bf', 10)),
+      now(),
+      now(),
+      now(),
+      '{"provider": "email", "providers": ["email"]}',
+      '{"full_name": "Solution Villa Super Admin", "role": "super_admin"}',
+      false,
+      'authenticated',
+      'authenticated',
+      '',
+      '',
+      '',
+      ''
+    );
+
+    -- Create the user profile with super_admin role
+    INSERT INTO public.user_profiles (id, full_name, role, created_at)
+    VALUES (user_id, 'Solution Villa Super Admin', 'super_admin', now())
+    ON CONFLICT (id) DO UPDATE SET role = 'super_admin', full_name = 'Solution Villa Super Admin';
+
+    RAISE NOTICE 'Super admin created with id: %', user_id;
+  ELSE
+    -- Update password if user exists
+    UPDATE auth.users
+    SET encrypted_password = crypt(user_password, gen_salt('bf', 10)),
+        email_confirmed_at = COALESCE(email_confirmed_at, now()),
+        updated_at = now(),
+        raw_user_meta_data = '{"full_name": "Solution Villa Super Admin", "role": "super_admin"}'
+    WHERE email = user_email
+    RETURNING id INTO user_id;
+
+    -- Ensure super_admin profile
+    INSERT INTO public.user_profiles (id, full_name, role, created_at)
+    VALUES (user_id, 'Solution Villa Super Admin', 'super_admin', now())
+    ON CONFLICT (id) DO UPDATE SET role = 'super_admin', full_name = 'Solution Villa Super Admin';
+
+    RAISE NOTICE 'Super admin updated with id: %', user_id;
+  END IF;
+END $$;
