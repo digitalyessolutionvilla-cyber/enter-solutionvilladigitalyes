@@ -15,12 +15,12 @@ const values = [
 ];
 
 const timeline = [
-  { year: "2016", title: "Founded in Lagos", desc: "Solution Villa was established with a mission to bridge Africa's digital gap." },
-  { year: "2018", title: "First 50 Clients", desc: "Expanded to serve businesses across Nigeria and Ghana with branding and web services." },
-  { year: "2020", title: "Tech Division Launch", desc: "Launched software and mobile app development practice, serving enterprise clients." },
-  { year: "2022", title: "Pan-African Expansion", desc: "Extended operations to Kenya, South Africa, and Côte d'Ivoire." },
-  { year: "2023", title: "Cloud & AI Services", desc: "Added cloud infrastructure and AI-powered digital marketing capabilities." },
-  { year: "2024", title: "200+ Projects Milestone", desc: "Celebrated 200 successful projects across 15 African countries." },
+  { year: "2016", title: "The Beginning (Idea is Born)", desc: "Started as a one-man operation in Lagos, driven by vision, resilience, and the determination to build something meaningful from nothing." },
+  { year: "2018", title: "First Breakthrough (30 Clients Milestone)", desc: "Secured the first 30 clients. Expanded services across Lagos and Ogun State, focusing on branding and web development solutions for growing businesses." },
+  { year: "2020", title: "Learning & Refinement Phase", desc: "A season of growth through challenges. Focused on improving technical skills, understanding client needs better, and refining service delivery systems." },
+  { year: "2022", title: "Industry Exposure & Experience", desc: "Gained hands-on experience working across different sectors, including collaboration with an insurance company. This expanded professional depth and operational understanding." },
+  { year: "2023", title: "Consolidation & Direction Shift", desc: "Strengthened brand identity and service structure. Began positioning for scale, improving processes, and aligning services for larger institutional clients and structured projects." },
+  { year: "2026", title: "Expansion & Impact Era", desc: "Transformed from a one-man operation into a strong, structured team. Delivered high-impact digital solutions, including 5 websites in a week and an event tracking web application for a top-tier agency in Lagos." },
 ];
 
 export default function About() {
@@ -100,6 +100,7 @@ export default function About() {
           <motion.div className="text-center mb-14" initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
             <span className="text-[#F5D76E] text-xs font-bold tracking-widest uppercase block mb-3">Our Journey</span>
             <h2 className="text-3xl md:text-5xl font-black text-white">The <span className="gradient-text">Story So Far</span></h2>
+            <p className="text-white/45 mt-3 text-lg">Journey of Growth</p>
           </motion.div>
 
           <div className="relative max-w-3xl mx-auto">
