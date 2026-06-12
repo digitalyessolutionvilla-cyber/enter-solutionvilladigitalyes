@@ -159,21 +159,21 @@ export default function HeroSection() {
           {/* Headline */}
           <motion.h1
             variants={itemVariants}
-            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-display font-black text-white leading-[1.05] tracking-tight mb-2"
+            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-display font-black text-white leading-[1.12] tracking-tight mb-4"
           >
             {hero.headline1}
           </motion.h1>
           <motion.h1
             variants={itemVariants}
-            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-display font-black text-white leading-[1.05] tracking-tight mb-3"
+            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-display font-black text-white leading-[1.12] tracking-tight mb-6"
           >
             {hero.headline2}
           </motion.h1>
 
           {/* Animated keyword */}
-          <motion.div variants={itemVariants} className="h-[1.15em] flex items-center justify-center mb-8">
+          <motion.div variants={itemVariants} className="h-[1.2em] flex items-center justify-center mb-10">
             <span
-              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-display font-black gradient-text leading-[1.05] tracking-tight transition-all duration-400"
+              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-display font-black gradient-text leading-[1.12] tracking-tight transition-all duration-400"
               style={{ opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(-12px)" }}
             >
               {keywords[keywordIndex]}
