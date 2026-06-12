@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useSeo } from "@/hooks/useSeo";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowRight, Search } from "lucide-react";
@@ -8,6 +9,7 @@ import { caseStudies } from "@/lib/data";
 const industries = ["All", "Technology", "Fintech", "Events", "Healthcare", "Retail"];
 
 export default function CaseStudies() {
+  useSeo("/case-studies");
   const [active, setActive] = useState("All");
   const [query, setQuery] = useState("");
 

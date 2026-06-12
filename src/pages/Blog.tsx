@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useSeo } from "@/hooks/useSeo";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Search, Clock, User, ArrowRight } from "lucide-react";
@@ -8,6 +9,7 @@ import { blogPosts } from "@/lib/data";
 const categories = ["All", "Digital Marketing", "Branding", "Technology", "Business", "Africa"];
 
 export default function Blog() {
+  useSeo("/blog");
   const [active, setActive] = useState("All");
   const [query, setQuery] = useState("");
 

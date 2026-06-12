@@ -5,6 +5,7 @@ import AdminLayout from "@/components/admin/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import { logActivity } from "@/lib/activityLog";
 
 interface TeamMember {
   id: string;
@@ -44,6 +45,7 @@ export default function TeamAdmin() {
       : await supabase.from("team_members").insert([form]);
     setSaving(false);
     if (error) { toast({ title: "Error", description: error.message, variant: "destructive" }); return; }
+    await logActivity(editingId ? "updated" : "created", "team_member", editingId || "new", form.name);
     toast({ title: editingId ? "Member updated" : "Member added" });
     setShowForm(false); setEditingId(null); setForm(defaultForm); load();
   };

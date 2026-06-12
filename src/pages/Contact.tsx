@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useSeo } from "@/hooks/useSeo";
 import { motion } from "framer-motion";
 import { MapPin, Phone, Mail, Clock, Send, CheckCircle, Twitter, Linkedin, Facebook, Instagram } from "lucide-react";
 import PageLayout from "@/components/layout/PageLayout";
@@ -15,6 +16,7 @@ const officeInfo = [
 const subjects = ["General Inquiry", "Branding & Design", "Website Development", "Mobile App", "Digital Marketing", "Event Production", "Business Consulting", "Other"];
 
 export default function Contact() {
+  useSeo("/contact");
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useSeo } from "@/hooks/useSeo";
 import { motion, AnimatePresence } from "framer-motion";
 import { ExternalLink, X, ChevronLeft, ChevronRight } from "lucide-react";
 import PageLayout from "@/components/layout/PageLayout";
@@ -7,6 +8,7 @@ import { portfolioItems } from "@/lib/data";
 const categories = ["All", "Branding", "Websites", "Mobile Apps", "Events", "Media", "Software", "Printing", "Marketing"];
 
 export default function Portfolio() {
+  useSeo("/portfolio");
   const [active, setActive] = useState("All");
   const [lightbox, setLightbox] = useState<number | null>(null);
 

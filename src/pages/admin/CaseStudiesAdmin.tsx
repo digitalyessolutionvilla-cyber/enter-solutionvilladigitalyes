@@ -5,6 +5,7 @@ import AdminLayout from "@/components/admin/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import { logActivity } from "@/lib/activityLog";
 
 interface CaseStudy {
   id: string;
@@ -44,6 +45,7 @@ export default function CaseStudiesAdmin() {
       : await supabase.from("case_studies").insert([payload]);
     setSaving(false);
     if (error) { toast({ title: "Error", description: error.message, variant: "destructive" }); return; }
+    await logActivity(editingId ? "updated" : "created", "case_study", editingId || "new", form.title || "Case Study");
     toast({ title: editingId ? "Updated" : "Created" });
     setShowForm(false); setEditingId(null); setForm(defaultForm); load();
   };
@@ -51,6 +53,7 @@ export default function CaseStudiesAdmin() {
   const handleDelete = async (id: string) => {
     if (!confirm("Delete this case study?")) return;
     await supabase.from("case_studies").delete().eq("id", id);
+    await logActivity("deleted", "case_study", id, "Case Study");
     toast({ title: "Deleted" }); load();
   };
 

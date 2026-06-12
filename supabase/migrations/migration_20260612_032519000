@@ -1,0 +1,162 @@
+
+-- ═══════════════════════════════════════════════════
+-- MEDIA FILES
+-- ═══════════════════════════════════════════════════
+CREATE TABLE IF NOT EXISTS media_files (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  file_name text NOT NULL,
+  file_url text NOT NULL,
+  file_type text NOT NULL DEFAULT 'image',
+  mime_type text,
+  file_size bigint DEFAULT 0,
+  alt_text text,
+  folder text DEFAULT 'general',
+  created_by uuid REFERENCES auth.users(id) ON DELETE SET NULL,
+  created_at timestamptz DEFAULT now()
+);
+ALTER TABLE media_files ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Authenticated can view media" ON media_files FOR SELECT USING (auth.role() = 'authenticated');
+CREATE POLICY "Authenticated can insert media" ON media_files FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+CREATE POLICY "Authenticated can delete own media" ON media_files FOR DELETE USING (auth.role() = 'authenticated');
+
+-- ═══════════════════════════════════════════════════
+-- ACTIVITY LOGS
+-- ═══════════════════════════════════════════════════
+CREATE TABLE IF NOT EXISTS activity_logs (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id uuid REFERENCES auth.users(id) ON DELETE SET NULL,
+  user_email text,
+  action text NOT NULL,
+  entity_type text NOT NULL,
+  entity_id text,
+  entity_title text,
+  details jsonb DEFAULT '{}',
+  created_at timestamptz DEFAULT now()
+);
+ALTER TABLE activity_logs ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Admins can read activity logs" ON activity_logs FOR SELECT USING (auth.role() = 'authenticated');
+CREATE POLICY "Admins can insert activity logs" ON activity_logs FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+
+-- ═══════════════════════════════════════════════════
+-- SEO SETTINGS
+-- ═══════════════════════════════════════════════════
+CREATE TABLE IF NOT EXISTS seo_settings (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  page_path text UNIQUE NOT NULL,
+  page_name text NOT NULL,
+  meta_title text,
+  meta_description text,
+  og_title text,
+  og_description text,
+  og_image text,
+  canonical_url text,
+  no_index boolean DEFAULT false,
+  updated_at timestamptz DEFAULT now()
+);
+ALTER TABLE seo_settings ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Public can read SEO settings" ON seo_settings FOR SELECT USING (true);
+CREATE POLICY "Admins can manage SEO settings" ON seo_settings FOR ALL USING (auth.role() = 'authenticated');
+
+-- Seed default SEO for all pages
+INSERT INTO seo_settings (page_path, page_name, meta_title, meta_description, og_title, og_description) VALUES
+  ('/', 'Home', 'Solution Villa – The Digital YES', 'Premium technology and digital solutions agency. We deliver world-class branding, software, marketing, and media.', 'Solution Villa – The Digital YES', 'Premium Solutions. Premium Experience. Premium Results.'),
+  ('/about', 'About', 'About Us – Solution Villa', 'Learn about Solution Villa''s mission, values, and the team behind Africa''s most premium digital agency.', 'About Solution Villa', 'Our story, mission, and the premium team behind The Digital YES.'),
+  ('/team', 'Team', 'Our Team – Solution Villa', 'Meet the world-class professionals driving digital transformation at Solution Villa.', 'The Solution Villa Team', 'World-class talent. Premium results.'),
+  ('/portfolio', 'Portfolio', 'Portfolio – Solution Villa', 'Explore our premium portfolio of branding, web, app, and marketing projects.', 'Solution Villa Portfolio', 'Premium work for premium brands.'),
+  ('/case-studies', 'Case Studies', 'Case Studies – Solution Villa', 'Real results from real clients. Explore Solution Villa''s documented success stories.', 'Solution Villa Case Studies', 'Data-driven results. Measurable impact.'),
+  ('/blog', 'Blog', 'Blog – Solution Villa', 'Insights on digital marketing, branding, technology and business from Africa''s leading digital agency.', 'Solution Villa Blog', 'Premium knowledge. Premium insights.'),
+  ('/contact', 'Contact', 'Contact Us – Solution Villa', 'Get in touch with Solution Villa to start your premium digital transformation journey.', 'Contact Solution Villa', 'Let''s build something premium together.')
+ON CONFLICT (page_path) DO NOTHING;
+
+-- ═══════════════════════════════════════════════════
+-- NAVIGATION ITEMS
+-- ═══════════════════════════════════════════════════
+CREATE TABLE IF NOT EXISTS navigation_items (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  label text NOT NULL,
+  href text NOT NULL,
+  parent_id uuid REFERENCES navigation_items(id) ON DELETE CASCADE,
+  sort_order int DEFAULT 0,
+  is_active boolean DEFAULT true,
+  opens_new_tab boolean DEFAULT false,
+  icon text,
+  created_at timestamptz DEFAULT now()
+);
+ALTER TABLE navigation_items ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Public can read active nav items" ON navigation_items FOR SELECT USING (is_active = true);
+CREATE POLICY "Admins can manage nav items" ON navigation_items FOR ALL USING (auth.role() = 'authenticated');
+
+-- Seed default navigation
+INSERT INTO navigation_items (label, href, sort_order) VALUES
+  ('Home', '/', 1),
+  ('About', '/about', 2),
+  ('Services', '/#services', 3),
+  ('Portfolio', '/portfolio', 4),
+  ('Case Studies', '/case-studies', 5),
+  ('Blog', '/blog', 6),
+  ('Team', '/team', 7),
+  ('Contact', '/contact', 8)
+ON CONFLICT DO NOTHING;
+
+-- ═══════════════════════════════════════════════════
+-- SITE SETTINGS (key-value store)
+-- ═══════════════════════════════════════════════════
+CREATE TABLE IF NOT EXISTS site_settings (
+  key text PRIMARY KEY,
+  value text,
+  label text,
+  group_name text DEFAULT 'general',
+  updated_at timestamptz DEFAULT now()
+);
+ALTER TABLE site_settings ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Public can read site settings" ON site_settings FOR SELECT USING (true);
+CREATE POLICY "Admins can manage site settings" ON site_settings FOR ALL USING (auth.role() = 'authenticated');
+
+-- Seed default settings
+INSERT INTO site_settings (key, value, label, group_name) VALUES
+  ('site_name', 'Solution Villa', 'Site Name', 'general'),
+  ('site_tagline', 'The Digital YES', 'Tagline', 'general'),
+  ('site_description', 'Africa''s most premium technology and digital solutions agency.', 'Description', 'general'),
+  ('contact_email', 'hello@solutionvilla.com', 'Contact Email', 'contact'),
+  ('contact_phone', '+234 800 000 0000', 'Phone Number', 'contact'),
+  ('contact_whatsapp', '+234 800 000 0000', 'WhatsApp Number', 'contact'),
+  ('contact_address', '14 Marina Street, Victoria Island, Lagos, Nigeria', 'Office Address', 'contact'),
+  ('business_hours', 'Monday – Friday, 9am – 6pm WAT', 'Business Hours', 'contact'),
+  ('twitter_url', '#', 'Twitter URL', 'social'),
+  ('linkedin_url', '#', 'LinkedIn URL', 'social'),
+  ('facebook_url', '#', 'Facebook URL', 'social'),
+  ('instagram_url', '#', 'Instagram URL', 'social'),
+  ('youtube_url', '#', 'YouTube URL', 'social'),
+  ('google_analytics_id', '', 'Google Analytics ID', 'analytics'),
+  ('maintenance_mode', 'false', 'Maintenance Mode', 'advanced')
+ON CONFLICT (key) DO NOTHING;
+
+-- ═══════════════════════════════════════════════════
+-- PAGE SECTIONS (content editor)
+-- ═══════════════════════════════════════════════════
+CREATE TABLE IF NOT EXISTS page_sections (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  page_path text NOT NULL,
+  section_key text NOT NULL,
+  section_label text NOT NULL,
+  content jsonb NOT NULL DEFAULT '{}',
+  updated_by uuid REFERENCES auth.users(id) ON DELETE SET NULL,
+  updated_at timestamptz DEFAULT now(),
+  UNIQUE(page_path, section_key)
+);
+ALTER TABLE page_sections ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Public can read page sections" ON page_sections FOR SELECT USING (true);
+CREATE POLICY "Admins can manage page sections" ON page_sections FOR ALL USING (auth.role() = 'authenticated');
+
+-- Seed default page sections
+INSERT INTO page_sections (page_path, section_key, section_label, content) VALUES
+  ('/', 'hero', 'Homepage Hero', '{"headline1":"Premium Solutions.","headline2":"Premium Experience.","subheadline":"Africa''s most premium technology and digital solutions agency. We deliver world-class branding, software, marketing, and media that transforms businesses into industry leaders.","cta_primary_text":"Start Your Premium Journey","cta_primary_href":"/contact","cta_secondary_text":"Explore Our Work","cta_secondary_href":"/portfolio"}'),
+  ('/', 'stats', 'Homepage Stats', '[{"label":"Projects Delivered","value":500,"suffix":"+"},{"label":"Happy Clients","value":200,"suffix":"+"},{"label":"Countries Served","value":15,"suffix":"+"},{"label":"Awards Won","value":30,"suffix":"+"}]'),
+  ('/about', 'mission', 'About – Mission & Vision', '{"mission":"To be Africa''s most trusted and innovative digital partner, delivering premium technology solutions that transform businesses into global market leaders.","vision":"A world where every African business has access to world-class digital solutions that drive sustainable growth and prosperity.","founded_year":"2014","headquarters":"Lagos, Nigeria"}')
+ON CONFLICT (page_path, section_key) DO NOTHING;
+
+-- ═══════════════════════════════════════════════════
+-- ENABLE REALTIME FOR KEY TABLES
+-- ═══════════════════════════════════════════════════
+ALTER PUBLICATION supabase_realtime ADD TABLE contact_submissions;
+ALTER PUBLICATION supabase_realtime ADD TABLE activity_logs;

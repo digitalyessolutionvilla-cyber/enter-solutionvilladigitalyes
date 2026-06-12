@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { logActivity } from "@/lib/activityLog";
 import { Mail, Phone, Calendar } from "lucide-react";
 
 interface Inquiry {

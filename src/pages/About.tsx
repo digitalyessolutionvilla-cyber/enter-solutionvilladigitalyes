@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { useSeo } from "@/hooks/useSeo";
 import { motion } from "framer-motion";
 import { ArrowRight, Target, Eye, Heart, Lightbulb, Shield, Users, Zap } from "lucide-react";
 import PageLayout from "@/components/layout/PageLayout";
@@ -23,6 +24,7 @@ const timeline = [
 ];
 
 export default function About() {
+  useSeo("/about");
   return (
     <PageLayout>
       {/* Hero */}

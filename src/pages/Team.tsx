@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useSeo } from "@/hooks/useSeo";
 import { motion } from "framer-motion";
 import { Linkedin, Twitter } from "lucide-react";
 import PageLayout from "@/components/layout/PageLayout";
@@ -7,6 +8,7 @@ import { teamMembers } from "@/lib/data";
 const departments = ["All", "Leadership", "Technology", "Design", "Marketing", "Events"];
 
 export default function Team() {
+  useSeo("/team");
   const [active, setActive] = useState("All");
 
   const filtered = active === "All"

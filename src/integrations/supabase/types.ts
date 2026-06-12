@@ -3109,6 +3109,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      activity_logs: {
+        Row: {
+          action: string
+          created_at: string | null
+          details: Json | null
+          entity_id: string | null
+          entity_title: string | null
+          entity_type: string
+          id: string
+          user_email: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string | null
+          details?: Json | null
+          entity_id?: string | null
+          entity_title?: string | null
+          entity_type: string
+          id?: string
+          user_email?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string | null
+          details?: Json | null
+          entity_id?: string | null
+          entity_title?: string | null
+          entity_type?: string
+          id?: string
+          user_email?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       blog_posts: {
         Row: {
           author_id: string | null
@@ -3247,6 +3283,118 @@ export type Database = {
         }
         Relationships: []
       }
+      media_files: {
+        Row: {
+          alt_text: string | null
+          created_at: string | null
+          created_by: string | null
+          file_name: string
+          file_size: number | null
+          file_type: string
+          file_url: string
+          folder: string | null
+          id: string
+          mime_type: string | null
+        }
+        Insert: {
+          alt_text?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          file_name: string
+          file_size?: number | null
+          file_type?: string
+          file_url: string
+          folder?: string | null
+          id?: string
+          mime_type?: string | null
+        }
+        Update: {
+          alt_text?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          file_name?: string
+          file_size?: number | null
+          file_type?: string
+          file_url?: string
+          folder?: string | null
+          id?: string
+          mime_type?: string | null
+        }
+        Relationships: []
+      }
+      navigation_items: {
+        Row: {
+          created_at: string | null
+          href: string
+          icon: string | null
+          id: string
+          is_active: boolean | null
+          label: string
+          opens_new_tab: boolean | null
+          parent_id: string | null
+          sort_order: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          href: string
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          label: string
+          opens_new_tab?: boolean | null
+          parent_id?: string | null
+          sort_order?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          href?: string
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          label?: string
+          opens_new_tab?: boolean | null
+          parent_id?: string | null
+          sort_order?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "navigation_items_parent_id_fkey"
+            columns: ["parent_id"]
+            referencedRelation: "navigation_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      page_sections: {
+        Row: {
+          content: Json
+          id: string
+          page_path: string
+          section_key: string
+          section_label: string
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          content?: Json
+          id?: string
+          page_path: string
+          section_key: string
+          section_label: string
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          content?: Json
+          id?: string
+          page_path?: string
+          section_key?: string
+          section_label?: string
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       portfolio_items: {
         Row: {
           category: string
@@ -3286,6 +3434,72 @@ export type Database = {
           tags?: string[] | null
           title?: string
           year?: number | null
+        }
+        Relationships: []
+      }
+      seo_settings: {
+        Row: {
+          canonical_url: string | null
+          id: string
+          meta_description: string | null
+          meta_title: string | null
+          no_index: boolean | null
+          og_description: string | null
+          og_image: string | null
+          og_title: string | null
+          page_name: string
+          page_path: string
+          updated_at: string | null
+        }
+        Insert: {
+          canonical_url?: string | null
+          id?: string
+          meta_description?: string | null
+          meta_title?: string | null
+          no_index?: boolean | null
+          og_description?: string | null
+          og_image?: string | null
+          og_title?: string | null
+          page_name: string
+          page_path: string
+          updated_at?: string | null
+        }
+        Update: {
+          canonical_url?: string | null
+          id?: string
+          meta_description?: string | null
+          meta_title?: string | null
+          no_index?: boolean | null
+          og_description?: string | null
+          og_image?: string | null
+          og_title?: string | null
+          page_name?: string
+          page_path?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      site_settings: {
+        Row: {
+          group_name: string | null
+          key: string
+          label: string | null
+          updated_at: string | null
+          value: string | null
+        }
+        Insert: {
+          group_name?: string | null
+          key: string
+          label?: string | null
+          updated_at?: string | null
+          value?: string | null
+        }
+        Update: {
+          group_name?: string | null
+          key?: string
+          label?: string | null
+          updated_at?: string | null
+          value?: string | null
         }
         Relationships: []
       }

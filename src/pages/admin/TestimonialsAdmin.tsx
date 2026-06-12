@@ -5,6 +5,7 @@ import AdminLayout from "@/components/admin/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import { logActivity } from "@/lib/activityLog";
 
 interface Testimonial {
   id: string;
@@ -44,6 +45,7 @@ export default function TestimonialsAdmin() {
       : await supabase.from("testimonials").insert([form]);
     setSaving(false);
     if (error) { toast({ title: "Error", description: error.message, variant: "destructive" }); return; }
+    await logActivity(editingId ? "updated" : "created", "testimonial", editingId || "new", form.author_name || "Testimonial");
     toast({ title: editingId ? "Updated" : "Added" });
     setShowForm(false); setEditingId(null); setForm(defaultForm); load();
   };
@@ -51,6 +53,7 @@ export default function TestimonialsAdmin() {
   const handleDelete = async (id: string) => {
     if (!confirm("Delete this testimonial?")) return;
     await supabase.from("testimonials").delete().eq("id", id);
+    await logActivity("deleted", "testimonial", id, "Testimonial");
     toast({ title: "Deleted" }); load();
   };
 

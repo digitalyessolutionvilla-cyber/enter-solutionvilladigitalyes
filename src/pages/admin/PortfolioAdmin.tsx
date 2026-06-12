@@ -5,6 +5,7 @@ import AdminLayout from "@/components/admin/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import { logActivity } from "@/lib/activityLog";
 
 interface PortfolioItem {
   id: string;
@@ -45,6 +46,7 @@ export default function PortfolioAdmin() {
       : await supabase.from("portfolio_items").insert([form]);
     setSaving(false);
     if (error) { toast({ title: "Error", description: error.message, variant: "destructive" }); return; }
+    await logActivity(editingId ? "updated" : "created", "portfolio_item", editingId || "new", form.title);
     toast({ title: editingId ? "Item updated" : "Item created" });
     setShowForm(false); setEditingId(null); setForm(defaultForm); load();
   };
@@ -52,6 +54,7 @@ export default function PortfolioAdmin() {
   const handleDelete = async (id: string) => {
     if (!confirm("Delete this item?")) return;
     await supabase.from("portfolio_items").delete().eq("id", id);
+    await logActivity("deleted", "portfolio_item", id, "Portfolio Item");
     toast({ title: "Item deleted" }); load();
   };
 

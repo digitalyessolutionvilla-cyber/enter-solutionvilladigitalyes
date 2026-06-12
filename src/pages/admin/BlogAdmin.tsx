@@ -5,6 +5,7 @@ import AdminLayout from "@/components/admin/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import { logActivity } from "@/lib/activityLog";
 
 interface BlogPost {
   id: string;
@@ -57,6 +58,7 @@ export default function BlogAdmin() {
       : await supabase.from("blog_posts").insert([payload]);
     setSaving(false);
     if (error) { toast({ title: "Error", description: error.message, variant: "destructive" }); return; }
+    await logActivity(editingId ? "updated" : "created", "blog_post", editingId || "new", form.title);
     toast({ title: editingId ? "Post updated" : "Post created" });
     setShowForm(false); setEditingId(null); setForm(defaultForm); load();
   };
@@ -70,6 +72,7 @@ export default function BlogAdmin() {
   const handleDelete = async (id: string) => {
     if (!confirm("Delete this post?")) return;
     await supabase.from("blog_posts").delete().eq("id", id);
+    await logActivity("deleted", "blog_post", id, "Blog Post");
     toast({ title: "Post deleted" });
     load();
   };
