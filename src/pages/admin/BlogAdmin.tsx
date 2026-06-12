@@ -92,37 +92,37 @@ export default function BlogAdmin() {
         {/* Form Modal */}
         {showForm && (
           <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-            <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-[#0A2540] border border-white/15 rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-[#1A1A1A] border border-white/15 rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
               <h2 className="text-white font-bold text-xl mb-6">{editingId ? "Edit Post" : "New Blog Post"}</h2>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="col-span-2">
                     <label className="text-white/60 text-xs font-semibold uppercase mb-1 block">Title *</label>
-                    <input required value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} className="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-[#00E5FF] transition-all" placeholder="Post title..." />
+                    <input required value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} className="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-[#F5D76E] transition-all" placeholder="Post title..." />
                   </div>
                   <div>
                     <label className="text-white/60 text-xs font-semibold uppercase mb-1 block">Category</label>
-                    <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className="w-full bg-[#060F1E] border border-white/15 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-[#00E5FF] transition-all">
+                    <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className="w-full bg-[#0A0A0A] border border-white/15 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-[#F5D76E] transition-all">
                       {categories.map((c) => <option key={c}>{c}</option>)}
                     </select>
                   </div>
                   <div>
                     <label className="text-white/60 text-xs font-semibold uppercase mb-1 block">Status</label>
-                    <select value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })} className="w-full bg-[#060F1E] border border-white/15 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-[#00E5FF] transition-all">
+                    <select value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })} className="w-full bg-[#0A0A0A] border border-white/15 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-[#F5D76E] transition-all">
                       <option>draft</option><option>published</option><option>archived</option>
                     </select>
                   </div>
                   <div className="col-span-2">
                     <label className="text-white/60 text-xs font-semibold uppercase mb-1 block">Featured Image URL</label>
-                    <input value={form.featured_image} onChange={(e) => setForm({ ...form, featured_image: e.target.value })} className="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-[#00E5FF] transition-all" placeholder="https://..." />
+                    <input value={form.featured_image} onChange={(e) => setForm({ ...form, featured_image: e.target.value })} className="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-[#F5D76E] transition-all" placeholder="https://..." />
                   </div>
                   <div className="col-span-2">
                     <label className="text-white/60 text-xs font-semibold uppercase mb-1 block">Excerpt</label>
-                    <textarea value={form.excerpt} onChange={(e) => setForm({ ...form, excerpt: e.target.value })} rows={2} className="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-[#00E5FF] transition-all resize-none" placeholder="Short description..." />
+                    <textarea value={form.excerpt} onChange={(e) => setForm({ ...form, excerpt: e.target.value })} rows={2} className="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-[#F5D76E] transition-all resize-none" placeholder="Short description..." />
                   </div>
                   <div className="col-span-2">
                     <label className="text-white/60 text-xs font-semibold uppercase mb-1 block">Body Content</label>
-                    <textarea value={form.body} onChange={(e) => setForm({ ...form, body: e.target.value })} rows={8} className="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-[#00E5FF] transition-all resize-none font-mono text-xs" placeholder="Write your article content here..." />
+                    <textarea value={form.body} onChange={(e) => setForm({ ...form, body: e.target.value })} rows={8} className="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-[#F5D76E] transition-all resize-none font-mono text-xs" placeholder="Write your article content here..." />
                   </div>
                 </div>
                 <div className="flex gap-3 pt-2">
@@ -137,7 +137,7 @@ export default function BlogAdmin() {
         )}
 
         {/* Table */}
-        <div className="bg-[#0A2540] border border-white/8 rounded-2xl overflow-hidden">
+        <div className="bg-[#1A1A1A] border border-white/8 rounded-2xl overflow-hidden">
           {loading ? (
             <div className="p-12 text-center text-white/40">Loading posts...</div>
           ) : posts.length === 0 ? (
@@ -169,7 +169,7 @@ export default function BlogAdmin() {
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-1.5 justify-end">
-                        <button onClick={() => handleEdit(post)} className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-[#0066FF] hover:bg-[rgba(0,102,255,0.15)] transition-colors">
+                        <button onClick={() => handleEdit(post)} className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-[#D4AF37] hover:bg-[rgba(212,175,55,0.15)] transition-colors">
                           <Pencil className="w-3.5 h-3.5" />
                         </button>
                         {isSuperAdmin && (

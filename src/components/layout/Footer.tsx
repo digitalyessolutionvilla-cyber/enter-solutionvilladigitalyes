@@ -21,24 +21,27 @@ export default function Footer() {
   ];
 
   return (
-    <footer className="bg-[#060F1E] border-t border-white/8">
+    <footer className="bg-[#0A0A0A] border-t border-[rgba(212,175,55,0.1)]">
+      {/* Top gold accent line */}
+      <div className="h-px bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent opacity-40" />
+
       <div className="container-custom py-16 md:py-20">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10">
           {/* Brand */}
           <div className="lg:col-span-2">
-            <Link to="/" className="flex items-center gap-3 mb-4">
-              <div className="w-9 h-9 rounded-lg gradient-brand flex items-center justify-center shadow-glow">
-                <span className="text-white font-black text-sm">SV</span>
+            <Link to="/" className="flex items-center gap-3 mb-5">
+              <div className="w-10 h-10 rounded-lg gradient-brand flex items-center justify-center shadow-glow">
+                <span className="text-[#0A0A0A] font-black text-sm">SV</span>
               </div>
               <div className="flex flex-col leading-tight">
-                <span className="text-white font-bold text-base">Solution Villa</span>
-                <span className="gradient-text text-[10px] font-semibold tracking-widest uppercase">
+                <span className="text-white font-display font-bold text-base">Solution Villa</span>
+                <span className="gradient-text-static text-[9px] font-semibold tracking-[0.25em] uppercase">
                   The Digital YES
                 </span>
               </div>
             </Link>
-            <p className="text-white/50 text-sm leading-relaxed mb-6 max-w-xs">
-              Africa's premier technology and digital solutions agency. We turn ideas into digital success stories across branding, tech, marketing, and media.
+            <p className="text-white/40 text-sm leading-relaxed mb-6 max-w-xs">
+              Africa's most premium technology and digital solutions agency. We deliver world-class results that transform businesses into industry leaders.
             </p>
             <div className="flex items-center gap-2">
               {socials.map(({ icon: Icon, label, href }) => (
@@ -46,7 +49,7 @@ export default function Footer() {
                   key={label}
                   href={href}
                   aria-label={label}
-                  className="w-9 h-9 flex items-center justify-center rounded-full bg-white/6 border border-white/10 text-white/60 hover:gradient-brand hover:text-white hover:border-transparent hover:scale-110 transition-all duration-200"
+                  className="w-9 h-9 flex items-center justify-center rounded-full bg-[rgba(212,175,55,0.06)] border border-[rgba(212,175,55,0.15)] text-white/40 hover:text-[#D4AF37] hover:border-[#D4AF37] hover:bg-[rgba(212,175,55,0.12)] hover:scale-110 transition-all duration-200"
                 >
                   <Icon className="w-4 h-4" />
                 </a>
@@ -56,13 +59,13 @@ export default function Footer() {
 
           {/* Services */}
           <div>
-            <h4 className="text-[#00E5FF] text-xs font-bold uppercase tracking-widest mb-4">Services</h4>
+            <h4 className="text-[#D4AF37] text-[10px] font-bold uppercase tracking-[0.2em] mb-4">Services</h4>
             <ul className="space-y-2.5">
               {footerLinks.services.map((l) => (
                 <li key={l.label}>
                   <Link
                     to={l.href}
-                    className="text-white/50 text-sm hover:text-white hover:translate-x-1 inline-block transition-all duration-150"
+                    className="text-white/40 text-sm hover:text-[#F5D76E] hover:translate-x-1 inline-block transition-all duration-200"
                   >
                     {l.label}
                   </Link>
@@ -73,13 +76,13 @@ export default function Footer() {
 
           {/* Company */}
           <div>
-            <h4 className="text-[#00E5FF] text-xs font-bold uppercase tracking-widest mb-4">Company</h4>
+            <h4 className="text-[#D4AF37] text-[10px] font-bold uppercase tracking-[0.2em] mb-4">Company</h4>
             <ul className="space-y-2.5">
               {footerLinks.company.map((l) => (
                 <li key={l.label}>
                   <Link
                     to={l.href}
-                    className="text-white/50 text-sm hover:text-white hover:translate-x-1 inline-block transition-all duration-150"
+                    className="text-white/40 text-sm hover:text-[#F5D76E] hover:translate-x-1 inline-block transition-all duration-200"
                   >
                     {l.label}
                   </Link>
@@ -90,25 +93,25 @@ export default function Footer() {
 
           {/* Newsletter */}
           <div>
-            <h4 className="text-[#00E5FF] text-xs font-bold uppercase tracking-widest mb-4">Newsletter</h4>
-            <p className="text-white/50 text-sm mb-4">
-              Get the latest insights on digital innovation in Africa.
+            <h4 className="text-[#D4AF37] text-[10px] font-bold uppercase tracking-[0.2em] mb-4">Newsletter</h4>
+            <p className="text-white/40 text-sm mb-4 leading-relaxed">
+              Get exclusive insights on premium digital innovation.
             </p>
             {subscribed ? (
-              <p className="text-[#00E5FF] text-sm font-medium">Thanks for subscribing!</p>
+              <p className="text-[#D4AF37] text-sm font-medium">Thank you for subscribing!</p>
             ) : (
-              <form onSubmit={handleSubscribe} className="flex rounded-full overflow-hidden border border-white/15 bg-white/5">
+              <form onSubmit={handleSubscribe} className="flex rounded-full overflow-hidden border border-[rgba(212,175,55,0.2)] bg-[rgba(212,175,55,0.04)]">
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="your@email.com"
-                  className="flex-1 bg-transparent px-4 py-2.5 text-sm text-white placeholder-white/30 outline-none min-w-0"
+                  className="flex-1 bg-transparent px-4 py-2.5 text-sm text-white placeholder-white/25 outline-none min-w-0"
                   required
                 />
                 <button
                   type="submit"
-                  className="gradient-brand px-4 py-2.5 text-white hover:opacity-90 transition-opacity"
+                  className="gradient-brand px-4 py-2.5 text-[#0A0A0A] hover:opacity-90 transition-opacity"
                   aria-label="Subscribe"
                 >
                   <Send className="w-4 h-4" />
@@ -116,11 +119,11 @@ export default function Footer() {
               </form>
             )}
             <div className="mt-8">
-              <h4 className="text-[#00E5FF] text-xs font-bold uppercase tracking-widest mb-3">Legal</h4>
+              <h4 className="text-[#D4AF37] text-[10px] font-bold uppercase tracking-[0.2em] mb-3">Legal</h4>
               <ul className="space-y-2">
                 {footerLinks.resources.map((l) => (
                   <li key={l.label}>
-                    <a href={l.href} className="text-white/40 text-sm hover:text-white transition-colors">
+                    <a href={l.href} className="text-white/30 text-sm hover:text-white/60 transition-colors">
                       {l.label}
                     </a>
                   </li>
@@ -131,12 +134,12 @@ export default function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="mt-12 pt-6 border-t border-white/8 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-white/30 text-sm">
+        <div className="mt-12 pt-6 border-t border-[rgba(212,175,55,0.08)] flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p className="text-white/25 text-sm">
             © {new Date().getFullYear()} Solution Villa. All rights reserved.
           </p>
-          <p className="text-white/30 text-sm">
-            Proudly serving Africa's digital future.
+          <p className="gradient-text-static text-sm font-semibold tracking-wide">
+            Premium Solutions. Premium Results.
           </p>
         </div>
       </div>

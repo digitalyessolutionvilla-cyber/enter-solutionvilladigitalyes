@@ -66,35 +66,35 @@ export default function TestimonialsAdmin() {
 
         {showForm && (
           <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-            <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-[#0A2540] border border-white/15 rounded-2xl p-6 w-full max-w-lg">
+            <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-[#1A1A1A] border border-white/15 rounded-2xl p-6 w-full max-w-lg">
               <h2 className="text-white font-bold text-xl mb-6">{editingId ? "Edit Testimonial" : "Add Testimonial"}</h2>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                   <label className="text-white/60 text-xs font-semibold uppercase mb-1 block">Quote *</label>
-                  <textarea required value={form.quote} onChange={(e) => setForm({ ...form, quote: e.target.value })} rows={4} className="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-[#00E5FF] transition-all resize-none" placeholder="Client testimonial..." />
+                  <textarea required value={form.quote} onChange={(e) => setForm({ ...form, quote: e.target.value })} rows={4} className="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-[#F5D76E] transition-all resize-none" placeholder="Client testimonial..." />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="text-white/60 text-xs font-semibold uppercase mb-1 block">Author Name *</label>
-                    <input required value={form.author_name} onChange={(e) => setForm({ ...form, author_name: e.target.value })} className="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-[#00E5FF] transition-all" />
+                    <input required value={form.author_name} onChange={(e) => setForm({ ...form, author_name: e.target.value })} className="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-[#F5D76E] transition-all" />
                   </div>
                   <div>
                     <label className="text-white/60 text-xs font-semibold uppercase mb-1 block">Title</label>
-                    <input value={form.author_title} onChange={(e) => setForm({ ...form, author_title: e.target.value })} className="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-[#00E5FF] transition-all" placeholder="CEO" />
+                    <input value={form.author_title} onChange={(e) => setForm({ ...form, author_title: e.target.value })} className="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-[#F5D76E] transition-all" placeholder="CEO" />
                   </div>
                   <div>
                     <label className="text-white/60 text-xs font-semibold uppercase mb-1 block">Company</label>
-                    <input value={form.company} onChange={(e) => setForm({ ...form, company: e.target.value })} className="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-[#00E5FF] transition-all" />
+                    <input value={form.company} onChange={(e) => setForm({ ...form, company: e.target.value })} className="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-[#F5D76E] transition-all" />
                   </div>
                   <div>
                     <label className="text-white/60 text-xs font-semibold uppercase mb-1 block">Status</label>
-                    <select value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })} className="w-full bg-[#060F1E] border border-white/15 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-[#00E5FF] transition-all">
+                    <select value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })} className="w-full bg-[#0A0A0A] border border-white/15 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-[#F5D76E] transition-all">
                       <option>published</option><option>draft</option><option>archived</option>
                     </select>
                   </div>
                   <div className="col-span-2">
                     <label className="text-white/60 text-xs font-semibold uppercase mb-1 block">Avatar URL</label>
-                    <input value={form.avatar_url} onChange={(e) => setForm({ ...form, avatar_url: e.target.value })} className="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-[#00E5FF] transition-all" placeholder="https://..." />
+                    <input value={form.avatar_url} onChange={(e) => setForm({ ...form, avatar_url: e.target.value })} className="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-[#F5D76E] transition-all" placeholder="https://..." />
                   </div>
                 </div>
                 <div className="flex gap-3 pt-2">
@@ -119,7 +119,7 @@ export default function TestimonialsAdmin() {
               </div>
               <div className="flex gap-1.5 flex-shrink-0">
                 <span className={`text-xs font-semibold px-2 py-0.5 rounded-full border capitalize self-start ${item.status === "published" ? "text-green-400 border-green-400/30 bg-green-400/10" : "text-yellow-400 border-yellow-400/30 bg-yellow-400/10"}`}>{item.status}</span>
-                <button onClick={() => { setEditingId(item.id); setForm({ quote: item.quote, author_name: item.author_name, author_title: item.author_title ?? "", company: item.company ?? "", avatar_url: item.avatar_url ?? "", status: item.status }); setShowForm(true); }} className="w-7 h-7 rounded-lg bg-white/5 flex items-center justify-center text-[#0066FF] hover:bg-[rgba(0,102,255,0.15)] transition-colors"><Pencil className="w-3 h-3" /></button>
+                <button onClick={() => { setEditingId(item.id); setForm({ quote: item.quote, author_name: item.author_name, author_title: item.author_title ?? "", company: item.company ?? "", avatar_url: item.avatar_url ?? "", status: item.status }); setShowForm(true); }} className="w-7 h-7 rounded-lg bg-white/5 flex items-center justify-center text-[#D4AF37] hover:bg-[rgba(212,175,55,0.15)] transition-colors"><Pencil className="w-3 h-3" /></button>
                 {isSuperAdmin && <button onClick={() => handleDelete(item.id)} className="w-7 h-7 rounded-lg bg-white/5 flex items-center justify-center text-red-400 hover:bg-[rgba(255,77,106,0.15)] transition-colors"><Trash2 className="w-3 h-3" /></button>}
               </div>
             </div>

@@ -15,31 +15,34 @@ function ServiceCard({ service, index }: { service: typeof services[0]; index: n
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-60px" }}
-      transition={{ duration: 0.5, delay: index * 0.07, ease: [0.4, 0, 0.2, 1] }}
-      className="group glass-card rounded-2xl p-7 cursor-pointer flex flex-col gap-4 hover:-translate-y-1 transition-all duration-300"
+      transition={{ duration: 0.6, delay: index * 0.07, ease: [0.4, 0, 0.2, 1] }}
+      className="group glass-card rounded-2xl p-7 cursor-pointer flex flex-col gap-4 hover:-translate-y-1.5 transition-all duration-400 relative overflow-hidden"
     >
+      {/* Top gold line on hover */}
+      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
       {/* Icon */}
-      <div className="w-12 h-12 rounded-xl bg-[rgba(0,102,255,0.15)] border border-[rgba(0,102,255,0.3)] flex items-center justify-center group-hover:bg-[rgba(0,102,255,0.25)] transition-colors duration-200">
-        <Icon className="w-6 h-6 text-[#00E5FF]" />
+      <div className="w-12 h-12 rounded-xl bg-[rgba(212,175,55,0.08)] border border-[rgba(212,175,55,0.2)] flex items-center justify-center group-hover:bg-[rgba(212,175,55,0.15)] group-hover:border-[rgba(212,175,55,0.4)] transition-all duration-300">
+        <Icon className="w-6 h-6 text-[#D4AF37] group-hover:text-[#F5D76E] transition-colors duration-200" />
       </div>
 
       {/* Tag */}
-      <span className="text-[#00E5FF] text-[10px] font-bold tracking-widest uppercase">
+      <span className="text-[#D4AF37]/60 text-[10px] font-bold tracking-[0.2em] uppercase">
         {service.tag}
       </span>
 
       {/* Title */}
-      <h3 className="text-white font-bold text-lg leading-snug">
+      <h3 className="text-white font-display font-bold text-lg leading-snug group-hover:text-[#F5D76E] transition-colors duration-200">
         {service.title}
       </h3>
 
       {/* Description */}
-      <p className="text-white/60 text-sm leading-relaxed line-clamp-3 flex-1">
+      <p className="text-white/45 text-sm leading-relaxed line-clamp-3 flex-1">
         {service.description}
       </p>
 
       {/* Learn More */}
-      <div className="flex items-center gap-1.5 text-[#0066FF] text-sm font-semibold group-hover:gap-2.5 transition-all duration-200">
+      <div className="flex items-center gap-1.5 text-[#D4AF37]/70 text-sm font-semibold group-hover:gap-2.5 group-hover:text-[#D4AF37] transition-all duration-200">
         Learn More
         <ArrowRight className="w-4 h-4" />
       </div>
@@ -52,34 +55,35 @@ export default function ServicesSection() {
   const inView = useInView(ref, { once: true, margin: "-100px" });
 
   return (
-    <section id="services" className="section-padding relative overflow-hidden">
-      {/* Background accent */}
+    <section id="services" className="section-padding relative overflow-hidden bg-[#0A0A0A]">
+      {/* Subtle gold center glow */}
       <div
-        className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] pointer-events-none"
-        style={{ background: "radial-gradient(ellipse at center, rgba(0,102,255,0.08) 0%, transparent 70%)" }}
+        className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] pointer-events-none"
+        style={{ background: "radial-gradient(ellipse at center top, rgba(212,175,55,0.05) 0%, transparent 70%)" }}
       />
 
       <div className="container-custom relative z-10" ref={ref}>
         {/* Section header */}
         <motion.div
-          className="text-center mb-14"
+          className="text-center mb-16"
           initial={{ opacity: 0, y: 24 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.7 }}
         >
-          <span className="text-[#00E5FF] text-xs font-bold tracking-widest uppercase mb-3 block">
+          <span className="text-[#D4AF37] text-[10px] font-bold tracking-[0.3em] uppercase mb-4 block">
             What We Do
           </span>
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-white mb-4">
-            Our <span className="gradient-text">Services</span>
+          <h2 className="text-3xl md:text-5xl font-display font-black text-white mb-4">
+            Our <span className="gradient-text">Premium Services</span>
           </h2>
-          <p className="text-white/55 text-lg max-w-2xl mx-auto">
-            Comprehensive digital solutions designed to accelerate your growth, amplify your brand, and transform your business.
+          <div className="luxury-divider my-5" />
+          <p className="text-white/45 text-lg max-w-2xl mx-auto font-light leading-relaxed">
+            Comprehensive luxury digital solutions designed to elevate your brand, accelerate growth, and deliver world-class results.
           </p>
         </motion.div>
 
         {/* Services grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 md:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
           {services.map((service, index) => (
             <ServiceCard key={service.id} service={service} index={index} />
           ))}

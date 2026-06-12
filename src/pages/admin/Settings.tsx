@@ -29,7 +29,7 @@ export default function Settings() {
         type={type}
         value={form[name]}
         onChange={(e) => setForm({ ...form, [name]: e.target.value })}
-        className="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-[#00E5FF] focus:ring-2 focus:ring-[rgba(0,229,255,0.15)] transition-all"
+        className="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-[#F5D76E] focus:ring-2 focus:ring-[rgba(245,215,110,0.15)] transition-all"
       />
     </div>
   );

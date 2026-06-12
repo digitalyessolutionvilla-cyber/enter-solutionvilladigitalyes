@@ -1,116 +1,142 @@
 import { useState, useEffect, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight, Quote } from "lucide-react";
+import { ChevronLeft, ChevronRight, Star, Quote } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
 import { testimonials } from "@/lib/data";
 
 export default function TestimonialsSection() {
-  const [current, setCurrent] = useState(0);
+  const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
+  const [direction, setDirection] = useState(1);
 
-  const next = useCallback(() => setCurrent((c) => (c + 1) % testimonials.length), []);
-  const prev = useCallback(() => setCurrent((c) => (c - 1 + testimonials.length) % testimonials.length), []);
+  const prev = useCallback(() => {
+    setDirection(-1);
+    setIndex((i) => (i - 1 + testimonials.length) % testimonials.length);
+  }, []);
+
+  const next = useCallback(() => {
+    setDirection(1);
+    setIndex((i) => (i + 1) % testimonials.length);
+  }, []);
 
   useEffect(() => {
     if (paused) return;
     const timer = setInterval(next, 6000);
     return () => clearInterval(timer);
-  }, [next, paused]);
+  }, [paused, next]);
 
-  const t = testimonials[current];
+  const t = testimonials[index];
+
+  const variants = {
+    enter: (dir: number) => ({ opacity: 0, x: dir > 0 ? 60 : -60, filter: "blur(4px)" }),
+    center: { opacity: 1, x: 0, filter: "blur(0px)" },
+    exit: (dir: number) => ({ opacity: 0, x: dir > 0 ? -60 : 60, filter: "blur(4px)" }),
+  };
 
   return (
-    <section
-      className="section-padding relative overflow-hidden"
-      style={{ background: "linear-gradient(180deg, #060F1E 0%, #0A2540 50%, #060F1E 100%)" }}
-    >
+    <section className="section-padding bg-[#0A0A0A] relative overflow-hidden">
+      {/* Gold orb */}
       <div
-        className="absolute inset-0 pointer-events-none"
-        style={{ background: "radial-gradient(ellipse at center, rgba(0,102,255,0.07) 0%, transparent 70%)" }}
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[400px] pointer-events-none"
+        style={{ background: "radial-gradient(ellipse, rgba(212,175,55,0.04) 0%, transparent 70%)" }}
       />
 
       <div className="container-custom relative z-10">
         {/* Header */}
-        <motion.div
-          className="text-center mb-14"
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-        >
-          <span className="text-[#00E5FF] text-xs font-bold tracking-widest uppercase mb-3 block">
-            Testimonials
-          </span>
-          <h2 className="text-3xl md:text-5xl font-black text-white">
-            What Our <span className="gradient-text">Clients Say</span>
+        <div className="text-center mb-14">
+          <span className="text-[#D4AF37] text-[10px] font-bold tracking-[0.3em] uppercase mb-3 block">Client Stories</span>
+          <h2 className="text-3xl md:text-5xl font-display font-black text-white">
+            Voices of <span className="gradient-text">Excellence</span>
           </h2>
-        </motion.div>
+          <div className="luxury-divider mt-4" />
+        </div>
 
-        {/* Carousel */}
+        {/* Testimonial card */}
         <div
-          className="relative max-w-3xl mx-auto"
+          className="max-w-3xl mx-auto"
           onMouseEnter={() => setPaused(true)}
           onMouseLeave={() => setPaused(false)}
         >
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={current}
-              initial={{ opacity: 0, x: 30 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -30 }}
-              transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
-              className="glass-card rounded-3xl p-8 md:p-12 text-center"
-            >
-              <Quote className="w-12 h-12 text-[#00E5FF] opacity-40 mx-auto mb-6" />
-              <p className="text-white/85 text-lg md:text-xl leading-relaxed italic mb-8">
-                "{t.quote}"
-              </p>
-              <div className="flex items-center justify-center gap-4">
-                <img
-                  src={t.avatar_url}
-                  alt={t.author_name}
-                  className="w-14 h-14 rounded-full object-cover border-2 border-[#00E5FF]"
-                />
-                <div className="text-left">
-                  <p className="text-white font-bold text-base">{t.author_name}</p>
-                  <p className="text-white/50 text-sm">{t.author_title} · {t.company}</p>
-                </div>
-              </div>
-            </motion.div>
-          </AnimatePresence>
+          <div className="relative glass-card rounded-3xl p-10 md:p-14 overflow-hidden">
+            {/* Background quote mark */}
+            <div className="absolute top-6 right-8 opacity-[0.06]">
+              <Quote className="w-32 h-32 text-[#D4AF37]" fill="currentColor" />
+            </div>
 
-          {/* Navigation */}
-          <div className="flex items-center justify-center gap-4 mt-8">
-            <button
-              onClick={prev}
-              className="w-11 h-11 rounded-full border border-white/15 bg-white/5 text-white/60 flex items-center justify-center hover:border-[#00E5FF] hover:text-[#00E5FF] transition-all duration-200"
-              aria-label="Previous testimonial"
-            >
-              <ChevronLeft className="w-5 h-5" />
-            </button>
+            <AnimatePresence mode="wait" custom={direction}>
+              <motion.div
+                key={index}
+                custom={direction}
+                variants={variants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                transition={{ duration: 0.45, ease: [0.4, 0, 0.2, 1] }}
+                className="relative z-10"
+              >
+                {/* Stars */}
+                <div className="flex gap-1 mb-6">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <Star
+                      key={i}
+                      className={`w-5 h-5 ${i < (t.rating || 5) ? "text-[#D4AF37]" : "text-white/15"}`}
+                      fill={i < (t.rating || 5) ? "currentColor" : "none"}
+                    />
+                  ))}
+                </div>
+
+                {/* Quote */}
+                <blockquote className="text-xl md:text-2xl text-white/85 font-light leading-relaxed mb-8 font-display italic">
+                  "{t.content}"
+                </blockquote>
+
+                {/* Author */}
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-full gradient-brand flex items-center justify-center flex-shrink-0 shadow-glow">
+                    <span className="text-[#0A0A0A] font-black text-sm">
+                      {t.name.charAt(0)}
+                    </span>
+                  </div>
+                  <div>
+                    <div className="text-white font-bold">{t.name}</div>
+                    <div className="text-[#D4AF37]/70 text-sm">{t.role} · {t.company}</div>
+                  </div>
+                </div>
+              </motion.div>
+            </AnimatePresence>
+          </div>
+
+          {/* Controls */}
+          <div className="flex items-center justify-between mt-8 px-2">
+            <div className="flex gap-2">
+              <button
+                onClick={prev}
+                className="w-10 h-10 rounded-full border border-[rgba(212,175,55,0.25)] flex items-center justify-center text-white/50 hover:text-[#D4AF37] hover:border-[#D4AF37] hover:bg-[rgba(212,175,55,0.08)] transition-all duration-200"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+              <button
+                onClick={next}
+                className="w-10 h-10 rounded-full border border-[rgba(212,175,55,0.25)] flex items-center justify-center text-white/50 hover:text-[#D4AF37] hover:border-[#D4AF37] hover:bg-[rgba(212,175,55,0.08)] transition-all duration-200"
+              >
+                <ChevronRight className="w-5 h-5" />
+              </button>
+            </div>
 
             {/* Dots */}
             <div className="flex items-center gap-2">
               {testimonials.map((_, i) => (
                 <button
                   key={i}
-                  onClick={() => setCurrent(i)}
-                  className={`rounded-full transition-all duration-300 ${
-                    i === current
-                      ? "w-6 h-2 bg-[#00E5FF]"
-                      : "w-2 h-2 bg-white/25 hover:bg-white/50"
-                  }`}
-                  aria-label={`Go to testimonial ${i + 1}`}
+                  onClick={() => { setDirection(i > index ? 1 : -1); setIndex(i); }}
+                  className={`transition-all duration-300 rounded-full ${i === index ? "w-8 h-2 bg-[#D4AF37]" : "w-2 h-2 bg-white/20 hover:bg-[#D4AF37]/50"}`}
                 />
               ))}
             </div>
 
-            <button
-              onClick={next}
-              className="w-11 h-11 rounded-full border border-white/15 bg-white/5 text-white/60 flex items-center justify-center hover:border-[#00E5FF] hover:text-[#00E5FF] transition-all duration-200"
-              aria-label="Next testimonial"
-            >
-              <ChevronRight className="w-5 h-5" />
-            </button>
+            {/* Counter */}
+            <span className="text-white/25 text-sm tabular-nums">
+              {String(index + 1).padStart(2, "0")} / {String(testimonials.length).padStart(2, "0")}
+            </span>
           </div>
         </div>
       </div>

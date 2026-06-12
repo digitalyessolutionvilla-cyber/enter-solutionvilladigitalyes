@@ -19,10 +19,10 @@ export default function Team() {
       <section className="relative pt-32 pb-16 overflow-hidden gradient-hero">
         <div
           className="absolute inset-0 pointer-events-none"
-          style={{ background: "radial-gradient(ellipse at 70% 50%, rgba(0,229,255,0.1) 0%, transparent 60%)" }}
+          style={{ background: "radial-gradient(ellipse at 70% 50%, rgba(245,215,110,0.1) 0%, transparent 60%)" }}
         />
         <div className="container-custom relative z-10 text-center max-w-3xl mx-auto">
-          <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-[#00E5FF] text-xs font-bold tracking-widest uppercase block mb-4">
+          <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-[#F5D76E] text-xs font-bold tracking-widest uppercase block mb-4">
             Our Team
           </motion.span>
           <motion.h1 initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="text-4xl md:text-6xl font-black text-white mb-5">
@@ -72,13 +72,13 @@ export default function Team() {
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
                   {/* Hover overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-[rgba(6,15,30,0.9)] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
+                  <div className="absolute inset-0 bg-gradient-to-t from-[rgba(10,10,10,0.9)] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
                     <p className="text-white/80 text-xs leading-relaxed line-clamp-3">{member.bio}</p>
                     <div className="flex gap-2 mt-3">
-                      <a href={member.linkedin} className="w-8 h-8 rounded-full bg-white/15 flex items-center justify-center hover:bg-[#0066FF] transition-colors">
+                      <a href={member.linkedin} className="w-8 h-8 rounded-full bg-white/15 flex items-center justify-center hover:bg-[#D4AF37] transition-colors">
                         <Linkedin className="w-4 h-4 text-white" />
                       </a>
-                      <a href={member.twitter} className="w-8 h-8 rounded-full bg-white/15 flex items-center justify-center hover:bg-[#0066FF] transition-colors">
+                      <a href={member.twitter} className="w-8 h-8 rounded-full bg-white/15 flex items-center justify-center hover:bg-[#D4AF37] transition-colors">
                         <Twitter className="w-4 h-4 text-white" />
                       </a>
                     </div>
@@ -87,7 +87,7 @@ export default function Team() {
 
                 {/* Info */}
                 <div className="p-4">
-                  <span className="text-[#00E5FF] text-[10px] font-bold tracking-widest uppercase">{member.department}</span>
+                  <span className="text-[#F5D76E] text-[10px] font-bold tracking-widest uppercase">{member.department}</span>
                   <h3 className="text-white font-bold mt-1">{member.name}</h3>
                   <p className="text-white/55 text-xs">{member.position}</p>
                 </div>

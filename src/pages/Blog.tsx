@@ -24,9 +24,9 @@ export default function Blog() {
     <PageLayout>
       {/* Hero */}
       <section className="relative pt-32 pb-16 overflow-hidden gradient-hero">
-        <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse at 70% 50%, rgba(0,102,255,0.12) 0%, transparent 65%)" }} />
+        <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse at 70% 50%, rgba(212,175,55,0.12) 0%, transparent 65%)" }} />
         <div className="container-custom relative z-10 text-center max-w-3xl mx-auto">
-          <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-[#00E5FF] text-xs font-bold tracking-widest uppercase block mb-4">
+          <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-[#F5D76E] text-xs font-bold tracking-widest uppercase block mb-4">
             Blog
           </motion.span>
           <motion.h1 initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="text-4xl md:text-6xl font-black text-white mb-5">
@@ -49,7 +49,7 @@ export default function Blog() {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search articles..."
-                className="w-full bg-white/5 border border-white/15 rounded-full pl-10 pr-4 py-2.5 text-white placeholder-white/35 text-sm outline-none focus:border-[#00E5FF] focus:ring-2 focus:ring-[rgba(0,229,255,0.15)] transition-all"
+                className="w-full bg-white/5 border border-white/15 rounded-full pl-10 pr-4 py-2.5 text-white placeholder-white/35 text-sm outline-none focus:border-[#F5D76E] focus:ring-2 focus:ring-[rgba(245,215,110,0.15)] transition-all"
               />
             </div>
             <div className="flex flex-wrap gap-2">
@@ -85,7 +85,7 @@ export default function Blog() {
                   </span>
                 </div>
                 <div className="md:w-1/2 p-8 md:p-10 flex flex-col justify-center">
-                  <h2 className="text-white font-black text-2xl md:text-3xl mb-4 leading-snug group-hover:text-[#00E5FF] transition-colors">
+                  <h2 className="text-white font-black text-2xl md:text-3xl mb-4 leading-snug group-hover:text-[#F5D76E] transition-colors">
                     {featured.title}
                   </h2>
                   <p className="text-white/60 leading-relaxed mb-6">{featured.excerpt}</p>
@@ -119,14 +119,14 @@ export default function Blog() {
                   </span>
                 </div>
                 <div className="p-6">
-                  <h3 className="text-white font-bold text-lg leading-snug mb-3 line-clamp-2 group-hover:text-[#00E5FF] transition-colors">{post.title}</h3>
+                  <h3 className="text-white font-bold text-lg leading-snug mb-3 line-clamp-2 group-hover:text-[#F5D76E] transition-colors">{post.title}</h3>
                   <p className="text-white/55 text-sm leading-relaxed line-clamp-3 mb-4">{post.excerpt}</p>
                   <div className="flex items-center justify-between border-t border-white/8 pt-4">
                     <div className="flex items-center gap-3 text-white/45 text-xs">
                       <span className="flex items-center gap-1"><User className="w-3.5 h-3.5" />{post.author}</span>
                       <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" />{post.readTime}</span>
                     </div>
-                    <Link to={`/blog/${post.slug}`} className="text-[#0066FF] text-xs font-semibold hover:text-[#00E5FF] transition-colors">
+                    <Link to={`/blog/${post.slug}`} className="text-[#D4AF37] text-xs font-semibold hover:text-[#F5D76E] transition-colors">
                       Read →
                     </Link>
                   </div>

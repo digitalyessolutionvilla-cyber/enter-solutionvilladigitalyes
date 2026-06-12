@@ -29,13 +29,13 @@ export default function About() {
       <section className="relative pt-32 pb-20 overflow-hidden gradient-hero">
         <div
           className="absolute inset-0 pointer-events-none"
-          style={{ background: "radial-gradient(ellipse at 30% 50%, rgba(0,102,255,0.15) 0%, transparent 60%)" }}
+          style={{ background: "radial-gradient(ellipse at 30% 50%, rgba(212,175,55,0.15) 0%, transparent 60%)" }}
         />
         <div className="container-custom relative z-10 text-center max-w-4xl mx-auto">
           <motion.span
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-[#00E5FF] text-xs font-bold tracking-widest uppercase block mb-4"
+            className="text-[#F5D76E] text-xs font-bold tracking-widest uppercase block mb-4"
           >
             About Us
           </motion.span>
@@ -102,7 +102,7 @@ export default function About() {
             viewport={{ once: true }}
             className="text-center mb-10"
           >
-            <span className="text-[#00E5FF] text-xs font-bold tracking-widest uppercase block mb-3">Core Values</span>
+            <span className="text-[#F5D76E] text-xs font-bold tracking-widest uppercase block mb-3">Core Values</span>
             <h2 className="text-3xl md:text-4xl font-black text-white">
               What <span className="gradient-text">Drives Us</span>
             </h2>
@@ -118,8 +118,8 @@ export default function About() {
                 transition={{ delay: i * 0.08 }}
                 className="glass-card rounded-2xl p-6 hover:-translate-y-1 transition-transform duration-300"
               >
-                <div className="w-10 h-10 rounded-xl bg-[rgba(0,102,255,0.15)] border border-[rgba(0,102,255,0.3)] flex items-center justify-center mb-4">
-                  <v.icon className="w-5 h-5 text-[#00E5FF]" />
+                <div className="w-10 h-10 rounded-xl bg-[rgba(212,175,55,0.15)] border border-[rgba(212,175,55,0.3)] flex items-center justify-center mb-4">
+                  <v.icon className="w-5 h-5 text-[#F5D76E]" />
                 </div>
                 <h3 className="text-white font-bold mb-2">{v.title}</h3>
                 <p className="text-white/55 text-sm leading-relaxed">{v.desc}</p>
@@ -130,7 +130,7 @@ export default function About() {
       </section>
 
       {/* Company Timeline */}
-      <section className="section-padding" style={{ background: "linear-gradient(180deg, transparent, rgba(0,102,255,0.05), transparent)" }}>
+      <section className="section-padding" style={{ background: "linear-gradient(180deg, transparent, rgba(212,175,55,0.05), transparent)" }}>
         <div className="container-custom">
           <motion.div
             className="text-center mb-14"
@@ -138,14 +138,14 @@ export default function About() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <span className="text-[#00E5FF] text-xs font-bold tracking-widest uppercase block mb-3">Our Journey</span>
+            <span className="text-[#F5D76E] text-xs font-bold tracking-widest uppercase block mb-3">Our Journey</span>
             <h2 className="text-3xl md:text-5xl font-black text-white">
               The <span className="gradient-text">Story So Far</span>
             </h2>
           </motion.div>
 
           <div className="relative max-w-3xl mx-auto">
-            <div className="absolute left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-[rgba(0,102,255,0.4)] to-transparent" />
+            <div className="absolute left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-[rgba(212,175,55,0.4)] to-transparent" />
             {timeline.map((item, i) => (
               <motion.div
                 key={item.year}
@@ -162,7 +162,7 @@ export default function About() {
                     <p className="text-white/55 text-sm leading-relaxed">{item.desc}</p>
                   </div>
                 </div>
-                <div className="absolute left-1/2 top-6 -translate-x-1/2 w-4 h-4 rounded-full gradient-brand border-2 border-[#060F1E] shadow-glow flex-shrink-0" />
+                <div className="absolute left-1/2 top-6 -translate-x-1/2 w-4 h-4 rounded-full gradient-brand border-2 border-[#0A0A0A] shadow-glow flex-shrink-0" />
                 <div className="flex-1" />
               </motion.div>
             ))}
@@ -179,7 +179,7 @@ export default function About() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <span className="text-[#00E5FF] text-xs font-bold tracking-widest uppercase block mb-3">Leadership</span>
+            <span className="text-[#F5D76E] text-xs font-bold tracking-widest uppercase block mb-3">Leadership</span>
             <h2 className="text-3xl md:text-5xl font-black text-white mb-4">
               Meet the <span className="gradient-text">Team</span>
             </h2>
@@ -199,10 +199,10 @@ export default function About() {
                 <img
                   src={member.photo}
                   alt={member.name}
-                  className="w-20 h-20 rounded-full object-cover mx-auto mb-4 border-2 border-[rgba(0,102,255,0.4)]"
+                  className="w-20 h-20 rounded-full object-cover mx-auto mb-4 border-2 border-[rgba(212,175,55,0.4)]"
                 />
                 <h3 className="text-white font-bold text-sm mb-1">{member.name}</h3>
-                <p className="text-[#00E5FF] text-xs font-medium">{member.position}</p>
+                <p className="text-[#F5D76E] text-xs font-medium">{member.position}</p>
               </motion.div>
             ))}
           </div>
@@ -221,7 +221,7 @@ export default function About() {
 
       {/* CTA */}
       <section className="section-padding relative overflow-hidden">
-        <div className="absolute inset-0 gradient-brand opacity-8" style={{ border: "1px solid rgba(0,102,255,0.15)", borderLeft: "none", borderRight: "none" }} />
+        <div className="absolute inset-0 gradient-brand opacity-8" style={{ border: "1px solid rgba(212,175,55,0.15)", borderLeft: "none", borderRight: "none" }} />
         <div className="container-custom relative z-10 text-center">
           <h2 className="text-3xl md:text-5xl font-black text-white mb-6">
             Ready to Work <span className="gradient-text">Together?</span>

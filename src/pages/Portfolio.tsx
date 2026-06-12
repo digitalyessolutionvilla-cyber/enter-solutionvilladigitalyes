@@ -30,10 +30,10 @@ export default function Portfolio() {
       <section className="relative pt-32 pb-16 overflow-hidden gradient-hero">
         <div
           className="absolute inset-0 pointer-events-none"
-          style={{ background: "radial-gradient(ellipse at 30% 50%, rgba(0,102,255,0.15) 0%, transparent 60%)" }}
+          style={{ background: "radial-gradient(ellipse at 30% 50%, rgba(212,175,55,0.15) 0%, transparent 60%)" }}
         />
         <div className="container-custom relative z-10 text-center max-w-3xl mx-auto">
-          <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-[#00E5FF] text-xs font-bold tracking-widest uppercase block mb-4">
+          <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-[#F5D76E] text-xs font-bold tracking-widest uppercase block mb-4">
             Our Portfolio
           </motion.span>
           <motion.h1 initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="text-4xl md:text-6xl font-black text-white mb-5">
@@ -85,13 +85,13 @@ export default function Portfolio() {
                     alt={item.title}
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[rgba(6,15,30,0.95)] via-[rgba(6,15,30,0.3)] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[rgba(10,10,10,0.95)] via-[rgba(10,10,10,0.3)] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   <div className="absolute bottom-0 left-0 right-0 p-5 translate-y-4 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300">
-                    <span className="text-[#00E5FF] text-[10px] font-bold tracking-widest uppercase mb-1 block">{item.category}</span>
+                    <span className="text-[#F5D76E] text-[10px] font-bold tracking-widest uppercase mb-1 block">{item.category}</span>
                     <h3 className="text-white font-bold text-lg">{item.title}</h3>
                     <p className="text-white/60 text-sm mt-1">{item.client}</p>
                   </div>
-                  <div className="absolute top-4 right-4 w-9 h-9 rounded-full bg-[rgba(0,102,255,0.85)] flex items-center justify-center opacity-0 group-hover:opacity-100 scale-75 group-hover:scale-100 transition-all duration-300">
+                  <div className="absolute top-4 right-4 w-9 h-9 rounded-full bg-[rgba(212,175,55,0.85)] flex items-center justify-center opacity-0 group-hover:opacity-100 scale-75 group-hover:scale-100 transition-all duration-300">
                     <ExternalLink className="w-4 h-4 text-white" />
                   </div>
                 </motion.div>
@@ -112,7 +112,7 @@ export default function Portfolio() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-[rgba(6,15,30,0.95)] backdrop-blur-xl flex items-center justify-center p-4"
+            className="fixed inset-0 z-50 bg-[rgba(10,10,10,0.95)] backdrop-blur-xl flex items-center justify-center p-4"
             onClick={closeLightbox}
           >
             <motion.div
@@ -128,7 +128,7 @@ export default function Portfolio() {
                 className="w-full max-h-[75vh] object-contain rounded-2xl"
               />
               <div className="mt-4 text-center">
-                <span className="text-[#00E5FF] text-xs font-bold tracking-widest uppercase">{currentItem.category}</span>
+                <span className="text-[#F5D76E] text-xs font-bold tracking-widest uppercase">{currentItem.category}</span>
                 <h3 className="text-white font-bold text-xl mt-1">{currentItem.title}</h3>
                 <p className="text-white/55 text-sm mt-1">{currentItem.description}</p>
               </div>
@@ -136,10 +136,10 @@ export default function Portfolio() {
               <button onClick={closeLightbox} className="absolute -top-4 -right-4 w-10 h-10 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white hover:bg-white/20 transition-colors">
                 <X className="w-5 h-5" />
               </button>
-              <button onClick={() => navigate(-1)} className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white hover:border-[#00E5FF] hover:text-[#00E5FF] transition-all">
+              <button onClick={() => navigate(-1)} className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white hover:border-[#F5D76E] hover:text-[#F5D76E] transition-all">
                 <ChevronLeft className="w-5 h-5" />
               </button>
-              <button onClick={() => navigate(1)} className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white hover:border-[#00E5FF] hover:text-[#00E5FF] transition-all">
+              <button onClick={() => navigate(1)} className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white hover:border-[#F5D76E] hover:text-[#F5D76E] transition-all">
                 <ChevronRight className="w-5 h-5" />
               </button>
             </motion.div>

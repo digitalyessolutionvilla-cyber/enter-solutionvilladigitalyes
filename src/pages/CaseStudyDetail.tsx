@@ -15,7 +15,7 @@ export default function CaseStudyDetail() {
           <div className="text-center">
             <p className="gradient-text text-6xl font-black mb-4">404</p>
             <h1 className="text-white font-bold text-2xl mb-4">Case Study Not Found</h1>
-            <Link to="/case-studies" className="text-[#0066FF] hover:text-[#00E5FF] transition-colors">
+            <Link to="/case-studies" className="text-[#D4AF37] hover:text-[#F5D76E] transition-colors">
               ← Back to Case Studies
             </Link>
           </div>
@@ -28,10 +28,10 @@ export default function CaseStudyDetail() {
     <PageLayout>
       {/* Hero */}
       <section className="relative pt-28 overflow-hidden gradient-hero">
-        <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse at center, rgba(0,102,255,0.12) 0%, transparent 65%)" }} />
+        <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse at center, rgba(212,175,55,0.12) 0%, transparent 65%)" }} />
         <div className="container-custom relative z-10 max-w-5xl pb-12">
           <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }}>
-            <Link to="/case-studies" className="inline-flex items-center gap-2 text-white/50 hover:text-[#00E5FF] text-sm transition-colors mb-6">
+            <Link to="/case-studies" className="inline-flex items-center gap-2 text-white/50 hover:text-[#F5D76E] text-sm transition-colors mb-6">
               <ArrowLeft className="w-4 h-4" /> Back to Case Studies
             </Link>
 
@@ -42,7 +42,7 @@ export default function CaseStudyDetail() {
             <h1 className="text-3xl md:text-5xl font-black text-white leading-tight mb-4">{study.title}</h1>
 
             <div className="flex items-center gap-2 text-white/55 text-sm">
-              <Building2 className="w-4 h-4 text-[#00E5FF]" />
+              <Building2 className="w-4 h-4 text-[#F5D76E]" />
               <span>Client: <strong className="text-white">{study.client}</strong></span>
             </div>
           </motion.div>
@@ -81,7 +81,7 @@ export default function CaseStudyDetail() {
           <div className="grid md:grid-cols-3 gap-8">
             {[
               { title: "The Challenge", content: study.problem, color: "border-red-500/30" },
-              { title: "Our Solution", content: study.solution, color: "border-[#0066FF]/40" },
+              { title: "Our Solution", content: study.solution, color: "border-[#D4AF37]/40" },
               { title: "The Results", content: study.results, color: "border-green-500/30" },
             ].map((section) => (
               <motion.div
@@ -92,7 +92,7 @@ export default function CaseStudyDetail() {
                 className={`glass-card rounded-2xl p-6 border-t-2 ${section.color}`}
               >
                 <h3 className="text-white font-black text-xl mb-4 flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5 text-[#00E5FF]" />
+                  <TrendingUp className="w-5 h-5 text-[#F5D76E]" />
                   {section.title}
                 </h3>
                 <p className="text-white/65 leading-relaxed text-sm">{section.content}</p>

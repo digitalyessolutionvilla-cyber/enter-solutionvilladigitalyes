@@ -38,7 +38,7 @@ export default function Inquiries() {
   };
 
   const statusColor = (s: string) =>
-    s === "new" ? "text-[#00E5FF] border-[rgba(0,229,255,0.3)] bg-[rgba(0,229,255,0.1)]" :
+    s === "new" ? "text-[#F5D76E] border-[rgba(245,215,110,0.3)] bg-[rgba(245,215,110,0.1)]" :
     s === "read" ? "text-yellow-400 border-yellow-400/30 bg-yellow-400/10" :
     "text-green-400 border-green-400/30 bg-green-400/10";
 
@@ -47,7 +47,7 @@ export default function Inquiries() {
       <div className="space-y-6">
         <h1 className="text-white font-black text-2xl">Contact Inquiries</h1>
 
-        <div className="bg-[#0A2540] border border-white/8 rounded-2xl overflow-hidden">
+        <div className="bg-[#1A1A1A] border border-white/8 rounded-2xl overflow-hidden">
           {loading ? <div className="p-12 text-center text-white/40">Loading...</div> :
            inquiries.length === 0 ? <div className="p-12 text-center text-white/40">No inquiries yet.</div> : (
             <table className="w-full">
@@ -74,16 +74,16 @@ export default function Inquiries() {
         {/* Detail panel */}
         {selected && (
           <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-            <div className="bg-[#0A2540] border border-white/15 rounded-2xl p-6 w-full max-w-lg">
+            <div className="bg-[#1A1A1A] border border-white/15 rounded-2xl p-6 w-full max-w-lg">
               <div className="flex items-center justify-between mb-5">
                 <h2 className="text-white font-bold text-xl">{selected.name}</h2>
                 <button onClick={() => setSelected(null)} className="text-white/40 hover:text-white text-2xl leading-none transition-colors">×</button>
               </div>
               <div className="space-y-3 mb-5">
-                <div className="flex items-center gap-2 text-white/60 text-sm"><Mail className="w-4 h-4 text-[#00E5FF]" />{selected.email}</div>
-                {selected.phone && <div className="flex items-center gap-2 text-white/60 text-sm"><Phone className="w-4 h-4 text-[#00E5FF]" />{selected.phone}</div>}
-                <div className="flex items-center gap-2 text-white/60 text-sm"><Calendar className="w-4 h-4 text-[#00E5FF]" />{new Date(selected.created_at).toLocaleString()}</div>
-                {selected.subject && <p className="text-[#00E5FF] text-sm font-semibold">{selected.subject}</p>}
+                <div className="flex items-center gap-2 text-white/60 text-sm"><Mail className="w-4 h-4 text-[#F5D76E]" />{selected.email}</div>
+                {selected.phone && <div className="flex items-center gap-2 text-white/60 text-sm"><Phone className="w-4 h-4 text-[#F5D76E]" />{selected.phone}</div>}
+                <div className="flex items-center gap-2 text-white/60 text-sm"><Calendar className="w-4 h-4 text-[#F5D76E]" />{new Date(selected.created_at).toLocaleString()}</div>
+                {selected.subject && <p className="text-[#F5D76E] text-sm font-semibold">{selected.subject}</p>}
               </div>
               <div className="bg-white/5 rounded-xl p-4 mb-5">
                 <p className="text-white/80 text-sm leading-relaxed whitespace-pre-wrap">{selected.message}</p>

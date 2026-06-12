@@ -66,37 +66,37 @@ export default function CaseStudiesAdmin() {
 
         {showForm && (
           <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-            <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-[#0A2540] border border-white/15 rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-[#1A1A1A] border border-white/15 rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
               <h2 className="text-white font-bold text-xl mb-6">{editingId ? "Edit Case Study" : "New Case Study"}</h2>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="col-span-2">
                     <label className="text-white/60 text-xs font-semibold uppercase mb-1 block">Title *</label>
-                    <input required value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} className="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-[#00E5FF] transition-all" />
+                    <input required value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} className="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-[#F5D76E] transition-all" />
                   </div>
                   <div>
                     <label className="text-white/60 text-xs font-semibold uppercase mb-1 block">Client *</label>
-                    <input required value={form.client} onChange={(e) => setForm({ ...form, client: e.target.value })} className="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-[#00E5FF] transition-all" />
+                    <input required value={form.client} onChange={(e) => setForm({ ...form, client: e.target.value })} className="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-[#F5D76E] transition-all" />
                   </div>
                   <div>
                     <label className="text-white/60 text-xs font-semibold uppercase mb-1 block">Industry</label>
-                    <select value={form.industry} onChange={(e) => setForm({ ...form, industry: e.target.value })} className="w-full bg-[#060F1E] border border-white/15 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-[#00E5FF] transition-all">
+                    <select value={form.industry} onChange={(e) => setForm({ ...form, industry: e.target.value })} className="w-full bg-[#0A0A0A] border border-white/15 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-[#F5D76E] transition-all">
                       {industries.map((i) => <option key={i}>{i}</option>)}
                     </select>
                   </div>
                   <div className="col-span-2">
                     <label className="text-white/60 text-xs font-semibold uppercase mb-1 block">Cover Image URL</label>
-                    <input value={form.cover_image} onChange={(e) => setForm({ ...form, cover_image: e.target.value })} className="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-[#00E5FF] transition-all" placeholder="https://..." />
+                    <input value={form.cover_image} onChange={(e) => setForm({ ...form, cover_image: e.target.value })} className="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-[#F5D76E] transition-all" placeholder="https://..." />
                   </div>
                   {["problem", "solution", "results"].map((field) => (
                     <div key={field} className="col-span-2">
                       <label className="text-white/60 text-xs font-semibold uppercase mb-1 block">{field}</label>
-                      <textarea value={form[field as keyof typeof form]} onChange={(e) => setForm({ ...form, [field]: e.target.value })} rows={3} className="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-[#00E5FF] transition-all resize-none" />
+                      <textarea value={form[field as keyof typeof form]} onChange={(e) => setForm({ ...form, [field]: e.target.value })} rows={3} className="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-[#F5D76E] transition-all resize-none" />
                     </div>
                   ))}
                   <div>
                     <label className="text-white/60 text-xs font-semibold uppercase mb-1 block">Status</label>
-                    <select value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })} className="w-full bg-[#060F1E] border border-white/15 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-[#00E5FF] transition-all">
+                    <select value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })} className="w-full bg-[#0A0A0A] border border-white/15 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-[#F5D76E] transition-all">
                       <option>published</option><option>draft</option><option>archived</option>
                     </select>
                   </div>
@@ -110,7 +110,7 @@ export default function CaseStudiesAdmin() {
           </div>
         )}
 
-        <div className="bg-[#0A2540] border border-white/8 rounded-2xl overflow-hidden">
+        <div className="bg-[#1A1A1A] border border-white/8 rounded-2xl overflow-hidden">
           {loading ? <div className="p-12 text-center text-white/40">Loading...</div> :
            items.length === 0 ? <div className="p-12 text-center text-white/40">No case studies yet.</div> : (
             <table className="w-full">
@@ -128,7 +128,7 @@ export default function CaseStudiesAdmin() {
                   <td className="px-4 py-3 text-white/55 text-sm hidden sm:table-cell">{item.industry ?? "—"}</td>
                   <td className="px-4 py-3"><span className={`text-xs font-semibold px-2.5 py-1 rounded-full border capitalize ${item.status === "published" ? "text-green-400 border-green-400/30 bg-green-400/10" : "text-yellow-400 border-yellow-400/30 bg-yellow-400/10"}`}>{item.status}</span></td>
                   <td className="px-4 py-3"><div className="flex items-center gap-1.5 justify-end">
-                    <button onClick={() => { setEditingId(item.id); setForm({ ...defaultForm, title: item.title, client: item.client, industry: item.industry ?? "", status: item.status }); setShowForm(true); }} className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-[#0066FF] hover:bg-[rgba(0,102,255,0.15)] transition-colors"><Pencil className="w-3.5 h-3.5" /></button>
+                    <button onClick={() => { setEditingId(item.id); setForm({ ...defaultForm, title: item.title, client: item.client, industry: item.industry ?? "", status: item.status }); setShowForm(true); }} className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-[#D4AF37] hover:bg-[rgba(212,175,55,0.15)] transition-colors"><Pencil className="w-3.5 h-3.5" /></button>
                     {isSuperAdmin && <button onClick={() => handleDelete(item.id)} className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-red-400 hover:bg-[rgba(255,77,106,0.15)] transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>}
                   </div></td>
                 </tr>

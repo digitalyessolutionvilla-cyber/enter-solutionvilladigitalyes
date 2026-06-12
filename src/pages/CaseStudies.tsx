@@ -21,9 +21,9 @@ export default function CaseStudies() {
     <PageLayout>
       {/* Hero */}
       <section className="relative pt-32 pb-16 overflow-hidden gradient-hero">
-        <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse at center, rgba(0,102,255,0.12) 0%, transparent 65%)" }} />
+        <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse at center, rgba(212,175,55,0.12) 0%, transparent 65%)" }} />
         <div className="container-custom relative z-10 text-center max-w-3xl mx-auto">
-          <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-[#00E5FF] text-xs font-bold tracking-widest uppercase block mb-4">
+          <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-[#F5D76E] text-xs font-bold tracking-widest uppercase block mb-4">
             Case Studies
           </motion.span>
           <motion.h1 initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="text-4xl md:text-6xl font-black text-white mb-5">
@@ -46,7 +46,7 @@ export default function CaseStudies() {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search case studies..."
-                className="w-full bg-white/5 border border-white/15 rounded-full pl-10 pr-4 py-2.5 text-white placeholder-white/35 text-sm outline-none focus:border-[#00E5FF] focus:ring-2 focus:ring-[rgba(0,229,255,0.15)] transition-all"
+                className="w-full bg-white/5 border border-white/15 rounded-full pl-10 pr-4 py-2.5 text-white placeholder-white/35 text-sm outline-none focus:border-[#F5D76E] focus:ring-2 focus:ring-[rgba(245,215,110,0.15)] transition-all"
               />
             </div>
             <div className="flex flex-wrap gap-2">
@@ -84,12 +84,12 @@ export default function CaseStudies() {
                   </span>
                 </div>
                 <div className="p-6">
-                  <p className="text-[#00E5FF] text-xs font-semibold mb-2">{study.client}</p>
+                  <p className="text-[#F5D76E] text-xs font-semibold mb-2">{study.client}</p>
                   <h3 className="text-white font-bold text-lg mb-3 line-clamp-2">{study.title}</h3>
                   <p className="text-white/55 text-sm mb-4 line-clamp-2">{study.problem}</p>
 
                   {/* Metrics */}
-                  <div className="grid grid-cols-3 gap-2 mb-5 p-3 rounded-xl bg-[rgba(0,102,255,0.08)] border border-[rgba(0,102,255,0.15)]">
+                  <div className="grid grid-cols-3 gap-2 mb-5 p-3 rounded-xl bg-[rgba(212,175,55,0.08)] border border-[rgba(212,175,55,0.15)]">
                     {[study.metric1, study.metric2, study.metric3].map((m) => (
                       <div key={m.label} className="text-center">
                         <p className="gradient-text font-black text-base">{m.value}</p>
@@ -100,7 +100,7 @@ export default function CaseStudies() {
 
                   <Link
                     to={`/case-studies/${study.slug}`}
-                    className="flex items-center gap-1.5 text-[#0066FF] text-sm font-semibold hover:gap-2.5 transition-all duration-200"
+                    className="flex items-center gap-1.5 text-[#D4AF37] text-sm font-semibold hover:gap-2.5 transition-all duration-200"
                   >
                     Read Full Case Study
                     <ArrowRight className="w-4 h-4" />

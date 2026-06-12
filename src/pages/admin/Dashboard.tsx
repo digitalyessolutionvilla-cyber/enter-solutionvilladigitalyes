@@ -26,7 +26,7 @@ function StatCard({ icon: Icon, label, value, delta, color }: {
       className="glass-card rounded-2xl p-6 relative overflow-hidden"
     >
       <div className={`absolute top-4 right-4 w-10 h-10 rounded-xl flex items-center justify-center ${color}`}>
-        <Icon className="w-5 h-5 text-white" />
+        <Icon className="w-5 h-5 text-[#D4AF37]" />
       </div>
       <p className="text-white/50 text-sm mb-2">{label}</p>
       <p className="text-white font-black text-3xl">{value}</p>
@@ -65,10 +65,10 @@ export default function Dashboard() {
   }, []);
 
   const statCards = [
-    { icon: MessageSquare, label: "Total Inquiries", value: stats.inquiries, delta: "All time", color: "bg-blue-500/80" },
-    { icon: FileText, label: "Blog Posts", value: stats.blog_posts, delta: "Published & draft", color: "bg-purple-500/80" },
-    { icon: Image, label: "Portfolio Items", value: stats.portfolio_items, delta: "All categories", color: "bg-cyan-500/80" },
-    { icon: Users, label: "Team Members", value: stats.team_members, delta: "Active", color: "bg-green-500/80" },
+    { icon: MessageSquare, label: "Total Inquiries", value: stats.inquiries, delta: "All time", color: "bg-[rgba(212,175,55,0.2)] border border-[rgba(212,175,55,0.3)]" },
+    { icon: FileText, label: "Blog Posts", value: stats.blog_posts, delta: "Published & draft", color: "bg-[rgba(212,175,55,0.12)] border border-[rgba(212,175,55,0.2)]" },
+    { icon: Image, label: "Portfolio Items", value: stats.portfolio_items, delta: "All categories", color: "bg-[rgba(245,215,110,0.12)] border border-[rgba(245,215,110,0.25)]" },
+    { icon: Users, label: "Team Members", value: stats.team_members, delta: "Active", color: "bg-[rgba(212,175,55,0.18)] border border-[rgba(212,175,55,0.28)]" },
   ];
 
   return (
@@ -95,10 +95,10 @@ export default function Dashboard() {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-white font-bold text-lg">Recent Inquiries</h2>
-            <a href="/admin/inquiries" className="text-[#0066FF] text-sm hover:text-[#00E5FF] transition-colors font-medium">View all →</a>
+            <a href="/admin/inquiries" className="text-[#D4AF37] text-sm hover:text-[#F5D76E] transition-colors font-medium">View all →</a>
           </div>
 
-          <div className="bg-[#0A2540] border border-white/8 rounded-2xl overflow-hidden">
+          <div className="bg-[#1A1A1A] border border-white/8 rounded-2xl overflow-hidden">
             {loading ? (
               <div className="p-8 text-center text-white/40">Loading...</div>
             ) : recentInquiries.length === 0 ? (
@@ -121,7 +121,7 @@ export default function Dashboard() {
                       <td className="px-4 py-3 text-white/60 text-sm hidden sm:table-cell">{inq.subject ?? "—"}</td>
                       <td className="px-4 py-3">
                         <span className={`text-xs font-semibold px-2.5 py-1 rounded-full capitalize ${
-                          inq.status === "new" ? "bg-[rgba(0,229,255,0.12)] text-[#00E5FF] border border-[rgba(0,229,255,0.25)]" :
+                          inq.status === "new" ? "bg-[rgba(245,215,110,0.12)] text-[#F5D76E] border border-[rgba(245,215,110,0.25)]" :
                           inq.status === "read" ? "bg-[rgba(255,176,32,0.12)] text-yellow-400 border border-[rgba(255,176,32,0.25)]" :
                           "bg-[rgba(0,200,150,0.12)] text-green-400 border border-[rgba(0,200,150,0.25)]"
                         }`}>

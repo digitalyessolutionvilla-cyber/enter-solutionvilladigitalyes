@@ -15,7 +15,7 @@ export default function BlogPost() {
           <div className="text-center">
             <p className="gradient-text text-6xl font-black mb-4">404</p>
             <h1 className="text-white font-bold text-2xl mb-4">Article Not Found</h1>
-            <Link to="/blog" className="text-[#0066FF] hover:text-[#00E5FF] transition-colors">
+            <Link to="/blog" className="text-[#D4AF37] hover:text-[#F5D76E] transition-colors">
               ← Back to Blog
             </Link>
           </div>
@@ -28,10 +28,10 @@ export default function BlogPost() {
     <PageLayout>
       {/* Hero */}
       <section className="relative pt-28 pb-0 overflow-hidden gradient-hero">
-        <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse at 50% 70%, rgba(0,102,255,0.12) 0%, transparent 60%)" }} />
+        <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse at 50% 70%, rgba(212,175,55,0.12) 0%, transparent 60%)" }} />
         <div className="container-custom relative z-10 max-w-4xl">
           <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }}>
-            <Link to="/blog" className="inline-flex items-center gap-2 text-white/50 hover:text-[#00E5FF] text-sm transition-colors mb-6">
+            <Link to="/blog" className="inline-flex items-center gap-2 text-white/50 hover:text-[#F5D76E] text-sm transition-colors mb-6">
               <ArrowLeft className="w-4 h-4" /> Back to Blog
             </Link>
 
@@ -46,9 +46,9 @@ export default function BlogPost() {
             </h1>
 
             <div className="flex flex-wrap items-center gap-5 text-white/45 text-sm mb-8 pb-8 border-b border-white/10">
-              <span className="flex items-center gap-1.5"><User className="w-4 h-4 text-[#00E5FF]" />{post.author}</span>
-              <span className="flex items-center gap-1.5"><Calendar className="w-4 h-4 text-[#00E5FF]" />{post.date}</span>
-              <span className="flex items-center gap-1.5"><Clock className="w-4 h-4 text-[#00E5FF]" />{post.readTime}</span>
+              <span className="flex items-center gap-1.5"><User className="w-4 h-4 text-[#F5D76E]" />{post.author}</span>
+              <span className="flex items-center gap-1.5"><Calendar className="w-4 h-4 text-[#F5D76E]" />{post.date}</span>
+              <span className="flex items-center gap-1.5"><Clock className="w-4 h-4 text-[#F5D76E]" />{post.readTime}</span>
             </div>
           </motion.div>
         </div>
@@ -91,8 +91,8 @@ export default function BlogPost() {
                 <Link key={related.id} to={`/blog/${related.slug}`} className="group glass-card rounded-2xl overflow-hidden hover:-translate-y-1 transition-all duration-300">
                   <img src={related.image} alt={related.title} className="w-full aspect-video object-cover transition-transform duration-500 group-hover:scale-105" />
                   <div className="p-5">
-                    <span className="text-[#00E5FF] text-[10px] font-bold tracking-widest uppercase">{related.category}</span>
-                    <h3 className="text-white font-bold mt-1 line-clamp-2 group-hover:text-[#00E5FF] transition-colors">{related.title}</h3>
+                    <span className="text-[#F5D76E] text-[10px] font-bold tracking-widest uppercase">{related.category}</span>
+                    <h3 className="text-white font-bold mt-1 line-clamp-2 group-hover:text-[#F5D76E] transition-colors">{related.title}</h3>
                   </div>
                 </Link>
               ))}

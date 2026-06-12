@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { ChevronDown, ArrowRight, Play } from "lucide-react";
+import { ChevronDown, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { stats } from "@/lib/data";
 
-const keywords = ["Digital Success", "Business Growth", "Brand Excellence", "Tech Innovation", "Market Leadership"];
+const keywords = ["Premium Results", "Digital Excellence", "Brand Luxury", "Tech Innovation", "Market Leadership"];
 
 function AnimatedCounter({ target, suffix }: { target: number; suffix: string }) {
   const [count, setCount] = useState(0);
@@ -16,14 +16,15 @@ function AnimatedCounter({ target, suffix }: { target: number; suffix: string })
       ([entry]) => {
         if (entry.isIntersecting && !started.current) {
           started.current = true;
-          const duration = 2000;
+          const duration = 2200;
           const start = performance.now();
-          const easeOutExpo = (t: number) => (t === 1 ? 1 : 1 - Math.pow(2, -10 * t));
+          const ease = (t: number) => 1 - Math.pow(2, -10 * t);
           const animate = (now: number) => {
             const elapsed = now - start;
             const progress = Math.min(elapsed / duration, 1);
-            setCount(Math.floor(easeOutExpo(progress) * target));
+            setCount(Math.floor(ease(progress) * target));
             if (progress < 1) requestAnimationFrame(animate);
+            else setCount(target);
           };
           requestAnimationFrame(animate);
         }
@@ -35,7 +36,7 @@ function AnimatedCounter({ target, suffix }: { target: number; suffix: string })
   }, [target]);
 
   return (
-    <span ref={ref} className="gradient-text text-4xl md:text-5xl font-black tabular-nums">
+    <span ref={ref} className="gradient-text text-4xl md:text-5xl font-black tabular-nums font-display">
       {count.toLocaleString()}{suffix}
     </span>
   );
@@ -52,44 +53,56 @@ export default function HeroSection() {
         setKeywordIndex((i) => (i + 1) % keywords.length);
         setVisible(true);
       }, 400);
-    }, 3000);
+    }, 3200);
     return () => clearInterval(interval);
   }, []);
 
   const containerVariants = {
     hidden: {},
-    visible: { transition: { staggerChildren: 0.15, delayChildren: 0.2 } },
+    visible: { transition: { staggerChildren: 0.18, delayChildren: 0.3 } },
   };
 
   const itemVariants = {
-    hidden: { opacity: 0, y: 30 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.4, 0, 0.2, 1] } },
+    hidden: { opacity: 0, y: 35 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.9, ease: [0.4, 0, 0.2, 1] } },
   };
 
   return (
-    <section className="relative min-h-screen flex flex-col justify-center overflow-hidden gradient-hero">
-      {/* Animated orbs */}
+    <section className="relative min-h-screen flex flex-col justify-center overflow-hidden bg-[#0A0A0A]">
+      {/* Background layers */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {/* Primary gold orb */}
         <div
-          className="absolute -top-40 -left-40 w-[600px] h-[600px] rounded-full animate-orb-pulse"
-          style={{ background: "radial-gradient(circle, rgba(0,102,255,0.3) 0%, transparent 70%)" }}
+          className="absolute -top-60 left-1/4 w-[700px] h-[700px] rounded-full animate-orb-pulse"
+          style={{ background: "radial-gradient(circle, rgba(212,175,55,0.12) 0%, rgba(212,175,55,0.03) 40%, transparent 70%)" }}
         />
+        {/* Bottom right orb */}
         <div
           className="absolute bottom-0 right-0 w-[500px] h-[500px] rounded-full animate-orb-pulse"
-          style={{ background: "radial-gradient(circle, rgba(0,229,255,0.15) 0%, transparent 70%)", animationDelay: "2s" }}
+          style={{ background: "radial-gradient(circle, rgba(245,215,110,0.07) 0%, transparent 65%)", animationDelay: "3s" }}
         />
+        {/* Center depth */}
         <div
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full"
-          style={{ background: "radial-gradient(circle, rgba(0,47,122,0.4) 0%, transparent 65%)" }}
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] rounded-full"
+          style={{ background: "radial-gradient(circle, rgba(212,175,55,0.04) 0%, transparent 60%)" }}
         />
-        {/* Grid pattern */}
+        {/* Luxury grid pattern */}
         <div
-          className="absolute inset-0 opacity-5"
+          className="absolute inset-0 opacity-[0.04]"
           style={{
-            backgroundImage: `linear-gradient(rgba(0,102,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(0,102,255,0.5) 1px, transparent 1px)`,
-            backgroundSize: "60px 60px",
+            backgroundImage: `linear-gradient(rgba(212,175,55,0.8) 1px, transparent 1px), linear-gradient(90deg, rgba(212,175,55,0.8) 1px, transparent 1px)`,
+            backgroundSize: "80px 80px",
           }}
         />
+        {/* Diagonal accent lines */}
+        <div
+          className="absolute inset-0 opacity-[0.03]"
+          style={{
+            backgroundImage: `repeating-linear-gradient(45deg, rgba(212,175,55,1) 0px, rgba(212,175,55,1) 1px, transparent 1px, transparent 80px)`,
+          }}
+        />
+        {/* Bottom gradient fade */}
+        <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-[#0A0A0A] to-transparent" />
       </div>
 
       {/* Content */}
@@ -101,64 +114,77 @@ export default function HeroSection() {
           animate="visible"
         >
           {/* Eyebrow */}
-          <motion.div variants={itemVariants} className="flex justify-center mb-6">
-            <span className="inline-flex items-center gap-2 border border-[rgba(0,229,255,0.35)] bg-[rgba(0,229,255,0.08)] text-[#00E5FF] text-xs font-semibold tracking-widest uppercase px-4 py-2 rounded-full">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#00E5FF] animate-pulse" />
-              The Digital YES — Solution Villa
+          <motion.div variants={itemVariants} className="flex justify-center mb-8">
+            <span className="inline-flex items-center gap-2.5 border border-[rgba(212,175,55,0.35)] bg-[rgba(212,175,55,0.07)] text-[#F5D76E] text-xs font-semibold tracking-[0.2em] uppercase px-5 py-2.5 rounded-full">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#D4AF37] animate-pulse" />
+              Solution Villa — The Digital YES
             </span>
           </motion.div>
 
           {/* Headline */}
           <motion.h1
             variants={itemVariants}
-            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white leading-[1.05] tracking-tight mb-2"
+            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-display font-black text-white leading-[1.05] tracking-tight mb-2"
           >
-            Turning Ideas Into
+            Premium Solutions.
           </motion.h1>
-          <motion.div variants={itemVariants} className="h-[1.15em] flex items-center justify-center mb-6">
+          <motion.h1
+            variants={itemVariants}
+            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-display font-black text-white leading-[1.05] tracking-tight mb-3"
+          >
+            Premium Experience.
+          </motion.h1>
+
+          {/* Animated keyword */}
+          <motion.div variants={itemVariants} className="h-[1.15em] flex items-center justify-center mb-8">
             <span
-              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black gradient-text leading-[1.05] tracking-tight transition-all duration-400"
-              style={{ opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(-10px)" }}
+              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-display font-black gradient-text leading-[1.05] tracking-tight transition-all duration-400"
+              style={{ opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(-12px)" }}
             >
               {keywords[keywordIndex]}
             </span>
           </motion.div>
 
+          {/* Divider */}
+          <motion.div variants={itemVariants} className="flex justify-center mb-8">
+            <div className="luxury-divider" />
+          </motion.div>
+
           {/* Sub-headline */}
           <motion.p
             variants={itemVariants}
-            className="text-white/65 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed mb-10"
+            className="text-white/55 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed mb-10 font-light"
           >
-            Africa's premier technology agency providing innovative branding, digital marketing, media production, software development, and business solutions that help organizations grow faster.
+            Africa's most premium technology and digital solutions agency. We deliver world-class branding, software, marketing, and media that transforms businesses into industry leaders.
           </motion.p>
 
           {/* CTA Buttons */}
           <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
             <Link
               to="/contact"
-              className="flex items-center gap-2 gradient-brand text-white font-semibold text-base px-8 py-4 rounded-full btn-glow hover:scale-105 hover:btn-glow-lg transition-all duration-200 w-full sm:w-auto justify-center"
+              className="flex items-center gap-2 gradient-brand text-[#0A0A0A] font-bold text-base px-8 py-4 rounded-full btn-glow hover:scale-105 transition-all duration-300 w-full sm:w-auto justify-center shadow-luxury"
             >
-              Start Your Project
+              Start Your Premium Journey
               <ArrowRight className="w-5 h-5" />
             </Link>
             <Link
               to="/portfolio"
-              className="flex items-center gap-2 border-2 border-white/25 text-white font-medium text-base px-8 py-4 rounded-full hover:border-[#00E5FF] hover:text-[#00E5FF] transition-all duration-200 w-full sm:w-auto justify-center group"
+              className="flex items-center gap-2 border border-[rgba(212,175,55,0.35)] text-white/80 font-medium text-base px-8 py-4 rounded-full hover:border-[#D4AF37] hover:text-[#F5D76E] transition-all duration-300 w-full sm:w-auto justify-center group backdrop-blur-sm"
             >
-              <Play className="w-4 h-4 fill-current" />
               Explore Our Work
+              <ArrowRight className="w-4 h-4 opacity-60 group-hover:opacity-100 transition-opacity" />
             </Link>
           </motion.div>
 
           {/* Stats bar */}
           <motion.div
             variants={itemVariants}
-            className="border-t border-white/10 pt-10 grid grid-cols-2 md:grid-cols-4 gap-8"
+            className="border-t border-[rgba(212,175,55,0.12)] pt-10 grid grid-cols-2 md:grid-cols-4 gap-8"
           >
             {stats.map((stat) => (
-              <div key={stat.label} className="flex flex-col items-center gap-1">
+              <div key={stat.label} className="flex flex-col items-center gap-1.5">
                 <AnimatedCounter target={stat.value} suffix={stat.suffix} />
-                <span className="text-white/55 text-sm font-medium">{stat.label}</span>
+                <span className="text-white/40 text-sm font-medium tracking-wide">{stat.label}</span>
               </div>
             ))}
           </motion.div>
@@ -167,8 +193,8 @@ export default function HeroSection() {
 
       {/* Scroll indicator */}
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-1 animate-bounce-soft">
-        <span className="text-white/30 text-xs tracking-wider uppercase">Scroll</span>
-        <ChevronDown className="w-5 h-5 text-white/30" />
+        <span className="text-[#D4AF37]/40 text-[10px] tracking-[0.25em] uppercase">Scroll</span>
+        <ChevronDown className="w-4 h-4 text-[#D4AF37]/40" />
       </div>
     </section>
   );

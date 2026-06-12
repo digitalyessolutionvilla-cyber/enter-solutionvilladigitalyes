@@ -40,9 +40,9 @@ export default function Contact() {
     <PageLayout>
       {/* Hero */}
       <section className="relative pt-32 pb-16 overflow-hidden gradient-hero">
-        <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse at 60% 50%, rgba(0,229,255,0.1) 0%, transparent 65%)" }} />
+        <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse at 60% 50%, rgba(245,215,110,0.1) 0%, transparent 65%)" }} />
         <div className="container-custom relative z-10 text-center max-w-3xl mx-auto">
-          <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-[#00E5FF] text-xs font-bold tracking-widest uppercase block mb-4">
+          <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-[#F5D76E] text-xs font-bold tracking-widest uppercase block mb-4">
             Contact Us
           </motion.span>
           <motion.h1 initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="text-4xl md:text-6xl font-black text-white mb-5">
@@ -80,7 +80,7 @@ export default function Contact() {
                     <p className="text-white/60">We'll be in touch within 24 hours.</p>
                     <button
                       onClick={() => { setSubmitted(false); setForm({ name: "", email: "", phone: "", subject: "", message: "" }); }}
-                      className="mt-6 text-[#0066FF] text-sm hover:text-[#00E5FF] transition-colors font-medium"
+                      className="mt-6 text-[#D4AF37] text-sm hover:text-[#F5D76E] transition-colors font-medium"
                     >
                       Send another message
                     </button>
@@ -93,7 +93,7 @@ export default function Contact() {
                         <label className="text-white/70 text-sm font-semibold block mb-1.5">Full Name *</label>
                         <input
                           name="name" value={form.name} onChange={handleChange} required
-                          className="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-3 text-white placeholder-white/30 text-sm outline-none focus:border-[#00E5FF] focus:ring-2 focus:ring-[rgba(0,229,255,0.15)] transition-all"
+                          className="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-3 text-white placeholder-white/30 text-sm outline-none focus:border-[#F5D76E] focus:ring-2 focus:ring-[rgba(245,215,110,0.15)] transition-all"
                           placeholder="John Doe"
                         />
                       </div>
@@ -101,7 +101,7 @@ export default function Contact() {
                         <label className="text-white/70 text-sm font-semibold block mb-1.5">Email *</label>
                         <input
                           name="email" value={form.email} onChange={handleChange} required type="email"
-                          className="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-3 text-white placeholder-white/30 text-sm outline-none focus:border-[#00E5FF] focus:ring-2 focus:ring-[rgba(0,229,255,0.15)] transition-all"
+                          className="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-3 text-white placeholder-white/30 text-sm outline-none focus:border-[#F5D76E] focus:ring-2 focus:ring-[rgba(245,215,110,0.15)] transition-all"
                           placeholder="john@company.com"
                         />
                       </div>
@@ -111,7 +111,7 @@ export default function Contact() {
                         <label className="text-white/70 text-sm font-semibold block mb-1.5">Phone</label>
                         <input
                           name="phone" value={form.phone} onChange={handleChange}
-                          className="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-3 text-white placeholder-white/30 text-sm outline-none focus:border-[#00E5FF] focus:ring-2 focus:ring-[rgba(0,229,255,0.15)] transition-all"
+                          className="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-3 text-white placeholder-white/30 text-sm outline-none focus:border-[#F5D76E] focus:ring-2 focus:ring-[rgba(245,215,110,0.15)] transition-all"
                           placeholder="+234 800 000 0000"
                         />
                       </div>
@@ -119,7 +119,7 @@ export default function Contact() {
                         <label className="text-white/70 text-sm font-semibold block mb-1.5">Subject</label>
                         <select
                           name="subject" value={form.subject} onChange={handleChange}
-                          className="w-full bg-[#0A2540] border border-white/15 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-[#00E5FF] focus:ring-2 focus:ring-[rgba(0,229,255,0.15)] transition-all"
+                          className="w-full bg-[#1A1A1A] border border-white/15 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-[#F5D76E] focus:ring-2 focus:ring-[rgba(245,215,110,0.15)] transition-all"
                         >
                           <option value="">Select subject</option>
                           {subjects.map((s) => <option key={s} value={s}>{s}</option>)}
@@ -130,7 +130,7 @@ export default function Contact() {
                       <label className="text-white/70 text-sm font-semibold block mb-1.5">Message *</label>
                       <textarea
                         name="message" value={form.message} onChange={handleChange} required rows={5}
-                        className="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-3 text-white placeholder-white/30 text-sm outline-none focus:border-[#00E5FF] focus:ring-2 focus:ring-[rgba(0,229,255,0.15)] transition-all resize-none"
+                        className="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-3 text-white placeholder-white/30 text-sm outline-none focus:border-[#F5D76E] focus:ring-2 focus:ring-[rgba(245,215,110,0.15)] transition-all resize-none"
                         placeholder="Tell us about your project..."
                       />
                     </div>
@@ -162,8 +162,8 @@ export default function Contact() {
                 <div className="space-y-5">
                   {officeInfo.map(({ icon: Icon, label, value }) => (
                     <div key={label} className="flex items-start gap-4">
-                      <div className="w-10 h-10 rounded-xl bg-[rgba(0,102,255,0.15)] border border-[rgba(0,102,255,0.3)] flex items-center justify-center flex-shrink-0">
-                        <Icon className="w-5 h-5 text-[#00E5FF]" />
+                      <div className="w-10 h-10 rounded-xl bg-[rgba(212,175,55,0.15)] border border-[rgba(212,175,55,0.3)] flex items-center justify-center flex-shrink-0">
+                        <Icon className="w-5 h-5 text-[#F5D76E]" />
                       </div>
                       <div>
                         <p className="text-white/45 text-xs font-medium mb-0.5">{label}</p>
@@ -187,11 +187,11 @@ export default function Contact() {
 
               {/* Map placeholder */}
               <div className="glass-card rounded-2xl overflow-hidden h-48">
-                <div className="w-full h-full bg-gradient-to-br from-[rgba(0,102,255,0.1)] to-[rgba(0,229,255,0.05)] flex items-center justify-center">
+                <div className="w-full h-full bg-gradient-to-br from-[rgba(212,175,55,0.1)] to-[rgba(245,215,110,0.05)] flex items-center justify-center">
                   <div className="text-center">
-                    <MapPin className="w-8 h-8 text-[#00E5FF] mx-auto mb-2" />
+                    <MapPin className="w-8 h-8 text-[#F5D76E] mx-auto mb-2" />
                     <p className="text-white/50 text-sm">Victoria Island, Lagos</p>
-                    <a href="https://maps.google.com" target="_blank" rel="noopener noreferrer" className="text-[#0066FF] text-xs mt-1 hover:text-[#00E5FF] transition-colors block">
+                    <a href="https://maps.google.com" target="_blank" rel="noopener noreferrer" className="text-[#D4AF37] text-xs mt-1 hover:text-[#F5D76E] transition-colors block">
                       Open in Maps →
                     </a>
                   </div>
