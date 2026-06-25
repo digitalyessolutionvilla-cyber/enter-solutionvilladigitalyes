@@ -2,8 +2,26 @@ import { useState, useEffect, useCallback } from "react";
 import { ChevronLeft, ChevronRight, Star, Quote } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { testimonials } from "@/lib/data";
+import { usePageSection } from "@/hooks/usePageSection";
+
+interface TestimonialsHeader {
+  eyebrow: string;
+  title: string;
+  title_highlighted: string;
+  subtitle: string;
+  is_visible: boolean;
+}
+
+const DEFAULT_HEADER: TestimonialsHeader = {
+  eyebrow: "Client Stories",
+  title: "What Our",
+  title_highlighted: "Clients Say",
+  subtitle: "Real results from real clients. Here's what Africa's leading businesses say about working with Solution Villa.",
+  is_visible: true,
+};
 
 export default function TestimonialsSection() {
+  const header = usePageSection<TestimonialsHeader>("/", "testimonials_header", DEFAULT_HEADER);
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
   const [direction, setDirection] = useState(1);
@@ -43,9 +61,9 @@ export default function TestimonialsSection() {
       <div className="container-custom relative z-10">
         {/* Header */}
         <div className="text-center mb-14">
-          <span className="text-[#D4AF37] text-[10px] font-bold tracking-[0.3em] uppercase mb-3 block">Client Stories</span>
+          <span className="text-[#D4AF37] text-[10px] font-bold tracking-[0.3em] uppercase mb-3 block">{header.eyebrow}</span>
           <h2 className="text-3xl md:text-5xl font-display font-black text-white">
-            Voices of <span className="gradient-text">Excellence</span>
+            {header.title} <span className="gradient-text">{header.title_highlighted}</span>
           </h2>
           <div className="luxury-divider mt-4" />
         </div>

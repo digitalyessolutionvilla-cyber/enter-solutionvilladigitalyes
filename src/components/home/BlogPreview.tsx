@@ -1,10 +1,35 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, ExternalLink } from "lucide-react";
 import { motion } from "framer-motion";
-import { blogPosts } from "@/lib/data";
+import { useBlogPosts } from "@/hooks/useBlogPosts";
+import { usePageSection } from "@/hooks/usePageSection";
+
+interface BlogHeader {
+  eyebrow: string;
+  title: string;
+  title_highlighted: string;
+  subtitle: string;
+  cta_text: string;
+  cta_href: string;
+  is_visible: boolean;
+}
+
+const DEFAULT_HEADER: BlogHeader = {
+  eyebrow: "Premium Insights",
+  title: "From the",
+  title_highlighted: "Blog",
+  subtitle: "Expert insights on digital marketing, branding, and technology from Africa's leading agency.",
+  cta_text: "Read All Articles",
+  cta_href: "/blog",
+  is_visible: true,
+};
 
 export default function BlogPreview() {
-  const posts = blogPosts.slice(0, 3);
+  const header = usePageSection<BlogHeader>("/", "blog_header", DEFAULT_HEADER);
+  const allPosts = useBlogPosts();
+  const posts = allPosts.slice(0, 3);
+
+  if (header.is_visible === false) return null;
 
   return (
     <section className="section-padding bg-[#0A0A0A] relative overflow-hidden">
@@ -12,16 +37,16 @@ export default function BlogPreview() {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
           <div>
-            <span className="text-[#D4AF37] text-[10px] font-bold tracking-[0.3em] uppercase mb-3 block">Insights</span>
+            <span className="text-[#D4AF37] text-[10px] font-bold tracking-[0.3em] uppercase mb-3 block">{header.eyebrow}</span>
             <h2 className="text-3xl md:text-5xl font-display font-black text-white">
-              Premium <span className="gradient-text">Knowledge</span>
+              {header.title} <span className="gradient-text">{header.title_highlighted}</span>
             </h2>
           </div>
           <Link
-            to="/blog"
+            to={header.cta_href || "/blog"}
             className="flex items-center gap-2 border border-[rgba(212,175,55,0.3)] text-[#D4AF37] text-sm font-semibold px-5 py-2.5 rounded-full hover:bg-[rgba(212,175,55,0.1)] transition-all duration-200 self-start md:self-auto whitespace-nowrap"
           >
-            All Articles <ArrowRight className="w-4 h-4" />
+            {header.cta_text || "All Articles"} <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
         <div className="luxury-divider mb-12" style={{ margin: "0 0 3rem 0" }} />
@@ -43,7 +68,7 @@ export default function BlogPreview() {
                 {/* Image */}
                 <div className="relative h-52 overflow-hidden">
                   <img
-                    src={post.image}
+                    src={post.featured_image ?? ""}
                     alt={post.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
@@ -64,7 +89,7 @@ export default function BlogPreview() {
                     {post.excerpt}
                   </p>
                   <div className="flex items-center justify-between pt-3 border-t border-[rgba(212,175,55,0.08)]">
-                    <span className="text-white/30 text-xs">{post.readTime} · {post.author}</span>
+                    <span className="text-white/30 text-xs">{post.author}</span>
                     <ExternalLink className="w-4 h-4 text-[#D4AF37]/40 group-hover:text-[#D4AF37] transition-colors" />
                   </div>
                 </div>
