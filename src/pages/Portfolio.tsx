@@ -1,9 +1,17 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSeo } from "@/hooks/useSeo";
 import { motion, AnimatePresence } from "framer-motion";
-import { ExternalLink, X, ChevronLeft, ChevronRight } from "lucide-react";
+import { ExternalLink, X, ChevronLeft, ChevronRight, Images } from "lucide-react";
 import PageLayout from "@/components/layout/PageLayout";
 import { usePortfolioItems } from "@/hooks/usePortfolioItems";
+import { supabase } from "@/integrations/supabase/client";
+
+interface PortfolioImage {
+  id: string;
+  image_url: string;
+  caption: string | null;
+  sort_order: number;
+}
 
 const categories = ["All", "Branding", "Websites", "Mobile Apps", "Events", "Media", "Software", "Printing", "Marketing"];
 
@@ -11,17 +19,54 @@ export default function Portfolio() {
   useSeo("/portfolio");
   const portfolioItems = usePortfolioItems();
   const [active, setActive] = useState("All");
-  const [lightbox, setLightbox] = useState<string | null>(null);
+  const [lightboxItemId, setLightboxItemId] = useState<string | null>(null);
+  const [lightboxImages, setLightboxImages] = useState<string[]>([]);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
+  const [loadingImages, setLoadingImages] = useState(false);
 
   const filtered = active === "All" ? portfolioItems : portfolioItems.filter((p) => p.category === active);
 
-  const currentIndex = lightbox !== null ? filtered.findIndex((p) => p.id === lightbox) : -1;
-  const currentItem = currentIndex >= 0 ? filtered[currentIndex] : null;
+  const currentItem = lightboxItemId ? portfolioItems.find((p) => p.id === lightboxItemId) ?? null : null;
 
-  const navigate = (dir: number) => {
-    if (currentIndex < 0) return;
-    const next = (currentIndex + dir + filtered.length) % filtered.length;
-    setLightbox(filtered[next].id);
+  // When lightbox opens for an item, load its extra images
+  useEffect(() => {
+    if (!lightboxItemId || !currentItem) return;
+
+    const primary = currentItem.image_url ? [currentItem.image_url] : [];
+    setLightboxImages(primary);
+    setLightboxIndex(0);
+    setLoadingImages(true);
+
+    supabase
+      .from("portfolio_images")
+      .select("id, image_url, caption, sort_order")
+      .eq("portfolio_item_id", lightboxItemId)
+      .order("sort_order")
+      .then(({ data }) => {
+        const extras = (data ?? []) as PortfolioImage[];
+        if (extras.length > 0) {
+          const allUrls = [...primary, ...extras.map((i) => i.image_url)];
+          setLightboxImages(allUrls);
+        }
+        setLoadingImages(false);
+      });
+  // Intentionally depends only on lightboxItemId — currentItem is derived and stable
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lightboxItemId]);
+
+  const openLightbox = (itemId: string) => {
+    setLightboxItemId(itemId);
+    setLightboxIndex(0);
+  };
+
+  const closeLightbox = () => {
+    setLightboxItemId(null);
+    setLightboxImages([]);
+    setLightboxIndex(0);
+  };
+
+  const navigateImg = (dir: number) => {
+    setLightboxIndex((prev) => (prev + dir + lightboxImages.length) % lightboxImages.length);
   };
 
   return (
@@ -63,7 +108,7 @@ export default function Portfolio() {
                   initial={{ opacity: 0, scale: 0.92 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.88 }}
                   transition={{ duration: 0.35, delay: i * 0.05 }}
                   className="group relative rounded-2xl overflow-hidden cursor-pointer break-inside-avoid mb-5"
-                  onClick={() => setLightbox(item.id)}
+                  onClick={() => openLightbox(item.id)}
                   style={{ aspectRatio: i % 4 === 0 ? "4/5" : i % 3 === 0 ? "3/4" : "4/3" }}
                 >
                   <img src={item.image_url ?? ""} alt={item.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
@@ -87,22 +132,98 @@ export default function Portfolio() {
         </div>
       </section>
 
-      {/* Lightbox */}
+      {/* Lightbox with multi-image carousel */}
       <AnimatePresence>
-        {lightbox !== null && currentItem && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-[rgba(10,10,10,0.95)] backdrop-blur-xl flex items-center justify-center p-4"
-            onClick={() => setLightbox(null)}>
-            <motion.div initial={{ scale: 0.9 }} animate={{ scale: 1 }} exit={{ scale: 0.9 }} className="relative max-w-4xl w-full" onClick={(e) => e.stopPropagation()}>
-              <img src={currentItem.image_url ?? ""} alt={currentItem.title} className="w-full max-h-[75vh] object-contain rounded-2xl" />
-              <div className="mt-4 text-center">
+        {lightboxItemId !== null && currentItem && (
+          <motion.div
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-[rgba(10,10,10,0.96)] backdrop-blur-xl flex items-center justify-center p-4"
+            onClick={closeLightbox}
+          >
+            <motion.div
+              initial={{ scale: 0.9 }} animate={{ scale: 1 }} exit={{ scale: 0.9 }}
+              className="relative max-w-4xl w-full flex flex-col items-center"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Main image */}
+              <div className="relative w-full">
+                {loadingImages ? (
+                  <div className="w-full aspect-video rounded-2xl bg-white/5 flex items-center justify-center">
+                    <div className="w-8 h-8 rounded-full border-2 border-[#D4AF37]/30 border-t-[#D4AF37] animate-spin" />
+                  </div>
+                ) : (
+                  <AnimatePresence mode="wait">
+                    <motion.img
+                      key={lightboxImages[lightboxIndex] ?? "empty"}
+                      initial={{ opacity: 0, x: 30 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -30 }}
+                      transition={{ duration: 0.2 }}
+                      src={lightboxImages[lightboxIndex] ?? ""}
+                      alt={currentItem.title}
+                      className="w-full max-h-[70vh] object-contain rounded-2xl"
+                    />
+                  </AnimatePresence>
+                )}
+
+                {/* Prev / Next arrows — only if multiple images */}
+                {lightboxImages.length > 1 && (
+                  <>
+                    <button
+                      onClick={() => navigateImg(-1)}
+                      className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white hover:border-[#F5D76E] hover:text-[#F5D76E] transition-all"
+                    >
+                      <ChevronLeft className="w-5 h-5" />
+                    </button>
+                    <button
+                      onClick={() => navigateImg(1)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white hover:border-[#F5D76E] hover:text-[#F5D76E] transition-all"
+                    >
+                      <ChevronRight className="w-5 h-5" />
+                    </button>
+                  </>
+                )}
+              </div>
+
+              {/* Info */}
+              <div className="mt-4 text-center w-full px-12">
                 <span className="text-[#F5D76E] text-xs font-bold tracking-widest uppercase">{currentItem.category}</span>
                 <h3 className="text-white font-bold text-xl mt-1">{currentItem.title}</h3>
-                <p className="text-white/55 text-sm mt-1">{currentItem.description}</p>
+                {currentItem.description && (
+                  <p className="text-white/55 text-sm mt-1 max-w-xl mx-auto">{currentItem.description}</p>
+                )}
               </div>
-              <button onClick={() => setLightbox(null)} className="absolute -top-4 -right-4 w-10 h-10 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white hover:bg-white/20 transition-colors"><X className="w-5 h-5" /></button>
-              <button onClick={() => navigate(-1)} className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white hover:border-[#F5D76E] hover:text-[#F5D76E] transition-all"><ChevronLeft className="w-5 h-5" /></button>
-              <button onClick={() => navigate(1)} className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white hover:border-[#F5D76E] hover:text-[#F5D76E] transition-all"><ChevronRight className="w-5 h-5" /></button>
+
+              {/* Thumbnail strip — only if multiple images */}
+              {lightboxImages.length > 1 && (
+                <div className="flex gap-2 mt-5 overflow-x-auto pb-1 max-w-full px-4">
+                  {lightboxImages.map((url, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setLightboxIndex(idx)}
+                      className={`flex-shrink-0 w-14 h-14 rounded-lg overflow-hidden border-2 transition-all ${idx === lightboxIndex ? "border-[#D4AF37]" : "border-transparent opacity-50 hover:opacity-80"}`}
+                    >
+                      <img src={url} alt="" className="w-full h-full object-cover" />
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {/* Image counter */}
+              {lightboxImages.length > 1 && (
+                <div className="flex items-center gap-1.5 mt-3">
+                  <Images className="w-3.5 h-3.5 text-white/30" />
+                  <span className="text-white/35 text-xs">{lightboxIndex + 1} / {lightboxImages.length}</span>
+                </div>
+              )}
+
+              {/* Close */}
+              <button
+                onClick={closeLightbox}
+                className="absolute -top-4 -right-4 w-10 h-10 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white hover:bg-white/20 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
             </motion.div>
           </motion.div>
         )}
