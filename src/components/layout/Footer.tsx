@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useFooterNavigation } from "@/hooks/useNavigation";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
 import { footerLinks as fallbackFooter } from "@/lib/data";
+import { supabase } from "@/integrations/supabase/client";
 
 const COLUMN_LABELS: Record<string, string> = {
   services: "Services",
@@ -14,14 +15,25 @@ const COLUMN_LABELS: Record<string, string> = {
 export default function Footer() {
   const [email, setEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
+  const [subMsg, setSubMsg] = useState("Thank you for subscribing!");
   const footerNav = useFooterNavigation();
   const settings = useSiteSettings();
 
   const hasFooterNav = Object.keys(footerNav).length > 0;
 
-  const handleSubscribe = (e: React.FormEvent) => {
+  const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (email) { setSubscribed(true); setEmail(""); }
+    if (!email) return;
+    const { error } = await supabase
+      .from("newsletter_subscribers")
+      .upsert({ email, source: "footer" }, { onConflict: "email", ignoreDuplicates: false });
+    if (!error) {
+      setSubMsg("Thank you for subscribing!");
+    } else {
+      setSubMsg("You're already subscribed!");
+    }
+    setSubscribed(true);
+    setEmail("");
   };
 
   const socials = [
@@ -116,7 +128,7 @@ export default function Footer() {
               Get exclusive insights on premium digital innovation.
             </p>
             {subscribed ? (
-              <p className="text-[#D4AF37] text-sm font-medium">Thank you for subscribing!</p>
+              <p className="text-[#D4AF37] text-sm font-medium">{subMsg}</p>
             ) : (
               <form onSubmit={handleSubscribe} className="flex rounded-full overflow-hidden border border-[rgba(212,175,55,0.2)] bg-[rgba(212,175,55,0.04)]">
                 <input

@@ -29,6 +29,7 @@ import ServicesAdmin from "./pages/admin/ServicesAdmin";
 import ContentEditor from "./pages/admin/ContentEditor";
 import HeroSlidesAdmin from "./pages/admin/HeroSlidesAdmin";
 import LiveChat from "./pages/admin/LiveChat";
+import NewsletterAdmin from "./pages/admin/NewsletterAdmin";
 import ProtectedRoute from "./components/admin/ProtectedRoute";
 import PublicLayout from "./components/layout/PublicLayout";
 
@@ -65,6 +66,7 @@ export const routers = [
   { path: "/admin/team", name: "adminTeam", element: <ProtectedRoute><TeamAdmin /></ProtectedRoute> },
   { path: "/admin/testimonials", name: "adminTestimonials", element: <ProtectedRoute><TestimonialsAdmin /></ProtectedRoute> },
   { path: "/admin/inquiries", name: "adminInquiries", element: <ProtectedRoute><Inquiries /></ProtectedRoute> },
+  { path: "/admin/newsletter", name: "adminNewsletter", element: <ProtectedRoute><NewsletterAdmin /></ProtectedRoute> },
 
   // Live Chat
   { path: "/admin/live-chat", name: "adminLiveChat", element: <ProtectedRoute><LiveChat /></ProtectedRoute> },

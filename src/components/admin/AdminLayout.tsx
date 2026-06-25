@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard, FileText, FolderOpen, Users, MessageSquare,
   BookOpen, Settings, ChevronLeft, ChevronRight, LogOut, Crown, Star,
-  Image, Clock, Search, Menu, Layout, BarChart2, Headphones, Images
+  Image, Clock, Search, Menu, Layout, BarChart2, Headphones, Images, Mail
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
@@ -19,6 +19,7 @@ const navItems = [
   { icon: Star, label: "Testimonials", href: "/admin/testimonials" },
   { icon: Users, label: "Team", href: "/admin/team" },
   { icon: MessageSquare, label: "Inquiries", href: "/admin/inquiries" },
+  { icon: Mail, label: "Newsletter", href: "/admin/newsletter" },
   { icon: Headphones, label: "Live Chat", href: "/admin/live-chat", badge: "waiting" },
   { divider: true, label: "Site Management" },
   { icon: Layout, label: "Content Editor", href: "/admin/content" },
