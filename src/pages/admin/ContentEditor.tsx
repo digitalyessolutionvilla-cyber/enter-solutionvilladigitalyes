@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { Save, ChevronDown, ChevronUp, Plus, Trash2, Eye, EyeOff, RotateCcw, Check, Home, Info, Briefcase, BookOpen, FileText, Phone } from "lucide-react";
+import { Save, ChevronDown, ChevronUp, Plus, Trash2, Eye, EyeOff, RotateCcw, Check, Home, Info, Briefcase, BookOpen, FileText, Phone, Wrench } from "lucide-react";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -17,6 +17,7 @@ interface PageSection {
 const PAGES = [
   { path: "/", label: "Home", icon: Home },
   { path: "/about", label: "About Us", icon: Info },
+  { path: "/services", label: "Services", icon: Wrench },
   { path: "/portfolio", label: "Portfolio", icon: Briefcase },
   { path: "/case-studies", label: "Case Studies", icon: FileText },
   { path: "/blog", label: "Blog", icon: BookOpen },

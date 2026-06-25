@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { logActivity } from "@/lib/activityLog";
+import ImagePicker from "@/components/admin/ImagePicker";
 
 interface CaseStudy {
   id: string;
@@ -117,11 +118,7 @@ export default function CaseStudiesAdmin() {
                     </select>
                   </div>
                   <div className="col-span-2">
-                    <label className="text-white/50 text-xs font-semibold uppercase mb-1 block">Cover Image URL</label>
-                    <input value={form.cover_image} onChange={(e) => f("cover_image", e.target.value)} className="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-[#D4AF37]/50 transition-all" placeholder="https://..." />
-                    {form.cover_image && (
-                      <img src={form.cover_image} alt="preview" className="mt-2 h-24 w-full object-cover rounded-lg border border-white/10" onError={(e) => (e.currentTarget.style.display = "none")} />
-                    )}
+                    <ImagePicker label="Cover Image" value={form.cover_image} onChange={(url) => f("cover_image", url)} />
                   </div>
                   {(["problem", "solution", "results"] as const).map((field) => (
                     <div key={field} className="col-span-2">

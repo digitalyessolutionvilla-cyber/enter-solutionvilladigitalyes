@@ -3256,6 +3256,40 @@ export type Database = {
         }
         Relationships: []
       }
+      case_study_gallery: {
+        Row: {
+          caption: string | null
+          case_study_id: string
+          created_at: string | null
+          id: string
+          image_url: string
+          sort_order: number
+        }
+        Insert: {
+          caption?: string | null
+          case_study_id: string
+          created_at?: string | null
+          id?: string
+          image_url: string
+          sort_order?: number
+        }
+        Update: {
+          caption?: string | null
+          case_study_id?: string
+          created_at?: string | null
+          id?: string
+          image_url?: string
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "case_study_gallery_case_study_id_fkey"
+            columns: ["case_study_id"]
+            referencedRelation: "case_studies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       chat_conversations: {
         Row: {
           assigned_to: string | null

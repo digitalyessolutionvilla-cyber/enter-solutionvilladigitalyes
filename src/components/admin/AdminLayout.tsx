@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard, FileText, FolderOpen, Users, MessageSquare,
   BookOpen, Settings, ChevronLeft, ChevronRight, LogOut, Crown, Star,
-  Image, Clock, Search, Menu, Layout, BarChart2, Headphones
+  Image, Clock, Search, Menu, Layout, BarChart2, Headphones, Images
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
@@ -15,6 +15,7 @@ const navItems = [
   { icon: FileText, label: "Blog Posts", href: "/admin/blog" },
   { icon: FolderOpen, label: "Portfolio", href: "/admin/portfolio" },
   { icon: BookOpen, label: "Case Studies", href: "/admin/case-studies" },
+  { icon: Images, label: "Gallery", href: "/admin/case-study-gallery", sub: true },
   { icon: Star, label: "Testimonials", href: "/admin/testimonials" },
   { icon: Users, label: "Team", href: "/admin/team" },
   { icon: MessageSquare, label: "Inquiries", href: "/admin/inquiries" },
@@ -105,16 +106,19 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             const Icon = item.icon as React.ComponentType<{ className?: string }>;
             const showBadge = "badge" in item && item.badge === "waiting" && waitingCount > 0;
 
+            const isSub = "sub" in item && item.sub;
+
             return (
               <Link
                 key={item.href as string}
                 to={item.href as string}
                 className={cn(
-                  "flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-xs font-medium transition-all duration-150 group",
+                  "flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all duration-150 group",
                   isActive
                     ? "bg-[rgba(212,175,55,0.1)] text-[#F5D76E] border border-[rgba(212,175,55,0.15)]"
                     : "text-white/40 hover:text-white/80 hover:bg-white/4",
-                  collapsed && "justify-center"
+                  collapsed && "justify-center",
+                  isSub && !collapsed && "ml-5 py-1.5"
                 )}
                 title={collapsed ? item.label as string : undefined}
               >

@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { logActivity } from "@/lib/activityLog";
+import ImagePicker from "@/components/admin/ImagePicker";
 
 interface BlogPost {
   id: string;
@@ -145,11 +146,7 @@ export default function BlogAdmin() {
                     <input value={form.slug} onChange={(e) => f("slug", e.target.value)} className="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-[#D4AF37]/50 transition-all font-mono" placeholder="auto-generated from title" />
                   </div>
                   <div className="col-span-2">
-                    <label className="text-white/50 text-xs font-semibold uppercase mb-1 block">Featured Image URL</label>
-                    <input value={form.featured_image} onChange={(e) => f("featured_image", e.target.value)} className="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-[#D4AF37]/50 transition-all" placeholder="https://..." />
-                    {form.featured_image && (
-                      <img src={form.featured_image} alt="preview" className="mt-2 h-24 w-full object-cover rounded-lg border border-white/10" onError={(e) => (e.currentTarget.style.display = "none")} />
-                    )}
+                    <ImagePicker label="Featured Image" value={form.featured_image} onChange={(url) => f("featured_image", url)} />
                   </div>
                   <div className="col-span-2">
                     <label className="text-white/50 text-xs font-semibold uppercase mb-1 block">Excerpt</label>

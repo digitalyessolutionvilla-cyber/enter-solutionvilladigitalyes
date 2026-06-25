@@ -14,6 +14,7 @@ import Dashboard from "./pages/admin/Dashboard";
 import BlogAdmin from "./pages/admin/BlogAdmin";
 import PortfolioAdmin from "./pages/admin/PortfolioAdmin";
 import CaseStudiesAdmin from "./pages/admin/CaseStudiesAdmin";
+import CaseStudyGallery from "./pages/admin/CaseStudyGallery";
 import TeamAdmin from "./pages/admin/TeamAdmin";
 import TestimonialsAdmin from "./pages/admin/TestimonialsAdmin";
 import Inquiries from "./pages/admin/Inquiries";
@@ -60,6 +61,7 @@ export const routers = [
   { path: "/admin/blog", name: "adminBlog", element: <ProtectedRoute><BlogAdmin /></ProtectedRoute> },
   { path: "/admin/portfolio", name: "adminPortfolio", element: <ProtectedRoute><PortfolioAdmin /></ProtectedRoute> },
   { path: "/admin/case-studies", name: "adminCaseStudies", element: <ProtectedRoute><CaseStudiesAdmin /></ProtectedRoute> },
+  { path: "/admin/case-study-gallery", name: "adminCaseStudyGallery", element: <ProtectedRoute><CaseStudyGallery /></ProtectedRoute> },
   { path: "/admin/team", name: "adminTeam", element: <ProtectedRoute><TeamAdmin /></ProtectedRoute> },
   { path: "/admin/testimonials", name: "adminTestimonials", element: <ProtectedRoute><TestimonialsAdmin /></ProtectedRoute> },
   { path: "/admin/inquiries", name: "adminInquiries", element: <ProtectedRoute><Inquiries /></ProtectedRoute> },
