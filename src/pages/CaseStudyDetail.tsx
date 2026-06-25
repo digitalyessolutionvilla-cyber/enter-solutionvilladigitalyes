@@ -1,13 +1,74 @@
+import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Building2, TrendingUp } from "lucide-react";
+import { ArrowLeft, Building2, TrendingUp, Images } from "lucide-react";
 import PageLayout from "@/components/layout/PageLayout";
-import { caseStudies } from "@/lib/data";
+import { supabase } from "@/integrations/supabase/client";
+
+interface CaseStudy {
+  id: string;
+  title: string;
+  slug: string;
+  client: string;
+  industry: string | null;
+  cover_image: string | null;
+  problem: string | null;
+  solution: string | null;
+  results: string | null;
+  testimonial: string | null;
+  testimonial_author: string | null;
+  status: string;
+}
+
+interface GalleryImage {
+  id: string;
+  image_url: string;
+  caption: string | null;
+  sort_order: number;
+}
 
 export default function CaseStudyDetail() {
   const { slug } = useParams();
-  const study = caseStudies.find((c) => c.slug === slug);
+  const [study, setStudy] = useState<CaseStudy | null | undefined>(undefined); // undefined = loading
+  const [gallery, setGallery] = useState<GalleryImage[]>([]);
+  const [lightbox, setLightbox] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (!slug) { setStudy(null); return; }
+
+    supabase
+      .from("case_studies")
+      .select("*")
+      .eq("slug", slug)
+      .maybeSingle()
+      .then(({ data }) => {
+        setStudy(data ?? null);
+        if (data?.id) {
+          supabase
+            .from("case_study_gallery")
+            .select("id, image_url, caption, sort_order")
+            .eq("case_study_id", data.id)
+            .order("sort_order")
+            .then(({ data: imgs }) => setGallery(imgs ?? []));
+        }
+      });
+  }, [slug]);
+
+  // Loading state
+  if (study === undefined) {
+    return (
+      <PageLayout>
+        <div className="min-h-screen flex items-center justify-center pt-24">
+          <div className="text-center">
+            <div className="w-12 h-12 rounded-full border-2 border-[#D4AF37]/30 border-t-[#D4AF37] animate-spin mx-auto mb-4" />
+            <p className="text-white/40 text-sm">Loading case study...</p>
+          </div>
+        </div>
+      </PageLayout>
+    );
+  }
+
+  // 404 state
   if (!study) {
     return (
       <PageLayout>
@@ -35,9 +96,11 @@ export default function CaseStudyDetail() {
               <ArrowLeft className="w-4 h-4" /> Back to Case Studies
             </Link>
 
-            <div className="flex items-center gap-3 mb-4">
-              <span className="gradient-brand text-white text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-full">{study.industry}</span>
-            </div>
+            {study.industry && (
+              <div className="flex items-center gap-3 mb-4">
+                <span className="gradient-brand text-white text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-full">{study.industry}</span>
+              </div>
+            )}
 
             <h1 className="text-3xl md:text-5xl font-black text-white leading-tight mb-4">{study.title}</h1>
 
@@ -50,40 +113,28 @@ export default function CaseStudyDetail() {
       </section>
 
       {/* Cover Image */}
-      <div className="container-custom max-w-5xl">
-        <motion.img
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          src={study.cover}
-          alt={study.title}
-          className="w-full rounded-2xl aspect-video object-cover"
-        />
-      </div>
-
-      {/* Results bar */}
-      <section className="py-10">
+      {study.cover_image && (
         <div className="container-custom max-w-5xl">
-          <div className="glass-card rounded-2xl p-6 grid grid-cols-3 gap-4">
-            {[study.metric1, study.metric2, study.metric3].map((m) => (
-              <div key={m.label} className="text-center">
-                <p className="gradient-text font-black text-3xl md:text-4xl">{m.value}</p>
-                <p className="text-white/55 text-sm mt-1">{m.label}</p>
-              </div>
-            ))}
-          </div>
+          <motion.img
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            src={study.cover_image}
+            alt={study.title}
+            className="w-full rounded-2xl aspect-video object-cover"
+          />
         </div>
-      </section>
+      )}
 
       {/* Content */}
-      <section className="pb-20">
+      <section className="py-14">
         <div className="container-custom max-w-5xl">
           <div className="grid md:grid-cols-3 gap-8">
             {[
               { title: "The Challenge", content: study.problem, color: "border-red-500/30" },
               { title: "Our Solution", content: study.solution, color: "border-[#D4AF37]/40" },
               { title: "The Results", content: study.results, color: "border-green-500/30" },
-            ].map((section) => (
+            ].filter((s) => s.content).map((section) => (
               <motion.div
                 key={section.title}
                 initial={{ opacity: 0, y: 24 }}
@@ -100,12 +151,105 @@ export default function CaseStudyDetail() {
             ))}
           </div>
 
-          {/* CTA */}
+          {/* Testimonial */}
+          {study.testimonial && (
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="mt-10 glass-card rounded-2xl p-8 border border-[rgba(212,175,55,0.2)] text-center"
+            >
+              <blockquote className="text-white/75 text-lg italic leading-relaxed mb-4">
+                "{study.testimonial}"
+              </blockquote>
+              {study.testimonial_author && (
+                <cite className="text-[#D4AF37] text-sm font-semibold not-italic">— {study.testimonial_author}</cite>
+              )}
+            </motion.div>
+          )}
+        </div>
+      </section>
+
+      {/* Gallery */}
+      {gallery.length > 0 && (
+        <section className="pb-16">
+          <div className="container-custom max-w-5xl">
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+            >
+              <div className="flex items-center gap-3 mb-6">
+                <Images className="w-5 h-5 text-[#D4AF37]" />
+                <h2 className="text-white font-black text-2xl">Project Gallery</h2>
+                <span className="text-white/25 text-sm">({gallery.length} images)</span>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                {gallery.map((img, i) => (
+                  <motion.button
+                    key={img.id}
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.05 }}
+                    onClick={() => setLightbox(img.image_url)}
+                    className="group relative aspect-square rounded-xl overflow-hidden border border-white/8 hover:border-[rgba(212,175,55,0.4)] transition-all duration-300"
+                  >
+                    <img
+                      src={img.image_url}
+                      alt={img.caption ?? `Gallery image ${i + 1}`}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                      <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+                        <Images className="w-4 h-4 text-white" />
+                      </div>
+                    </div>
+                    {img.caption && (
+                      <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/80 to-transparent px-3 py-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <p className="text-white text-xs truncate">{img.caption}</p>
+                      </div>
+                    )}
+                  </motion.button>
+                ))}
+              </div>
+            </motion.div>
+          </div>
+        </section>
+      )}
+
+      {/* Lightbox */}
+      {lightbox && (
+        <div
+          className="fixed inset-0 z-[9999] bg-black/90 flex items-center justify-center p-4"
+          onClick={() => setLightbox(null)}
+        >
+          <motion.img
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            src={lightbox}
+            alt="Gallery"
+            className="max-w-full max-h-[90vh] object-contain rounded-2xl"
+            onClick={(e) => e.stopPropagation()}
+          />
+          <button
+            onClick={() => setLightbox(null)}
+            className="absolute top-6 right-6 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-colors text-xl font-light"
+          >
+            ×
+          </button>
+        </div>
+      )}
+
+      {/* CTA */}
+      <section className="pb-20">
+        <div className="container-custom max-w-5xl">
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="mt-16 glass-card rounded-2xl p-8 text-center"
+            className="glass-card rounded-2xl p-8 text-center"
           >
             <h2 className="text-white font-black text-2xl md:text-3xl mb-4">
               Ready for Similar <span className="gradient-text">Results?</span>

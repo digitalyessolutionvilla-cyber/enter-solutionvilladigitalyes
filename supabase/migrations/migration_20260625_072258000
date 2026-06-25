@@ -1,0 +1,40 @@
+
+INSERT INTO page_sections (page_path, section_key, section_label, content) VALUES
+('/services', 'hero', 'Services – Hero', '{
+  "badge_text": "What We Do",
+  "title": "Premium Solutions",
+  "title_highlight": "For Every Challenge",
+  "subtitle": "From brand identity to enterprise software — we deliver world-class digital solutions that drive measurable growth for ambitious businesses across Africa and beyond.",
+  "features": ["End-to-end project delivery", "Dedicated account manager", "On-time, on-budget guarantee", "Post-launch support included"],
+  "stats": [
+    {"value": "200+", "label": "Projects Delivered"},
+    {"value": "9", "label": "Core Services"},
+    {"value": "10+", "label": "Years Experience"},
+    {"value": "98%", "label": "Client Satisfaction"}
+  ]
+}'),
+('/services', 'why_us', 'Services – Why Choose Us', '{
+  "badge_text": "The Digital YES",
+  "title": "We Say YES to Every",
+  "title_highlight": "Digital Challenge",
+  "subtitle": "At Solution Villa, no project is too big or too complex. Since 2016, we have built our reputation by delivering premium results for every client — from startups to established enterprises across Africa and beyond.",
+  "benefits": [
+    {"title": "Full-Service Capability", "desc": "One agency for branding, tech, marketing, and media — seamlessly integrated."},
+    {"title": "Results-Driven Approach", "desc": "Every solution is built with measurable outcomes and ROI in mind."},
+    {"title": "Expert Team", "desc": "Seasoned professionals across design, engineering, marketing, and strategy."},
+    {"title": "African Market Intelligence", "desc": "Deep understanding of the African business landscape and consumer behavior."}
+  ],
+  "process_steps": [
+    {"step": "01", "title": "Discovery & Strategy", "desc": "We deep-dive into your business, goals, and audience to craft a tailored roadmap."},
+    {"step": "02", "title": "Design & Development", "desc": "Our team executes with precision — beautiful design meets robust engineering."},
+    {"step": "03", "title": "Launch & Optimization", "desc": "We go live, monitor performance, and iterate to maximize impact."},
+    {"step": "04", "title": "Ongoing Partnership", "desc": "Long-term support and continuous improvement — we grow with you."}
+  ]
+}'),
+('/services', 'cta', 'Services – Bottom CTA', '{
+  "title": "Ready to Start Your",
+  "title_highlight": "Next Project?",
+  "subtitle": "Tell us about your vision — we will build the perfect solution. No challenge is too big, no dream too ambitious.",
+  "button1_text": "Start a Project",
+  "button2_text": "View Our Work"
+}');
