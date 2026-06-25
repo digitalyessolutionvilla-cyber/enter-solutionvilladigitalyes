@@ -3256,6 +3256,131 @@ export type Database = {
         }
         Relationships: []
       }
+      chat_conversations: {
+        Row: {
+          assigned_to: string | null
+          created_at: string | null
+          id: string
+          page_url: string | null
+          session_id: string
+          status: string
+          updated_at: string | null
+          visitor_company: string | null
+          visitor_email: string | null
+          visitor_name: string | null
+          visitor_phone: string | null
+        }
+        Insert: {
+          assigned_to?: string | null
+          created_at?: string | null
+          id?: string
+          page_url?: string | null
+          session_id?: string
+          status?: string
+          updated_at?: string | null
+          visitor_company?: string | null
+          visitor_email?: string | null
+          visitor_name?: string | null
+          visitor_phone?: string | null
+        }
+        Update: {
+          assigned_to?: string | null
+          created_at?: string | null
+          id?: string
+          page_url?: string | null
+          session_id?: string
+          status?: string
+          updated_at?: string | null
+          visitor_company?: string | null
+          visitor_email?: string | null
+          visitor_name?: string | null
+          visitor_phone?: string | null
+        }
+        Relationships: []
+      }
+      chat_leads: {
+        Row: {
+          budget: string | null
+          company: string | null
+          conversation_id: string | null
+          created_at: string | null
+          email: string | null
+          id: string
+          name: string | null
+          notes: string | null
+          phone: string | null
+          project_type: string | null
+          timeline: string | null
+        }
+        Insert: {
+          budget?: string | null
+          company?: string | null
+          conversation_id?: string | null
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          name?: string | null
+          notes?: string | null
+          phone?: string | null
+          project_type?: string | null
+          timeline?: string | null
+        }
+        Update: {
+          budget?: string | null
+          company?: string | null
+          conversation_id?: string | null
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          name?: string | null
+          notes?: string | null
+          phone?: string | null
+          project_type?: string | null
+          timeline?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_leads_conversation_id_fkey"
+            columns: ["conversation_id"]
+            referencedRelation: "chat_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chat_messages: {
+        Row: {
+          admin_name: string | null
+          content: string
+          conversation_id: string
+          created_at: string | null
+          id: string
+          role: string
+        }
+        Insert: {
+          admin_name?: string | null
+          content: string
+          conversation_id: string
+          created_at?: string | null
+          id?: string
+          role?: string
+        }
+        Update: {
+          admin_name?: string | null
+          content?: string
+          conversation_id?: string
+          created_at?: string | null
+          id?: string
+          role?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            referencedRelation: "chat_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       contact_submissions: {
         Row: {
           created_at: string | null
@@ -3744,7 +3869,7 @@ export type Database = {
         }
         Relationships: []
       }
-      messages_2026_06_05: {
+      messages_2026_06_22: {
         Row: {
           event: string | null
           extension: string
@@ -3777,7 +3902,7 @@ export type Database = {
         }
         Relationships: []
       }
-      messages_2026_06_06: {
+      messages_2026_06_23: {
         Row: {
           event: string | null
           extension: string
@@ -3810,7 +3935,7 @@ export type Database = {
         }
         Relationships: []
       }
-      messages_2026_06_07: {
+      messages_2026_06_24: {
         Row: {
           event: string | null
           extension: string
@@ -3843,7 +3968,7 @@ export type Database = {
         }
         Relationships: []
       }
-      messages_2026_06_08: {
+      messages_2026_06_25: {
         Row: {
           event: string | null
           extension: string
@@ -3876,7 +4001,73 @@ export type Database = {
         }
         Relationships: []
       }
-      messages_2026_06_09: {
+      messages_2026_06_26: {
+        Row: {
+          event: string | null
+          extension: string
+          id: string
+          inserted_at: string
+          payload: Json | null
+          private: boolean | null
+          topic: string
+          updated_at: string
+        }
+        Insert: {
+          event?: string | null
+          extension: string
+          id?: string
+          inserted_at?: string
+          payload?: Json | null
+          private?: boolean | null
+          topic: string
+          updated_at?: string
+        }
+        Update: {
+          event?: string | null
+          extension?: string
+          id?: string
+          inserted_at?: string
+          payload?: Json | null
+          private?: boolean | null
+          topic?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      messages_2026_06_27: {
+        Row: {
+          event: string | null
+          extension: string
+          id: string
+          inserted_at: string
+          payload: Json | null
+          private: boolean | null
+          topic: string
+          updated_at: string
+        }
+        Insert: {
+          event?: string | null
+          extension: string
+          id?: string
+          inserted_at?: string
+          payload?: Json | null
+          private?: boolean | null
+          topic: string
+          updated_at?: string
+        }
+        Update: {
+          event?: string | null
+          extension?: string
+          id?: string
+          inserted_at?: string
+          payload?: Json | null
+          private?: boolean | null
+          topic?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      messages_2026_06_28: {
         Row: {
           event: string | null
           extension: string

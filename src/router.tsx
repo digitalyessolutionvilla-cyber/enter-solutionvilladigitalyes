@@ -8,6 +8,7 @@ import CaseStudyDetail from "./pages/CaseStudyDetail";
 import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
 import Contact from "./pages/Contact";
+import Services from "./pages/Services";
 import AdminLogin from "./pages/admin/Login";
 import Dashboard from "./pages/admin/Dashboard";
 import BlogAdmin from "./pages/admin/BlogAdmin";
@@ -44,6 +45,7 @@ export const routers = [
       { path: "/blog", name: "blog", element: <Blog /> },
       { path: "/blog/:slug", name: "blogPost", element: <BlogPost /> },
       { path: "/contact", name: "contact", element: <Contact /> },
+      { path: "/services", name: "services", element: <Services /> },
     ],
   },
 

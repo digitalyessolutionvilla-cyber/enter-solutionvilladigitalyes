@@ -378,12 +378,12 @@ export const navLinks = [
 
 export const footerLinks = {
   services: [
-    { label: "Branding & Design", href: "/#services" },
-    { label: "Digital Marketing", href: "/#services" },
-    { label: "Website Development", href: "/#services" },
-    { label: "Mobile Apps", href: "/#services" },
-    { label: "Event Production", href: "/#services" },
-    { label: "Cloud Solutions", href: "/#services" },
+    { label: "Branding & Design", href: "/services" },
+    { label: "Digital Marketing", href: "/services" },
+    { label: "Website Development", href: "/services" },
+    { label: "Mobile Apps", href: "/services" },
+    { label: "Event Production", href: "/services" },
+    { label: "Cloud Solutions", href: "/services" },
   ],
   company: [
     { label: "About Us", href: "/about" },
