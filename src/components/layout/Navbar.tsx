@@ -30,18 +30,13 @@ export default function Navbar() {
         <div className="container-custom">
           <div className="flex items-center justify-between h-16 md:h-20">
             {/* Logo */}
-            <Link to="/" className="flex items-center gap-3 group">
-              <div className="w-10 h-10 rounded-lg gradient-brand flex items-center justify-center shadow-glow flex-shrink-0">
-                <span className="text-[#0A0A0A] font-black text-sm tracking-tight">SV</span>
-              </div>
-              <div className="flex flex-col leading-tight">
-                <span className="text-white font-bold text-base tracking-tight font-display">
-                  Solution Villa
-                </span>
-                <span className="gradient-text-static text-[9px] font-semibold tracking-[0.25em] uppercase">
-                  The Digital YES
-                </span>
-              </div>
+            <Link to="/" className="flex items-center group">
+              <img
+                src="https://grazia-prod.oss-ap-southeast-1.aliyuncs.com/resources/uid_100066245/88e3e64b-646f-4e.png"
+                alt="Solution Villa"
+                className="h-10 w-auto object-contain"
+                crossOrigin="anonymous"
+              />
             </Link>
 
             {/* Desktop Nav */}
