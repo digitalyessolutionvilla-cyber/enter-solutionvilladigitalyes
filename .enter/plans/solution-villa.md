@@ -1,104 +1,116 @@
-# Newsletter Management — Plan
+# Staff Roles & Permissions — Plan
 
 ## Context
-The footer has a subscribe form that only sets local state (never saves to DB). The user wants:
-1. All subscriber emails saved to a Supabase table
-2. An admin page to view/manage subscribers
-3. Ability to compose and send email campaigns to all subscribers via Resend
+The Users admin page already lets a Super Admin invite staff and assign **Admin** / **Super Admin** roles (via the `invite-user` backend function), but both roles currently get identical full CMS access. The user wants granular staff roles:
+- **Content Editor** — Blog, Portfolio, Case Studies, Testimonials, Team, Content Editor (page sections), Services
+- **Support** — Inquiries, Newsletter, Live Chat
+
+Restricted roles must be enforced for real (RLS in the database), not just hidden in the sidebar — direct URL access and direct API calls must also be blocked, per the security ground rules for this project.
+
+Today almost every CMS table uses a blanket `auth.role() = 'authenticated'` policy — meaning any logged-in staff member (regardless of intended role) can already read/write every table directly via the API. This plan replaces those blanket checks with role-scoped checks so DB access matches the UI restrictions exactly.
 
 ---
 
-## Implementation Steps
+## Design
 
-### 1. DB Migration
-Create two tables:
+### 1. Roles
+Extend `user_profiles.role` to 4 values: `super_admin`, `admin`, `content_editor`, `support`.
+- `super_admin` / `admin` — unchanged, full access to everything (as today)
+- `content_editor` — content tables only
+- `support` — support tables only
 
-**`newsletter_subscribers`**
-- id (uuid PK)
-- email (text, unique, not null)
-- name (text, nullable)
-- status (`active` | `unsubscribed`, default `active`)
-- source (text, default `footer`) — where they signed up
-- created_at (timestamptz)
-- RLS: public can insert (subscribe), authenticated can read/update/delete
+### 2. Database helper function
+```sql
+CREATE OR REPLACE FUNCTION public.current_user_role()
+RETURNS text LANGUAGE plpgsql SECURITY DEFINER SET search_path TO 'public'
+AS $$
+DECLARE r text;
+BEGIN
+  SELECT role INTO r FROM public.user_profiles WHERE id = auth.uid();
+  RETURN r;
+EXCEPTION WHEN OTHERS THEN RETURN NULL;
+END;
+$$;
+```
 
-**`newsletter_campaigns`**
-- id (uuid PK)
-- subject (text, not null)
-- body (text, not null) — plain HTML or markdown
-- status (`draft` | `sent`, default `draft`)
-- sent_at (timestamptz)
-- recipient_count (int, default 0)
-- created_at (timestamptz)
-- RLS: authenticated only
+### 3. RLS policy updates (single migration)
+Replace existing `auth.role() = 'authenticated'` admin policies with `current_user_role() IN (...)`:
 
----
+| Scope | Tables | Allowed roles |
+|---|---|---|
+| Content | `blog_posts`, `portfolio_items`, `portfolio_images`, `case_studies`, `case_study_gallery`, `testimonials`, `team_members`, `page_sections`, `services`, `media_files` (insert/select/delete) | `super_admin`, `admin`, `content_editor` |
+| Support | `contact_submissions` (select/update), `newsletter_subscribers`, `newsletter_campaigns`, `chat_leads`, `chat_messages` | `super_admin`, `admin`, `support` |
+| Full-admin only | `navigation_items`, `seo_settings`, `site_settings`, `hero_slides`, `activity_logs` (select only; insert stays open to any authenticated staff so actions can still be logged) | `super_admin`, `admin` |
 
-### 2. Fix Footer Subscribe Form
-**File:** `src/components/layout/Footer.tsx`
-- `handleSubscribe()` → call `supabase.from("newsletter_subscribers").insert({ email, source: "footer" })` with upsert on conflict (email) to avoid duplicate errors
-- Show success or "already subscribed" message
+`user_profiles` policies (`auth.uid() = id` for own row, `is_super_admin()` for cross-user) stay unchanged — every role must still read its own profile to log in.
 
----
+Also update the `user_profiles_role_check` CHECK constraint to allow the 2 new role values.
 
-### 3. Supabase Edge Function — send-newsletter-campaign
-**File:** `supabase/functions/send-newsletter-campaign/index.ts`
-- Accepts `{ campaignId }` in POST body
-- Fetches campaign by id from `newsletter_campaigns`
-- Fetches all `active` subscribers from `newsletter_subscribers`
-- Sends individual emails via Resend API (`https://api.resend.com/emails`) using `RESEND_API_KEY` secret
-- Updates campaign `status = 'sent'`, `sent_at = now()`, `recipient_count = N`
-- Returns `{ sent: N }`
+### 4. Frontend permission matrix
+New file `src/lib/adminPermissions.ts`:
+```ts
+export type StaffRole = "super_admin" | "admin" | "content_editor" | "support";
+export const CONTENT_ROLES: StaffRole[] = ["super_admin", "admin", "content_editor"];
+export const SUPPORT_ROLES: StaffRole[] = ["super_admin", "admin", "support"];
+export const FULL_ADMIN_ROLES: StaffRole[] = ["super_admin", "admin"];
+export const SUPER_ADMIN_ONLY: StaffRole[] = ["super_admin"];
+```
 
-Secret needed: `RESEND_API_KEY` — will prompt user with `supabase_add_secret`
+### 5. Route protection
+`src/components/admin/ProtectedRoute.tsx` gets an optional `roles?: StaffRole[]` prop:
+- If provided and `profile` hasn't loaded yet (but user is authenticated) → show the existing spinner (avoids a false "Access Restricted" flash). Requires adding a `profileLoading` flag to `AuthContext` that flips false once the first profile fetch resolves.
+- If provided and loaded `profile.role` is not included → render a shared `AccessRestricted` component (extracted from the existing pattern in `Users.tsx`).
+- If omitted → any authenticated user passes (used only for Dashboard).
 
----
+`src/router.tsx` — wrap each admin route with the matching `roles` array from the matrix above (content routes → `CONTENT_ROLES`, support routes → `SUPPORT_ROLES`, site/system routes → `FULL_ADMIN_ROLES`, `/admin/users` → `SUPER_ADMIN_ONLY`, dashboard → none).
 
-### 4. Admin Page — Newsletter
-**File:** `src/pages/admin/NewsletterAdmin.tsx`
+### 6. Sidebar
+`src/components/admin/AdminLayout.tsx` — add `roles?: StaffRole[]` to each `navItems` entry (omit = visible to all, i.e. Dashboard only). Filter items by `profile.role`; suppress a section divider if none of its children are visible for the current role.
 
-Two tabs: **Subscribers** | **Campaigns**
-
-**Subscribers tab:**
-- Stats bar: Total, Active, Unsubscribed
-- Table: Email | Source | Date subscribed | Status | Actions (unsubscribe / delete)
-- Export CSV button (generates `data:text/csv` download)
-- Search/filter input
-
-**Campaigns tab:**
-- List of past campaigns with status badge, date, recipient count
-- "New Campaign" button → opens compose panel:
-  - Subject input
-  - Body textarea (HTML or plain text)
-  - "Save as Draft" and "Send Now" buttons
-- "Send Now" invokes edge function → shows sending spinner → success toast
-
----
-
-### 5. Router + Sidebar
-**File:** `src/router.tsx` — add `/admin/newsletter` route
-**File:** `src/components/admin/AdminLayout.tsx` — add nav item under Content section
-- Icon: `Mail` from lucide-react (already imported group)
-- Label: "Newsletter"
-- href: `/admin/newsletter`
+### 7. Users page & invite flow
+- `src/pages/admin/Users.tsx` — extend role badge styles/icons for `content_editor` (e.g. `FileEdit` icon) and `support` (e.g. `Headphones` icon); update both the invite-form role `<select>` and the per-row role-change `<select>` to offer all 4 roles; extract the "Access Restricted" block into `src/components/admin/AccessRestricted.tsx` and reuse it here too.
+- `supabase/functions/invite-user/index.ts` — validate `role` against the 4 allowed values (400 if invalid); update the invite email's `displayRole` label mapping to include "Content Editor" / "Support".
+- `src/context/AuthContext.tsx` — widen the `UserProfile.role` type to the 4-value union; add `profileLoading` state.
 
 ---
 
 ## Files Modified
 | File | Change |
 |---|---|
-| `supabase/migrations/migration_*` | Create 2 tables |
-| `src/components/layout/Footer.tsx` | Save subscribe to DB |
-| `supabase/functions/send-newsletter-campaign/index.ts` | New edge function |
-| `src/pages/admin/NewsletterAdmin.tsx` | New admin page |
-| `src/router.tsx` | Add route |
-| `src/components/admin/AdminLayout.tsx` | Add nav item |
+| `supabase/migrations/migration_*` | New role values, `current_user_role()` fn, RLS policy rewrites |
+| `src/lib/adminPermissions.ts` | New — role constants |
+| `src/components/admin/AccessRestricted.tsx` | New — shared restricted-access UI |
+| `src/components/admin/ProtectedRoute.tsx` | Add `roles` prop + loading-aware gating |
+| `src/context/AuthContext.tsx` | Widen role type, add `profileLoading` |
+| `src/router.tsx` | Add `roles` prop per route |
+| `src/components/admin/AdminLayout.tsx` | Add `roles` per nav item, filter sidebar |
+| `src/pages/admin/Users.tsx` | 4-role badges/dropdowns, reuse `AccessRestricted` |
+| `supabase/functions/invite-user/index.ts` | Validate role, update email labels |
 
-## Secrets Required
-- `RESEND_API_KEY` — Resend dashboard → API Keys → Create Key
+---
 
-## Verification
-1. Subscribe via footer → check Subscribers tab shows the email
-2. Create a draft campaign → save → appears in list
-3. Send campaign → spinner → success toast → recipient count updates
-4. Unsubscribe a user → status changes, not included in future sends
+## Implementation Checklist
+- [ ] Migration: widen `user_profiles_role_check` to 4 roles
+- [ ] Migration: create `current_user_role()` SECURITY DEFINER function
+- [ ] Migration: rewrite content-table policies to `CONTENT_ROLES`
+- [ ] Migration: rewrite support-table policies to `SUPPORT_ROLES`
+- [ ] Migration: rewrite site/system-table policies (`navigation_items`, `seo_settings`, `site_settings`, `hero_slides`, `activity_logs` select) to `FULL_ADMIN_ROLES`
+- [ ] `src/lib/adminPermissions.ts` created with role constants
+- [ ] `AuthContext` — role type widened, `profileLoading` added
+- [ ] `AccessRestricted` shared component created and used in `Users.tsx`
+- [ ] `ProtectedRoute` — `roles` prop implemented with loading-aware gating
+- [ ] `router.tsx` — every admin route annotated with correct `roles`
+- [ ] `AdminLayout` — sidebar filtered by role, dividers hidden when empty
+- [ ] `Users.tsx` — 4-role invite dropdown, 4-role row-level dropdown, badge styles/icons
+- [ ] `invite-user` edge function — role validation + email label update
+
+## Verification Checklist
+- [ ] Super Admin can invite a user with role Content Editor and Support
+- [ ] Content Editor login: sidebar shows only Dashboard + content items; Blog/Portfolio/etc. work end to end
+- [ ] Content Editor navigating directly to `/admin/inquiries` or `/admin/settings` sees Access Restricted, not the page content
+- [ ] Support login: sidebar shows only Dashboard + Inquiries/Newsletter/Live Chat; those pages work end to end
+- [ ] Support navigating directly to `/admin/blog` sees Access Restricted
+- [ ] Content Editor calling `supabase.from("contact_submissions").select()` directly (e.g. via browser console) is blocked by RLS
+- [ ] Support calling `supabase.from("blog_posts").insert()` directly is blocked by RLS
+- [ ] Existing Admin/Super Admin accounts retain full access to every section (no regression)
+- [ ] `pnpm` lint passes with 0 errors after all file changes
