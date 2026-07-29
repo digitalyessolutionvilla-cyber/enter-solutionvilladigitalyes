@@ -3947,6 +3947,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      current_user_role: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
       is_super_admin: {
         Args: Record<PropertyKey, never>
         Returns: boolean
@@ -3994,7 +3998,7 @@ export type Database = {
         }
         Relationships: []
       }
-      messages_2026_06_22: {
+      messages_2026_07_25: {
         Row: {
           event: string | null
           extension: string
@@ -4027,7 +4031,7 @@ export type Database = {
         }
         Relationships: []
       }
-      messages_2026_06_23: {
+      messages_2026_07_26: {
         Row: {
           event: string | null
           extension: string
@@ -4060,7 +4064,7 @@ export type Database = {
         }
         Relationships: []
       }
-      messages_2026_06_24: {
+      messages_2026_07_27: {
         Row: {
           event: string | null
           extension: string
@@ -4093,7 +4097,7 @@ export type Database = {
         }
         Relationships: []
       }
-      messages_2026_06_25: {
+      messages_2026_07_28: {
         Row: {
           event: string | null
           extension: string
@@ -4126,7 +4130,7 @@ export type Database = {
         }
         Relationships: []
       }
-      messages_2026_06_26: {
+      messages_2026_07_29: {
         Row: {
           event: string | null
           extension: string
@@ -4159,7 +4163,7 @@ export type Database = {
         }
         Relationships: []
       }
-      messages_2026_06_27: {
+      messages_2026_07_30: {
         Row: {
           event: string | null
           extension: string
@@ -4192,7 +4196,7 @@ export type Database = {
         }
         Relationships: []
       }
-      messages_2026_06_28: {
+      messages_2026_07_31: {
         Row: {
           event: string | null
           extension: string

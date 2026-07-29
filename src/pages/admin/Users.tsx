@@ -1,14 +1,16 @@
 import { useCallback, useEffect, useState } from "react";
-import { Users as UsersIcon, Plus, ShieldAlert, Shield, Mail, X, Crown, CheckCircle, Copy, Check, Key } from "lucide-react";
+import { Users as UsersIcon, Plus, ShieldAlert, Shield, Mail, X, Crown, CheckCircle, Copy, Check, Key, FileEdit, Headphones } from "lucide-react";
 import AdminLayout from "@/components/admin/AdminLayout";
+import AccessRestricted from "@/components/admin/AccessRestricted";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import { type StaffRole, ROLE_LABELS, ROLE_DESCRIPTIONS } from "@/lib/adminPermissions";
 
 interface UserRecord {
   id: string;
   full_name: string | null;
-  role: "super_admin" | "admin";
+  role: StaffRole;
   avatar_url: string | null;
   created_at: string;
 }
@@ -19,10 +21,21 @@ interface InviteResult {
   tempPassword?: string;
 }
 
-const ROLE_STYLES = {
+const ROLE_STYLES: Record<StaffRole, string> = {
   super_admin: "text-[#F5D76E] bg-[rgba(212,175,55,0.12)] border-[rgba(212,175,55,0.3)]",
   admin: "text-white/60 bg-white/5 border-white/15",
+  content_editor: "text-sky-300 bg-sky-500/10 border-sky-400/25",
+  support: "text-emerald-300 bg-emerald-500/10 border-emerald-400/25",
 };
+
+const ROLE_ICONS: Record<StaffRole, React.ComponentType<{ className?: string }>> = {
+  super_admin: Crown,
+  admin: Shield,
+  content_editor: FileEdit,
+  support: Headphones,
+};
+
+const ALL_ROLES: StaffRole[] = ["super_admin", "admin", "content_editor", "support"];
 
 function CredentialsModal({ result, onClose }: { result: InviteResult; onClose: () => void }) {
   const [copied, setCopied] = useState(false);
@@ -53,11 +66,11 @@ function CredentialsModal({ result, onClose }: { result: InviteResult; onClose: 
           <div className="w-16 h-16 rounded-2xl bg-green-500/10 border border-green-500/25 flex items-center justify-center mx-auto mb-4">
             <CheckCircle className="w-8 h-8 text-green-400" />
           </div>
-          <h2 className="text-white font-display font-black text-xl mb-1">Admin Invited!</h2>
+          <h2 className="text-white font-display font-black text-xl mb-1">Staff Member Invited!</h2>
           <p className="text-white/40 text-sm">
             {result.emailSent
               ? "An invitation email with login credentials has been sent."
-              : "Account created. Share these credentials with the admin:"}
+              : "Account created. Share these credentials with the team member:"}
           </p>
         </div>
 
@@ -91,7 +104,7 @@ function CredentialsModal({ result, onClose }: { result: InviteResult; onClose: 
 
         {result.tempPassword && (
           <p className="text-white/25 text-xs text-center mb-5">
-            Share these credentials securely. The admin should change their password after first login.
+            Share these credentials securely. They should change their password after first login.
           </p>
         )}
 
@@ -112,7 +125,7 @@ export default function Users() {
   const [users, setUsers] = useState<UserRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [showInvite, setShowInvite] = useState(false);
-  const [inviteForm, setInviteForm] = useState({ email: "", full_name: "", role: "admin" as "admin" | "super_admin" });
+  const [inviteForm, setInviteForm] = useState({ email: "", full_name: "", role: "admin" as StaffRole });
   const [inviting, setInviting] = useState(false);
   const [inviteResult, setInviteResult] = useState<InviteResult | null>(null);
 
@@ -126,20 +139,10 @@ export default function Users() {
   useEffect(() => { if (isSuperAdmin) load(); }, [isSuperAdmin, load]);
 
   if (!isSuperAdmin) {
-    return (
-      <AdminLayout>
-        <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
-          <div className="w-16 h-16 rounded-2xl bg-red-500/10 border border-red-500/25 flex items-center justify-center mb-4">
-            <ShieldAlert className="w-8 h-8 text-red-400" />
-          </div>
-          <h2 className="text-white font-bold text-xl mb-2">Access Restricted</h2>
-          <p className="text-white/50 text-sm max-w-xs">Only Super Admins can manage users and roles.</p>
-        </div>
-      </AdminLayout>
-    );
+    return <AccessRestricted title="Access Restricted" description="Only Super Admins can manage users and roles." />;
   }
 
-  const handleRoleChange = async (userId: string, newRole: "admin" | "super_admin") => {
+  const handleRoleChange = async (userId: string, newRole: StaffRole) => {
     if (userId === currentUser?.id) {
       toast({ title: "Cannot change your own role", variant: "destructive" });
       return;
@@ -189,11 +192,11 @@ export default function Users() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-white font-display font-black text-2xl">Users & Roles</h1>
-            <p className="text-white/40 text-sm mt-0.5">{users.length} admin account{users.length !== 1 ? "s" : ""}</p>
+            <p className="text-white/40 text-sm mt-0.5">{users.length} staff account{users.length !== 1 ? "s" : ""}</p>
           </div>
           <button onClick={() => setShowInvite(true)}
             className="flex items-center gap-2 gradient-brand text-[#0A0A0A] font-bold px-5 py-2.5 rounded-full btn-glow hover:scale-105 transition-all">
-            <Plus className="w-4 h-4" /> Invite Admin
+            <Plus className="w-4 h-4" /> Invite Staff
           </button>
         </div>
 
@@ -202,7 +205,7 @@ export default function Users() {
           <div className="glass-card rounded-2xl p-6 border border-[rgba(212,175,55,0.2)] space-y-5">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-white font-bold text-lg">Invite New Admin</h2>
+                <h2 className="text-white font-bold text-lg">Invite New Staff Member</h2>
                 <p className="text-white/30 text-xs mt-0.5">A secure password will be generated and emailed automatically</p>
               </div>
               <button onClick={() => setShowInvite(false)} className="text-white/30 hover:text-white transition-colors"><X className="w-5 h-5" /></button>
@@ -212,7 +215,7 @@ export default function Users() {
                 <label className="text-white/50 text-xs font-semibold uppercase block mb-1.5">Email *</label>
                 <input required type="email" value={inviteForm.email}
                   onChange={(e) => setInviteForm((f) => ({ ...f, email: e.target.value }))}
-                  placeholder="admin@company.com"
+                  placeholder="name@company.com"
                   className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-[#D4AF37]/50" />
               </div>
               <div>
@@ -225,12 +228,20 @@ export default function Users() {
               <div>
                 <label className="text-white/50 text-xs font-semibold uppercase block mb-1.5">Role</label>
                 <select value={inviteForm.role}
-                  onChange={(e) => setInviteForm((f) => ({ ...f, role: e.target.value as "admin" | "super_admin" }))}
+                  onChange={(e) => setInviteForm((f) => ({ ...f, role: e.target.value as StaffRole }))}
                   className="w-full bg-[#1A1A1A] border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-[#D4AF37]/50">
-                  <option value="admin">Admin</option>
-                  <option value="super_admin">Super Admin</option>
+                  {ALL_ROLES.map((r) => (
+                    <option key={r} value={r} className="bg-[#1A1A1A]">{ROLE_LABELS[r]}</option>
+                  ))}
                 </select>
               </div>
+              {inviteForm.role && (
+                <div className="md:col-span-3">
+                  <p className="text-white/35 text-xs leading-relaxed">
+                    <span className="text-white/50 font-semibold">{ROLE_LABELS[inviteForm.role]}:</span> {ROLE_DESCRIPTIONS[inviteForm.role]}
+                  </p>
+                </div>
+              )}
               <div className="md:col-span-3 flex gap-3 items-center">
                 <button type="submit" disabled={inviting}
                   className="flex items-center gap-2 gradient-brand text-[#0A0A0A] font-bold px-6 py-2.5 rounded-full btn-glow disabled:opacity-50 transition-all">
@@ -271,6 +282,7 @@ export default function Users() {
               <tbody>
                 {users.map((u) => {
                   const isYou = u.id === currentUser?.id;
+                  const BadgeIcon = ROLE_ICONS[u.role];
                   return (
                     <tr key={u.id} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors">
                       <td className="px-5 py-4">
@@ -280,7 +292,7 @@ export default function Users() {
                           </div>
                           <div>
                             <div className="text-white font-medium text-sm flex items-center gap-1.5">
-                              {u.full_name || "Admin User"}
+                              {u.full_name || "Staff User"}
                               {isYou && <span className="text-[10px] text-[#D4AF37]/60 border border-[rgba(212,175,55,0.2)] rounded-full px-1.5">You</span>}
                             </div>
                             <div className="text-white/25 text-xs font-mono">{u.id.slice(0, 8)}…</div>
@@ -289,8 +301,8 @@ export default function Users() {
                       </td>
                       <td className="px-5 py-4">
                         <span className={`inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide border rounded-full px-2.5 py-1 ${ROLE_STYLES[u.role]}`}>
-                          {u.role === "super_admin" ? <Crown className="w-3 h-3" /> : <Shield className="w-3 h-3" />}
-                          {u.role === "super_admin" ? "Super Admin" : "Admin"}
+                          <BadgeIcon className="w-3 h-3" />
+                          {ROLE_LABELS[u.role]}
                         </span>
                       </td>
                       <td className="px-5 py-4 hidden sm:table-cell">
@@ -300,10 +312,11 @@ export default function Users() {
                         <div className="flex items-center justify-end gap-2">
                           {!isYou ? (
                             <select value={u.role}
-                              onChange={(e) => handleRoleChange(u.id, e.target.value as "admin" | "super_admin")}
+                              onChange={(e) => handleRoleChange(u.id, e.target.value as StaffRole)}
                               className="bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-white text-xs outline-none focus:border-[#D4AF37]/50 cursor-pointer">
-                              <option value="admin" className="bg-[#1A1A1A]">Admin</option>
-                              <option value="super_admin" className="bg-[#1A1A1A]">Super Admin</option>
+                              {ALL_ROLES.map((r) => (
+                                <option key={r} value={r} className="bg-[#1A1A1A]">{ROLE_LABELS[r]}</option>
+                              ))}
                             </select>
                           ) : (
                             <span className="text-white/20 text-xs italic">current session</span>
@@ -322,7 +335,7 @@ export default function Users() {
         <div className="glass-card rounded-xl p-4 border border-[rgba(212,175,55,0.1)] flex items-start gap-3">
           <ShieldAlert className="w-4 h-4 text-[#D4AF37]/60 flex-shrink-0 mt-0.5" />
           <p className="text-white/30 text-xs leading-relaxed">
-            All admin accounts have full CMS access. Super Admins can manage users and all settings. When you invite a user, a secure temporary password is generated and emailed to them automatically.
+            Access is enforced per role: <strong className="text-white/50">Content Editors</strong> manage blog, portfolio, case studies, testimonials, team, content and services; <strong className="text-white/50">Support</strong> manages inquiries, newsletter and live chat; <strong className="text-white/50">Admins</strong> have full access. Restrictions are enforced in the database, not just the UI. A secure temporary password is generated and emailed on invite.
           </p>
         </div>
       </div>

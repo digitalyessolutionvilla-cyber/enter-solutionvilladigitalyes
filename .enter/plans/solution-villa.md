@@ -90,27 +90,27 @@ export const SUPER_ADMIN_ONLY: StaffRole[] = ["super_admin"];
 ---
 
 ## Implementation Checklist
-- [ ] Migration: widen `user_profiles_role_check` to 4 roles
-- [ ] Migration: create `current_user_role()` SECURITY DEFINER function
-- [ ] Migration: rewrite content-table policies to `CONTENT_ROLES`
-- [ ] Migration: rewrite support-table policies to `SUPPORT_ROLES`
-- [ ] Migration: rewrite site/system-table policies (`navigation_items`, `seo_settings`, `site_settings`, `hero_slides`, `activity_logs` select) to `FULL_ADMIN_ROLES`
-- [ ] `src/lib/adminPermissions.ts` created with role constants
-- [ ] `AuthContext` — role type widened, `profileLoading` added
-- [ ] `AccessRestricted` shared component created and used in `Users.tsx`
-- [ ] `ProtectedRoute` — `roles` prop implemented with loading-aware gating
-- [ ] `router.tsx` — every admin route annotated with correct `roles`
-- [ ] `AdminLayout` — sidebar filtered by role, dividers hidden when empty
-- [ ] `Users.tsx` — 4-role invite dropdown, 4-role row-level dropdown, badge styles/icons
-- [ ] `invite-user` edge function — role validation + email label update
+- [passed] Migration: widen `user_profiles_role_check` to 4 roles
+- [passed] Migration: create `current_user_role()` SECURITY DEFINER function
+- [passed] Migration: rewrite content-table policies to `CONTENT_ROLES`
+- [passed] Migration: rewrite support-table policies to `SUPPORT_ROLES`
+- [passed] Migration: rewrite site/system-table policies (`navigation_items`, `seo_settings`, `site_settings`, `hero_slides`, `activity_logs` select) to `FULL_ADMIN_ROLES`
+- [passed] `src/lib/adminPermissions.ts` created with role constants
+- [passed] `AuthContext` — role type widened, `profileLoading` added
+- [passed] `AccessRestricted` shared component created and used in `Users.tsx`
+- [passed] `ProtectedRoute` — `roles` prop implemented with loading-aware gating
+- [passed] `router.tsx` — every admin route annotated with correct `roles`
+- [passed] `AdminLayout` — sidebar filtered by role, dividers hidden when empty
+- [passed] `Users.tsx` — 4-role invite dropdown, 4-role row-level dropdown, badge styles/icons
+- [passed] `invite-user` edge function — role validation + email label update
 
 ## Verification Checklist
-- [ ] Super Admin can invite a user with role Content Editor and Support
-- [ ] Content Editor login: sidebar shows only Dashboard + content items; Blog/Portfolio/etc. work end to end
-- [ ] Content Editor navigating directly to `/admin/inquiries` or `/admin/settings` sees Access Restricted, not the page content
-- [ ] Support login: sidebar shows only Dashboard + Inquiries/Newsletter/Live Chat; those pages work end to end
-- [ ] Support navigating directly to `/admin/blog` sees Access Restricted
-- [ ] Content Editor calling `supabase.from("contact_submissions").select()` directly (e.g. via browser console) is blocked by RLS
-- [ ] Support calling `supabase.from("blog_posts").insert()` directly is blocked by RLS
-- [ ] Existing Admin/Super Admin accounts retain full access to every section (no regression)
-- [ ] `pnpm` lint passes with 0 errors after all file changes
+- [manual-required] Super Admin can invite a user with role Content Editor and Support
+- [manual-required] Content Editor login: sidebar shows only Dashboard + content items; Blog/Portfolio/etc. work end to end
+- [manual-required] Content Editor navigating directly to `/admin/inquiries` or `/admin/settings` sees Access Restricted, not the page content
+- [manual-required] Support login: sidebar shows only Dashboard + Inquiries/Newsletter/Live Chat; those pages work end to end
+- [manual-required] Support navigating directly to `/admin/blog` sees Access Restricted
+- [passed] Content Editor calling `supabase.from("contact_submissions").select()` directly (e.g. via browser console) is blocked by RLS
+- [passed] Support calling `supabase.from("blog_posts").insert()` directly is blocked by RLS
+- [passed] Existing Admin/Super Admin accounts retain full access to every section (no regression)
+- [passed] `pnpm` lint passes with 0 errors after all file changes

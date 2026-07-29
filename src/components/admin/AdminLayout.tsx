@@ -8,30 +8,38 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
 import { cn } from "@/lib/utils";
+import {
+  CONTENT_ROLES, SUPPORT_ROLES, FULL_ADMIN_ROLES, SUPER_ADMIN_ONLY,
+  type StaffRole,
+} from "@/lib/adminPermissions";
 
-const navItems = [
+type NavItem =
+  | { icon: React.ComponentType<{ className?: string }>; label: string; href: string; sub?: boolean; badge?: "waiting"; roles?: StaffRole[] }
+  | { divider: true; label: string };
+
+const navItems: NavItem[] = [
   { icon: LayoutDashboard, label: "Dashboard", href: "/admin/dashboard" },
   { divider: true, label: "Content" },
-  { icon: FileText, label: "Blog Posts", href: "/admin/blog" },
-  { icon: FolderOpen, label: "Portfolio", href: "/admin/portfolio" },
-  { icon: BookOpen, label: "Case Studies", href: "/admin/case-studies" },
-  { icon: Images, label: "Gallery", href: "/admin/case-study-gallery", sub: true },
-  { icon: Star, label: "Testimonials", href: "/admin/testimonials" },
-  { icon: Users, label: "Team", href: "/admin/team" },
-  { icon: MessageSquare, label: "Inquiries", href: "/admin/inquiries" },
-  { icon: Mail, label: "Newsletter", href: "/admin/newsletter" },
-  { icon: Headphones, label: "Live Chat", href: "/admin/live-chat", badge: "waiting" },
+  { icon: FileText, label: "Blog Posts", href: "/admin/blog", roles: CONTENT_ROLES },
+  { icon: FolderOpen, label: "Portfolio", href: "/admin/portfolio", roles: CONTENT_ROLES },
+  { icon: BookOpen, label: "Case Studies", href: "/admin/case-studies", roles: CONTENT_ROLES },
+  { icon: Images, label: "Gallery", href: "/admin/case-study-gallery", sub: true, roles: CONTENT_ROLES },
+  { icon: Star, label: "Testimonials", href: "/admin/testimonials", roles: CONTENT_ROLES },
+  { icon: Users, label: "Team", href: "/admin/team", roles: CONTENT_ROLES },
+  { icon: MessageSquare, label: "Inquiries", href: "/admin/inquiries", roles: SUPPORT_ROLES },
+  { icon: Mail, label: "Newsletter", href: "/admin/newsletter", roles: SUPPORT_ROLES },
+  { icon: Headphones, label: "Live Chat", href: "/admin/live-chat", badge: "waiting", roles: SUPPORT_ROLES },
   { divider: true, label: "Site Management" },
-  { icon: Layout, label: "Content Editor", href: "/admin/content" },
-  { icon: BarChart2, label: "Services", href: "/admin/services" },
-  { icon: Image, label: "Hero Slides", href: "/admin/hero-slides" },
-  { icon: Image, label: "Media Library", href: "/admin/media" },
-  { icon: Menu, label: "Navigation", href: "/admin/navigation" },
-  { icon: Search, label: "SEO Settings", href: "/admin/seo" },
+  { icon: Layout, label: "Content Editor", href: "/admin/content", roles: CONTENT_ROLES },
+  { icon: BarChart2, label: "Services", href: "/admin/services", roles: CONTENT_ROLES },
+  { icon: Image, label: "Hero Slides", href: "/admin/hero-slides", roles: FULL_ADMIN_ROLES },
+  { icon: Image, label: "Media Library", href: "/admin/media", roles: CONTENT_ROLES },
+  { icon: Menu, label: "Navigation", href: "/admin/navigation", roles: FULL_ADMIN_ROLES },
+  { icon: Search, label: "SEO Settings", href: "/admin/seo", roles: FULL_ADMIN_ROLES },
   { divider: true, label: "System" },
-  { icon: Clock, label: "Activity Logs", href: "/admin/activity-logs" },
-  { icon: Users, label: "Users", href: "/admin/users", superAdminOnly: true },
-  { icon: Settings, label: "Settings", href: "/admin/settings" },
+  { icon: Clock, label: "Activity Logs", href: "/admin/activity-logs", roles: FULL_ADMIN_ROLES },
+  { icon: Users, label: "Users", href: "/admin/users", roles: SUPER_ADMIN_ONLY },
+  { icon: Settings, label: "Settings", href: "/admin/settings", roles: FULL_ADMIN_ROLES },
 ];
 
 interface AdminLayoutProps {
@@ -64,7 +72,23 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     navigate("/admin/login");
   };
 
-  const currentTitle = navItems.find((n) => "href" in n && n.href === location.pathname)?.label ?? "Admin";
+  // Filter nav items by role; drop section dividers that have no visible children.
+  const role = profile?.role;
+  const visibleNavItems: NavItem[] = [];
+  let pendingDivider: NavItem | null = null;
+  for (const item of navItems) {
+    if ("divider" in item) {
+      pendingDivider = item;
+      continue;
+    }
+    const allowed = !item.roles || (role ? item.roles.includes(role) : false);
+    if (!allowed) continue;
+    if (pendingDivider) { visibleNavItems.push(pendingDivider); pendingDivider = null; }
+    visibleNavItems.push(item);
+  }
+
+  const canSeeChats = role ? SUPPORT_ROLES.includes(role) : false;
+  const currentTitle = visibleNavItems.find((n) => "href" in n && n.href === location.pathname)?.label ?? "Admin";
 
   return (
     <div className="flex min-h-screen bg-[#0A0A0A]">
@@ -90,7 +114,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
         {/* Nav */}
         <nav className="flex-1 p-2 overflow-y-auto space-y-0.5">
-          {navItems.map((item, i) => {
+          {visibleNavItems.map((item, i) => {
             if ("divider" in item && item.divider) {
               if (collapsed) return null;
               return (
@@ -100,11 +124,10 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
               );
             }
             if (!("href" in item)) return null;
-            if ("superAdminOnly" in item && item.superAdminOnly && profile?.role !== "super_admin") return null;
 
             const isActive = (location.pathname === item.href && item.href !== "/admin/dashboard") ||
               (item.href === "/admin/dashboard" && (location.pathname === "/admin/dashboard" || location.pathname === "/admin"));
-            const Icon = item.icon as React.ComponentType<{ className?: string }>;
+            const Icon = item.icon;
             const showBadge = "badge" in item && item.badge === "waiting" && waitingCount > 0;
 
             const isSub = "sub" in item && item.sub;
@@ -175,7 +198,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             <p className="text-white/25 text-[10px] mt-0.5">Solution Villa · CMS</p>
           </div>
           <div className="flex items-center gap-3">
-            {waitingCount > 0 && (
+            {waitingCount > 0 && canSeeChats && (
               <Link to="/admin/live-chat"
                 className="flex items-center gap-1.5 text-xs text-yellow-400 font-medium border border-yellow-400/25 rounded-full px-3 py-1.5 bg-yellow-400/5 hover:bg-yellow-400/10 transition-all">
                 <Headphones className="w-3.5 h-3.5" />

@@ -1,0 +1,14 @@
+-- Restore public write policies on chat tables used by the solution-ai-chat
+-- backend (it may insert via the anon key). Keeps live chat working while the
+-- broad authenticated policies remain replaced by support-scoped ones.
+DROP POLICY IF EXISTS "Public can insert messages" ON public.chat_messages;
+CREATE POLICY "Public can insert messages" ON public.chat_messages
+  FOR INSERT WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Public can insert leads" ON public.chat_leads;
+CREATE POLICY "Public can insert leads" ON public.chat_leads
+  FOR INSERT WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Public can update leads" ON public.chat_leads;
+CREATE POLICY "Public can update leads" ON public.chat_leads
+  FOR UPDATE USING (true) WITH CHECK (true);

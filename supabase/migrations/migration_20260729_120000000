@@ -1,0 +1,201 @@
+-- ════════════════════════════════════════════════════════════════════════
+-- Staff Roles & Permissions
+-- Granular staff roles: super_admin, admin, content_editor, support
+-- Replaces blanket `auth.role() = 'authenticated'` admin policies with
+-- role-scoped checks so DB access matches the UI restrictions exactly.
+-- ════════════════════════════════════════════════════════════════════════
+
+-- ── 1. Widen role CHECK constraint to 4 roles ────────────────────────────
+ALTER TABLE public.user_profiles DROP CONSTRAINT IF EXISTS user_profiles_role_check;
+ALTER TABLE public.user_profiles
+  ADD CONSTRAINT user_profiles_role_check
+  CHECK (role IN ('super_admin', 'admin', 'content_editor', 'support'));
+
+-- ── 2. current_user_role() helper (SECURITY DEFINER, bypasses RLS) ───────
+CREATE OR REPLACE FUNCTION public.current_user_role()
+RETURNS text
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE r text;
+BEGIN
+  SELECT role INTO r FROM public.user_profiles WHERE id = auth.uid();
+  RETURN r;
+EXCEPTION WHEN OTHERS THEN
+  RETURN NULL;
+END;
+$$;
+
+-- ════════════════════════════════════════════════════════════════════════
+-- 3. CONTENT tables → super_admin, admin, content_editor
+--    (public read policies for published rows are left untouched)
+-- ════════════════════════════════════════════════════════════════════════
+
+-- blog_posts
+DROP POLICY IF EXISTS "Admins can do all on posts" ON public.blog_posts;
+CREATE POLICY "Content roles can manage posts" ON public.blog_posts
+  FOR ALL
+  USING (public.current_user_role() IN ('super_admin', 'admin', 'content_editor'))
+  WITH CHECK (public.current_user_role() IN ('super_admin', 'admin', 'content_editor'));
+
+-- portfolio_items
+DROP POLICY IF EXISTS "Admins can do all on portfolio" ON public.portfolio_items;
+CREATE POLICY "Content roles can manage portfolio" ON public.portfolio_items
+  FOR ALL
+  USING (public.current_user_role() IN ('super_admin', 'admin', 'content_editor'))
+  WITH CHECK (public.current_user_role() IN ('super_admin', 'admin', 'content_editor'));
+
+-- portfolio_images
+DROP POLICY IF EXISTS "Admins manage portfolio images" ON public.portfolio_images;
+CREATE POLICY "Content roles can manage portfolio images" ON public.portfolio_images
+  FOR ALL
+  USING (public.current_user_role() IN ('super_admin', 'admin', 'content_editor'))
+  WITH CHECK (public.current_user_role() IN ('super_admin', 'admin', 'content_editor'));
+
+-- case_studies
+DROP POLICY IF EXISTS "Admins can do all on case studies" ON public.case_studies;
+CREATE POLICY "Content roles can manage case studies" ON public.case_studies
+  FOR ALL
+  USING (public.current_user_role() IN ('super_admin', 'admin', 'content_editor'))
+  WITH CHECK (public.current_user_role() IN ('super_admin', 'admin', 'content_editor'));
+
+-- case_study_gallery
+DROP POLICY IF EXISTS "Admins manage gallery" ON public.case_study_gallery;
+CREATE POLICY "Content roles can manage gallery" ON public.case_study_gallery
+  FOR ALL
+  USING (public.current_user_role() IN ('super_admin', 'admin', 'content_editor'))
+  WITH CHECK (public.current_user_role() IN ('super_admin', 'admin', 'content_editor'));
+
+-- testimonials
+DROP POLICY IF EXISTS "Admins can do all on testimonials" ON public.testimonials;
+CREATE POLICY "Content roles can manage testimonials" ON public.testimonials
+  FOR ALL
+  USING (public.current_user_role() IN ('super_admin', 'admin', 'content_editor'))
+  WITH CHECK (public.current_user_role() IN ('super_admin', 'admin', 'content_editor'));
+
+-- team_members
+DROP POLICY IF EXISTS "Admins can do all on team" ON public.team_members;
+CREATE POLICY "Content roles can manage team" ON public.team_members
+  FOR ALL
+  USING (public.current_user_role() IN ('super_admin', 'admin', 'content_editor'))
+  WITH CHECK (public.current_user_role() IN ('super_admin', 'admin', 'content_editor'));
+
+-- page_sections
+DROP POLICY IF EXISTS "Admins can manage page sections" ON public.page_sections;
+CREATE POLICY "Content roles can manage page sections" ON public.page_sections
+  FOR ALL
+  USING (public.current_user_role() IN ('super_admin', 'admin', 'content_editor'))
+  WITH CHECK (public.current_user_role() IN ('super_admin', 'admin', 'content_editor'));
+
+-- services
+DROP POLICY IF EXISTS "Admins can manage services" ON public.services;
+CREATE POLICY "Content roles can manage services" ON public.services
+  FOR ALL
+  USING (public.current_user_role() IN ('super_admin', 'admin', 'content_editor'))
+  WITH CHECK (public.current_user_role() IN ('super_admin', 'admin', 'content_editor'));
+
+-- media_files (select / insert / delete)
+DROP POLICY IF EXISTS "Authenticated can view media" ON public.media_files;
+DROP POLICY IF EXISTS "Authenticated can insert media" ON public.media_files;
+DROP POLICY IF EXISTS "Authenticated can delete own media" ON public.media_files;
+CREATE POLICY "Content roles can view media" ON public.media_files
+  FOR SELECT
+  USING (public.current_user_role() IN ('super_admin', 'admin', 'content_editor'));
+CREATE POLICY "Content roles can insert media" ON public.media_files
+  FOR INSERT
+  WITH CHECK (public.current_user_role() IN ('super_admin', 'admin', 'content_editor'));
+CREATE POLICY "Content roles can delete media" ON public.media_files
+  FOR DELETE
+  USING (public.current_user_role() IN ('super_admin', 'admin', 'content_editor'));
+
+-- ════════════════════════════════════════════════════════════════════════
+-- 4. SUPPORT tables → super_admin, admin, support
+--    (public INSERT policies for visitor submissions are left untouched)
+-- ════════════════════════════════════════════════════════════════════════
+
+-- contact_submissions (select / update only; public insert stays)
+DROP POLICY IF EXISTS "Admins can view submissions" ON public.contact_submissions;
+DROP POLICY IF EXISTS "Admins can update submissions" ON public.contact_submissions;
+CREATE POLICY "Support roles can view submissions" ON public.contact_submissions
+  FOR SELECT
+  USING (public.current_user_role() IN ('super_admin', 'admin', 'support'));
+CREATE POLICY "Support roles can update submissions" ON public.contact_submissions
+  FOR UPDATE
+  USING (public.current_user_role() IN ('super_admin', 'admin', 'support'))
+  WITH CHECK (public.current_user_role() IN ('super_admin', 'admin', 'support'));
+
+-- newsletter_subscribers (public insert stays)
+DROP POLICY IF EXISTS "Admins can manage subscribers" ON public.newsletter_subscribers;
+CREATE POLICY "Support roles can manage subscribers" ON public.newsletter_subscribers
+  FOR ALL
+  USING (public.current_user_role() IN ('super_admin', 'admin', 'support'))
+  WITH CHECK (public.current_user_role() IN ('super_admin', 'admin', 'support'));
+
+-- newsletter_campaigns
+DROP POLICY IF EXISTS "Admins manage campaigns" ON public.newsletter_campaigns;
+CREATE POLICY "Support roles can manage campaigns" ON public.newsletter_campaigns
+  FOR ALL
+  USING (public.current_user_role() IN ('super_admin', 'admin', 'support'))
+  WITH CHECK (public.current_user_role() IN ('super_admin', 'admin', 'support'));
+
+-- chat_leads
+--   • Public INSERT/UPDATE stay (the solution-ai-chat backend may write leads
+--     via the anon key). SELECT is support-only so lead PII is protected.
+DROP POLICY IF EXISTS "Admins can manage leads" ON public.chat_leads;
+CREATE POLICY "Support roles can manage leads" ON public.chat_leads
+  FOR ALL
+  USING (public.current_user_role() IN ('super_admin', 'admin', 'support'))
+  WITH CHECK (public.current_user_role() IN ('super_admin', 'admin', 'support'));
+
+-- chat_messages
+--   • Public SELECT stays (anonymous visitor restores chat history + realtime).
+--   • Public INSERT stays (the solution-ai-chat backend may insert via the
+--     anon key; keeping it guarantees the live chat keeps working).
+--   • The broad authenticated policy is replaced by a support-scoped one so
+--     staff write/modify access is limited to Support/Admin roles.
+DROP POLICY IF EXISTS "Admins can manage messages" ON public.chat_messages;
+CREATE POLICY "Support roles can manage messages" ON public.chat_messages
+  FOR ALL
+  USING (public.current_user_role() IN ('super_admin', 'admin', 'support'))
+  WITH CHECK (public.current_user_role() IN ('super_admin', 'admin', 'support'));
+
+-- ════════════════════════════════════════════════════════════════════════
+-- 5. FULL-ADMIN tables → super_admin, admin
+--    (public read policies are left untouched)
+-- ════════════════════════════════════════════════════════════════════════
+
+-- navigation_items
+DROP POLICY IF EXISTS "Admins can manage nav items" ON public.navigation_items;
+CREATE POLICY "Full admins can manage nav items" ON public.navigation_items
+  FOR ALL
+  USING (public.current_user_role() IN ('super_admin', 'admin'))
+  WITH CHECK (public.current_user_role() IN ('super_admin', 'admin'));
+
+-- seo_settings
+DROP POLICY IF EXISTS "Admins can manage SEO settings" ON public.seo_settings;
+CREATE POLICY "Full admins can manage SEO settings" ON public.seo_settings
+  FOR ALL
+  USING (public.current_user_role() IN ('super_admin', 'admin'))
+  WITH CHECK (public.current_user_role() IN ('super_admin', 'admin'));
+
+-- site_settings
+DROP POLICY IF EXISTS "Admins can manage site settings" ON public.site_settings;
+CREATE POLICY "Full admins can manage site settings" ON public.site_settings
+  FOR ALL
+  USING (public.current_user_role() IN ('super_admin', 'admin'))
+  WITH CHECK (public.current_user_role() IN ('super_admin', 'admin'));
+
+-- hero_slides
+DROP POLICY IF EXISTS "Admins can manage hero slides" ON public.hero_slides;
+CREATE POLICY "Full admins can manage hero slides" ON public.hero_slides
+  FOR ALL
+  USING (public.current_user_role() IN ('super_admin', 'admin'))
+  WITH CHECK (public.current_user_role() IN ('super_admin', 'admin'));
+
+-- activity_logs: SELECT → full admin only.
+--   INSERT stays open to any authenticated staff so actions can still be logged.
+DROP POLICY IF EXISTS "Admins can read activity logs" ON public.activity_logs;
+CREATE POLICY "Full admins can read activity logs" ON public.activity_logs
+  FOR SELECT
+  USING (public.current_user_role() IN ('super_admin', 'admin'));

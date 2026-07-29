@@ -1,11 +1,12 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { User, Session } from "@supabase/supabase-js";
+import type { StaffRole } from "@/lib/adminPermissions";
 
 interface UserProfile {
   id: string;
   full_name: string | null;
-  role: "super_admin" | "admin";
+  role: StaffRole;
   avatar_url: string | null;
 }
 
@@ -14,6 +15,8 @@ interface AuthContextType {
   session: Session | null;
   profile: UserProfile | null;
   loading: boolean;
+  /** True until the first profile fetch resolves (after auth is ready). */
+  profileLoading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
   isSuperAdmin: boolean;
@@ -27,14 +30,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [profileLoading, setProfileLoading] = useState(true);
 
   const fetchProfile = async (userId: string) => {
+    setProfileLoading(true);
     const { data } = await supabase
       .from("user_profiles")
       .select("*")
       .eq("id", userId)
       .maybeSingle();
     if (data) setProfile(data as UserProfile);
+    setProfileLoading(false);
   };
 
   useEffect(() => {
@@ -46,6 +52,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setTimeout(() => fetchProfile(session.user.id), 0);
         } else {
           setProfile(null);
+          setProfileLoading(false);
         }
         setLoading(false);
       }
@@ -54,7 +61,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
-      if (session?.user) fetchProfile(session.user.id);
+      if (session?.user) {
+        fetchProfile(session.user.id);
+      } else {
+        setProfileLoading(false);
+      }
       setLoading(false);
     });
 
@@ -77,6 +88,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         session,
         profile,
         loading,
+        profileLoading,
         signIn,
         signOut,
         isSuperAdmin: profile?.role === "super_admin",

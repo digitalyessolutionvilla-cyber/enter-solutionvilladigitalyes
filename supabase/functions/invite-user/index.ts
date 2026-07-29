@@ -19,6 +19,15 @@ function generatePassword(): string {
   return pwd.split("").sort(() => Math.random() - 0.5).join("");
 }
 
+const ALLOWED_ROLES = ["super_admin", "admin", "content_editor", "support"] as const;
+
+const ROLE_LABELS: Record<string, string> = {
+  super_admin: "Super Admin",
+  admin: "Admin",
+  content_editor: "Content Editor",
+  support: "Support",
+};
+
 async function sendInviteEmail(opts: {
   resendKey: string;
   toEmail: string;
@@ -28,7 +37,7 @@ async function sendInviteEmail(opts: {
   loginUrl: string;
 }) {
   const { resendKey, toEmail, toName, role, password, loginUrl } = opts;
-  const displayRole = role === "super_admin" ? "Super Admin" : "Admin";
+  const displayRole = ROLE_LABELS[role] ?? "Staff";
 
   const html = `
 <!DOCTYPE html>
@@ -50,7 +59,7 @@ async function sendInviteEmail(opts: {
         <!-- Body -->
         <tr><td style="padding:40px;">
           <h1 style="color:#FFFFFF;font-size:24px;font-weight:800;margin:0 0 8px 0;letter-spacing:-0.5px;">
-            You've been invited 🎉
+            You've been invited
           </h1>
           <p style="color:rgba(255,255,255,0.5);font-size:15px;margin:0 0 28px 0;line-height:1.6;">
             Hi <strong style="color:rgba(255,255,255,0.8);">${toName || toEmail}</strong>, you've been granted <strong style="color:#D4AF37;">${displayRole}</strong> access to the Solution Villa content management system.
@@ -83,7 +92,7 @@ async function sendInviteEmail(opts: {
           <!-- CTA Button -->
           <div style="text-align:center;margin-bottom:32px;">
             <a href="${loginUrl}" style="display:inline-block;background:linear-gradient(135deg,#D4AF37,#F5D76E);color:#0A0A0A;font-weight:800;font-size:15px;padding:14px 36px;border-radius:50px;text-decoration:none;letter-spacing:0.5px;">
-              Login to Dashboard →
+              Login to Dashboard
             </a>
           </div>
 
@@ -168,6 +177,11 @@ Deno.serve(async (req) => {
     const { email, full_name, role = "admin" } = await req.json();
     if (!email) {
       return new Response(JSON.stringify({ error: "Email is required" }), {
+        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    if (!(ALLOWED_ROLES as readonly string[]).includes(role)) {
+      return new Response(JSON.stringify({ error: "Invalid role. Must be one of: super_admin, admin, content_editor, support" }), {
         status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }

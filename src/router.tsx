@@ -32,6 +32,12 @@ import LiveChat from "./pages/admin/LiveChat";
 import NewsletterAdmin from "./pages/admin/NewsletterAdmin";
 import ProtectedRoute from "./components/admin/ProtectedRoute";
 import PublicLayout from "./components/layout/PublicLayout";
+import {
+  CONTENT_ROLES,
+  SUPPORT_ROLES,
+  FULL_ADMIN_ROLES,
+  SUPER_ADMIN_ONLY,
+} from "./lib/adminPermissions";
 
 export const routers = [
   // ── Public pages (with SOLUTION AI widget via PublicLayout) ──
@@ -58,32 +64,32 @@ export const routers = [
   { path: "/admin", name: "admin", element: <ProtectedRoute><Dashboard /></ProtectedRoute> },
   { path: "/admin/dashboard", name: "dashboard", element: <ProtectedRoute><Dashboard /></ProtectedRoute> },
 
-  // Content management
-  { path: "/admin/blog", name: "adminBlog", element: <ProtectedRoute><BlogAdmin /></ProtectedRoute> },
-  { path: "/admin/portfolio", name: "adminPortfolio", element: <ProtectedRoute><PortfolioAdmin /></ProtectedRoute> },
-  { path: "/admin/case-studies", name: "adminCaseStudies", element: <ProtectedRoute><CaseStudiesAdmin /></ProtectedRoute> },
-  { path: "/admin/case-study-gallery", name: "adminCaseStudyGallery", element: <ProtectedRoute><CaseStudyGallery /></ProtectedRoute> },
-  { path: "/admin/team", name: "adminTeam", element: <ProtectedRoute><TeamAdmin /></ProtectedRoute> },
-  { path: "/admin/testimonials", name: "adminTestimonials", element: <ProtectedRoute><TestimonialsAdmin /></ProtectedRoute> },
-  { path: "/admin/inquiries", name: "adminInquiries", element: <ProtectedRoute><Inquiries /></ProtectedRoute> },
-  { path: "/admin/newsletter", name: "adminNewsletter", element: <ProtectedRoute><NewsletterAdmin /></ProtectedRoute> },
+  // Content management (Content Editor + Admins)
+  { path: "/admin/blog", name: "adminBlog", element: <ProtectedRoute roles={CONTENT_ROLES}><BlogAdmin /></ProtectedRoute> },
+  { path: "/admin/portfolio", name: "adminPortfolio", element: <ProtectedRoute roles={CONTENT_ROLES}><PortfolioAdmin /></ProtectedRoute> },
+  { path: "/admin/case-studies", name: "adminCaseStudies", element: <ProtectedRoute roles={CONTENT_ROLES}><CaseStudiesAdmin /></ProtectedRoute> },
+  { path: "/admin/case-study-gallery", name: "adminCaseStudyGallery", element: <ProtectedRoute roles={CONTENT_ROLES}><CaseStudyGallery /></ProtectedRoute> },
+  { path: "/admin/team", name: "adminTeam", element: <ProtectedRoute roles={CONTENT_ROLES}><TeamAdmin /></ProtectedRoute> },
+  { path: "/admin/testimonials", name: "adminTestimonials", element: <ProtectedRoute roles={CONTENT_ROLES}><TestimonialsAdmin /></ProtectedRoute> },
+  { path: "/admin/inquiries", name: "adminInquiries", element: <ProtectedRoute roles={SUPPORT_ROLES}><Inquiries /></ProtectedRoute> },
+  { path: "/admin/newsletter", name: "adminNewsletter", element: <ProtectedRoute roles={SUPPORT_ROLES}><NewsletterAdmin /></ProtectedRoute> },
 
-  // Live Chat
-  { path: "/admin/live-chat", name: "adminLiveChat", element: <ProtectedRoute><LiveChat /></ProtectedRoute> },
+  // Live Chat (Support + Admins)
+  { path: "/admin/live-chat", name: "adminLiveChat", element: <ProtectedRoute roles={SUPPORT_ROLES}><LiveChat /></ProtectedRoute> },
 
   // Site management
-  { path: "/admin/content", name: "adminContent", element: <ProtectedRoute><ContentEditor /></ProtectedRoute> },
-  { path: "/admin/services", name: "adminServices", element: <ProtectedRoute><ServicesAdmin /></ProtectedRoute> },
-  { path: "/admin/hero-slides", name: "adminHeroSlides", element: <ProtectedRoute><HeroSlidesAdmin /></ProtectedRoute> },
-  { path: "/admin/pages", name: "adminPages", element: <ProtectedRoute><PageEditor /></ProtectedRoute> },
-  { path: "/admin/media", name: "adminMedia", element: <ProtectedRoute><MediaLibrary /></ProtectedRoute> },
-  { path: "/admin/navigation", name: "adminNavigation", element: <ProtectedRoute><NavigationAdmin /></ProtectedRoute> },
-  { path: "/admin/seo", name: "adminSeo", element: <ProtectedRoute><SeoSettings /></ProtectedRoute> },
+  { path: "/admin/content", name: "adminContent", element: <ProtectedRoute roles={CONTENT_ROLES}><ContentEditor /></ProtectedRoute> },
+  { path: "/admin/services", name: "adminServices", element: <ProtectedRoute roles={CONTENT_ROLES}><ServicesAdmin /></ProtectedRoute> },
+  { path: "/admin/pages", name: "adminPages", element: <ProtectedRoute roles={CONTENT_ROLES}><PageEditor /></ProtectedRoute> },
+  { path: "/admin/media", name: "adminMedia", element: <ProtectedRoute roles={CONTENT_ROLES}><MediaLibrary /></ProtectedRoute> },
+  { path: "/admin/hero-slides", name: "adminHeroSlides", element: <ProtectedRoute roles={FULL_ADMIN_ROLES}><HeroSlidesAdmin /></ProtectedRoute> },
+  { path: "/admin/navigation", name: "adminNavigation", element: <ProtectedRoute roles={FULL_ADMIN_ROLES}><NavigationAdmin /></ProtectedRoute> },
+  { path: "/admin/seo", name: "adminSeo", element: <ProtectedRoute roles={FULL_ADMIN_ROLES}><SeoSettings /></ProtectedRoute> },
 
   // System
-  { path: "/admin/activity-logs", name: "adminActivityLogs", element: <ProtectedRoute><ActivityLogs /></ProtectedRoute> },
-  { path: "/admin/users", name: "adminUsers", element: <ProtectedRoute><Users /></ProtectedRoute> },
-  { path: "/admin/settings", name: "adminSettings", element: <ProtectedRoute><Settings /></ProtectedRoute> },
+  { path: "/admin/activity-logs", name: "adminActivityLogs", element: <ProtectedRoute roles={FULL_ADMIN_ROLES}><ActivityLogs /></ProtectedRoute> },
+  { path: "/admin/users", name: "adminUsers", element: <ProtectedRoute roles={SUPER_ADMIN_ONLY}><Users /></ProtectedRoute> },
+  { path: "/admin/settings", name: "adminSettings", element: <ProtectedRoute roles={FULL_ADMIN_ROLES}><Settings /></ProtectedRoute> },
 
   /* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */
   { path: "*", name: "404", element: <NotFound /> },

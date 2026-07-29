@@ -1,0 +1,25 @@
+-- ════════════════════════════════════════════════════════════════════════
+-- Corrective follow-up to migration_20260729_120000000.
+--
+-- The parent migration dropped the public INSERT/UPDATE policies on the chat
+-- tables. Those policies are required by the solution-ai-chat backend, which
+-- may write chat rows via the anon key (the visitor widget is unauthenticated).
+-- Dropping them risked breaking the live chat. Restore them here so the chat
+-- keeps working, while the broad authenticated policies remain replaced by
+-- support-scoped ones.
+--
+-- Note: chat_leads has NO public SELECT, so lead PII stays support-readable.
+--       chat_messages keeps public SELECT for visitor chat-history restore.
+-- ════════════════════════════════════════════════════════════════════════
+
+DROP POLICY IF EXISTS "Public can insert messages" ON public.chat_messages;
+CREATE POLICY "Public can insert messages" ON public.chat_messages
+  FOR INSERT WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Public can insert leads" ON public.chat_leads;
+CREATE POLICY "Public can insert leads" ON public.chat_leads
+  FOR INSERT WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Public can update leads" ON public.chat_leads;
+CREATE POLICY "Public can update leads" ON public.chat_leads
+  FOR UPDATE USING (true) WITH CHECK (true);
